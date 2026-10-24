@@ -54,9 +54,10 @@ TELEGRAM_CHAT_ID = "6018016670"
 
 # 2 Indices + Top 10 Stocks
 # 2 Indices + Top 10 Stocks
+# 2 Indices + Top 10 Stocks
 WATCHLIST = {
-    "^NSEI": {"name": "NIFTY 50", "type": "INDEX", "tv": "NSE:NIFTY", "lot": 100, "step": 50},
-    "^NSEBANK": {"name": "BANK NIFTY", "type": "INDEX", "tv": "NSE:BANKNIFTY", "lot": 60, "step": 100},
+    "^NSEI": {"name": "NIFTY 50", "type": "INDEX", "tv": "NSE:NIFTY1!", "lot": 100, "step": 50},
+    "^NSEBANK": {"name": "BANK NIFTY", "type": "INDEX", "tv": "NSE:BANKNIFTY1!", "lot": 60, "step": 100},
     "RELIANCE.NS": {"name": "RELIANCE", "type": "STOCK", "tv": "NSE:RELIANCE", "lot": 100, "step": 20},
     "HDFCBANK.NS": {"name": "HDFC BANK", "type": "STOCK", "tv": "NSE:HDFCBANK", "lot": 100, "step": 10},
     "ICICIBANK.NS": {"name": "ICICI BANK", "type": "STOCK", "tv": "NSE:ICICIBANK", "lot": 100, "step": 10},
