@@ -5,6 +5,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+import os
 
 # Page configuration
 st.set_page_config(
@@ -53,8 +54,9 @@ st.markdown("""
 INITIAL_CAPITAL = 2000000.0  # ₹20 Lakh Virtual Capital
 TELEGRAM_BOT_TOKEN = "8620926844:AAF5mKGb820OWgUjRv9uXS4T-6amaCU5EI0"
 TELEGRAM_CHAT_ID = "6018016670"
+CSV_FILE_PATH = "trade_history.csv"
 
-# 2 Indices + 10 Top Liquidity F&O Stocks (Strategy execution remains 100% on NSE data)
+# 2 Indices + 10 Top Liquidity F&O Stocks
 WATCHLIST = {
     "^NSEI": {"name": "NIFTY 50", "type": "INDEX", "tv": "BSE:NIFTYBEES", "lot": 100, "step": 50},
     "^NSEBANK": {"name": "BANK NIFTY", "type": "INDEX", "tv": "BSE:BANKBEES", "lot": 60, "step": 100},
@@ -78,15 +80,36 @@ def send_telegram_notification(message: str):
     except Exception as e:
         print(f"Telegram error: {e}")
 
+# Permanent Storage Helpers
+def load_trade_history():
+    if os.path.exists(CSV_FILE_PATH):
+        try:
+            df = pd.read_csv(CSV_FILE_PATH)
+            return df.to_dict('records')
+        except Exception:
+            return []
+    return []
+
+def save_trade_to_csv(trade_dict):
+    df_new = pd.DataFrame([trade_dict])
+    if not os.path.exists(CSV_FILE_PATH):
+        df_new.to_csv(CSV_FILE_PATH, index=False)
+    else:
+        df_new.to_csv(CSV_FILE_PATH, mode='a', header=False, index=False)
+
 # Session state initialization
+if "trade_history" not in st.session_state:
+    st.session_state.trade_history = load_trade_history()
+
+# Calculate initial realized PnL from historical trades
+saved_realized_pnl = sum([float(t.get("pnl", 0.0)) for t in st.session_state.trade_history])
+
 if "virtual_cash" not in st.session_state:
-    st.session_state.virtual_cash = INITIAL_CAPITAL
+    st.session_state.virtual_cash = INITIAL_CAPITAL + saved_realized_pnl
 if "realized_pnl" not in st.session_state:
-    st.session_state.realized_pnl = 0.0
+    st.session_state.realized_pnl = saved_realized_pnl
 if "active_positions" not in st.session_state:
     st.session_state.active_positions = {}
-if "trade_history" not in st.session_state:
-    st.session_state.trade_history = []
 
 @st.cache_data(ttl=60)
 def fetch_all_tickers():
@@ -122,7 +145,7 @@ def fetch_moneycontrol_news():
 data_map = fetch_all_tickers()
 news_items = fetch_moneycontrol_news()
 
-# Evaluation Loop (Liquidity Sweep + Volume Absorption for all 12 assets)
+# Strategy Loop (Liquidity Sweep + Volume Absorption for all 12 instruments)
 for ticker, meta in WATCHLIST.items():
     if ticker not in data_map or len(data_map[ticker]) < 30:
         continue
@@ -147,7 +170,7 @@ for ticker, meta in WATCHLIST.items():
     is_volume = c_vol >= (avg_vol * 1.8)
     is_green = c_close > float(latest['Open'])
 
-    # Entry Check
+    # Entry Logic
     if ticker not in st.session_state.active_positions:
         if is_sweep and is_volume and is_green:
             hard_sl = c_low
@@ -173,14 +196,14 @@ for ticker, meta in WATCHLIST.items():
                     "strategy": "Bull Call Spread",
                     "buy_leg": f"{atm_strike} CE",
                     "sell_leg": f"{otm_strike} CE",
-                    "entry_spot": c_close,
-                    "entry_debit": spread_debit_est,
+                    "entry_spot": round(c_close, 2),
+                    "entry_debit": round(spread_debit_est, 2),
                     "qty": meta["lot"],
                     "hard_sl": round(hard_sl, 2),
                     "target": round(target, 2),
                     "current_sl": round(hard_sl, 2),
                     "trailing_activated": False,
-                    "entry_time": datetime.now().strftime("%I:%M %p")
+                    "entry_time": datetime.now().strftime("%Y-%m-%d %I:%M %p")
                 }
                 
                 alert_text = (
@@ -193,7 +216,7 @@ for ticker, meta in WATCHLIST.items():
                 )
                 send_telegram_notification(alert_text)
 
-    # Exit & Trailing Check
+    # Exit & Trailing SL Logic
     else:
         pos = st.session_state.active_positions[ticker]
         entry = pos["entry_spot"]
@@ -209,24 +232,49 @@ for ticker, meta in WATCHLIST.items():
                 pos["current_sl"] = round(atr_sl, 2)
 
         if c_close >= pos["target"]:
-            profit = (pos["target"] - entry) * 0.40 * pos["qty"]
+            profit = round((pos["target"] - entry) * 0.40 * pos["qty"], 2)
             st.session_state.virtual_cash += (pos["entry_debit"] * pos["qty"]) + profit
             st.session_state.realized_pnl += profit
-            pos["status"] = "TARGET ACHIEVED"
-            pos["exit_spot"] = c_close
-            pos["pnl"] = profit
-            st.session_state.trade_history.append(pos)
+            
+            record = {
+                "symbol": pos["symbol"],
+                "strategy": pos["strategy"],
+                "buy_leg": pos["buy_leg"],
+                "sell_leg": pos["sell_leg"],
+                "qty": pos["qty"],
+                "entry_time": pos["entry_time"],
+                "exit_time": datetime.now().strftime("%Y-%m-%d %I:%M %p"),
+                "entry_spot": pos["entry_spot"],
+                "exit_spot": round(c_close, 2),
+                "status": "TARGET ACHIEVED",
+                "pnl": profit
+            }
+            save_trade_to_csv(record)
+            st.session_state.trade_history.append(record)
             del st.session_state.active_positions[ticker]
 
             send_telegram_notification(f"✅ *TARGET HIT: {pos['symbol']}* | Profit: +₹{profit:,.2f}")
+
         elif c_close <= pos["current_sl"]:
-            loss = (entry - pos["current_sl"]) * 0.35 * pos["qty"]
+            loss = round((entry - pos["current_sl"]) * 0.35 * pos["qty"], 2)
             st.session_state.virtual_cash += max(0.0, (pos["entry_debit"] * pos["qty"]) - loss)
             st.session_state.realized_pnl -= loss
-            pos["status"] = "SL TRIGGERED"
-            pos["exit_spot"] = c_close
-            pos["pnl"] = -loss
-            st.session_state.trade_history.append(pos)
+            
+            record = {
+                "symbol": pos["symbol"],
+                "strategy": pos["strategy"],
+                "buy_leg": pos["buy_leg"],
+                "sell_leg": pos["sell_leg"],
+                "qty": pos["qty"],
+                "entry_time": pos["entry_time"],
+                "exit_time": datetime.now().strftime("%Y-%m-%d %I:%M %p"),
+                "entry_spot": pos["entry_spot"],
+                "exit_spot": round(c_close, 2),
+                "status": "SL TRIGGERED",
+                "pnl": -loss
+            }
+            save_trade_to_csv(record)
+            st.session_state.trade_history.append(record)
             del st.session_state.active_positions[ticker]
 
             send_telegram_notification(f"🛑 *STOP-LOSS HIT: {pos['symbol']}* | Loss: -₹{loss:,.2f}")
@@ -285,10 +333,9 @@ with tab1:
         key="tv_asset_selector"
     )
 
-    # Pick mapped ticker
     tv_ticker = WATCHLIST[selected_asset]["tv"]
 
-    # Official Direct TradingView Embed (No script freeze / No loading loop)
+    # Official Direct TradingView Embed (High performance / No loading freeze)
     tv_embed_url = (
         f"https://s.tradingview.com/widgetembed/"
         f"?symbol={tv_ticker}"
@@ -332,7 +379,7 @@ with tab2:
                     Spread: <b>{pos['buy_leg']}</b> / <b>{pos['sell_leg']}</b>
                 </div>
                 <div style="font-size:0.82rem; color:#848e9c;">
-                    Entry: <b>₹{pos['entry_spot']}</b> | Trailing SL: <b style="color:#ff5252;">₹{pos['current_sl']}</b> | Target: <b style="color:#00c853;">₹{pos['target']}</b>
+                    Entry: <b>₹{pos['entry_spot']}</b> | Trailing SL: <b style="color:#ff5252;">₹{pos['current_sl']}</b> | Target: <b style="color:#00c853;">₹{pos['target']}</b> | Time: {pos.get('entry_time', '')}
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -342,24 +389,37 @@ with tab2:
     if st.button("🔄 Scan & Re-evaluate All 12 Assets Now", use_container_width=True):
         st.rerun()
 
-    st.write("##### Closed Trade History")
+    st.write("##### Closed Trade History (Permanent Record)")
+    
+    # Download Tradebook Button
     if st.session_state.trade_history:
+        df_history = pd.DataFrame(st.session_state.trade_history)
+        csv_data = df_history.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Download Trade Book (CSV / Excel)",
+            data=csv_data,
+            file_name=f"trade_book_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+
         for t in reversed(st.session_state.trade_history):
-            pnl_badge = f"+₹{t['pnl']:,.2f}" if t['pnl'] >= 0 else f"-₹{abs(t['pnl']):,.2f}"
-            pnl_col = "#00c853" if t['pnl'] >= 0 else "#ff5252"
+            pnl_val = float(t.get('pnl', 0.0))
+            pnl_badge = f"+₹{pnl_val:,.2f}" if pnl_val >= 0 else f"-₹{abs(pnl_val):,.2f}"
+            pnl_col = "#00c853" if pnl_val >= 0 else "#ff5252"
             st.markdown(f"""
             <div class="trade-card-closed">
-                <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
-                    <b>{t['symbol']} ({t['buy_leg']})</b>
+                <div style="display:flex; justify-content:space-between; font-size:0.88rem;">
+                    <b>{t.get('symbol')} ({t.get('buy_leg')})</b>
                     <b style="color:{pnl_col};">{pnl_badge}</b>
                 </div>
-                <div style="font-size:0.75rem; color:#848e9c; margin-top:3px;">
-                    Result: {t['status']} | Exit: ₹{t.get('exit_spot', 0.0)}
+                <div style="font-size:0.75rem; color:#848e9c; margin-top:4px;">
+                    Result: <b>{t.get('status')}</b> | Entry: ₹{t.get('entry_spot')} → Exit: ₹{t.get('exit_spot')} | Out: {t.get('exit_time', '')}
                 </div>
             </div>
             """, unsafe_allow_html=True)
     else:
-        st.caption("No closed trades yet.")
+        st.caption("No closed trades in record yet.")
 
 with tab3:
     st.write("##### Market News Feed")
