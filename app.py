@@ -283,17 +283,19 @@ with tab1:
         selected_asset = st.selectbox(
             "Chart Asset Chuniye:", 
             list(WATCHLIST.keys()), 
-            format_func=lambda x: WATCHLIST[x]["name"]
+            format_func=lambda x: WATCHLIST[x]["name"],
+            key="asset_selector_dropdown"
         )
     with col_tf:
         selected_tf = st.selectbox(
             "Timeframe:",
             ["1", "5", "15", "60", "D"],
             index=1,
-            format_func=lambda x: "1 Min" if x=="1" else ("5 Min" if x=="5" else ("15 Min" if x=="15" else ("1 Hour" if x=="60" else "Daily")))
+            format_func=lambda x: "1 Min" if x=="1" else ("5 Min" if x=="5" else ("15 Min" if x=="15" else ("1 Hour" if x=="60" else "Daily"))),
+            key="tf_selector_dropdown"
         )
 
-    # Symbol router: Indices ke liye NIFTYBEES/BANKBEES aur Cash Stocks ke liye direct BSE ticker
+    # Symbol router: Indices ke liye liquid ETF aur Cash Stocks ke liye direct BSE ticker
     raw_sym = selected_asset.replace(".NS", "").replace("^", "")
     if raw_sym == "NSEI":
         tv_ticker = "BSE:NIFTYBEES"
@@ -302,19 +304,23 @@ with tab1:
     else:
         tv_ticker = f"BSE:{raw_sym}"
 
-    # TradingView Direct Frame (No restriction error)
-    tv_url = f"https://s.tradingview.com/widgetembed/?symbol={tv_ticker}&interval={selected_tf}&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=151922&theme=dark&style=1&timezone=Asia%2FKolkata&withdateranges=1&studies=RSI%40tv-basicstudies&locale=in"
-    
-    tv_iframe = f"""
-    <iframe 
-        src="{tv_url}" 
-        style="width: 100%; height: 550px; border: none; border-radius: 8px;"
-        allowtransparency="true" 
-        scrolling="no" 
-        allowfullscreen>
-    </iframe>
+    import time
+    ts = int(time.time())
+
+    # Direct embed with cache-busting timestamp & proper container
+    tv_widget_html = f"""
+    <div style="width:100%; height:550px; background-color:#151922; border-radius:8px; overflow:hidden;">
+        <iframe 
+            key="{tv_ticker}_{selected_tf}_{ts}"
+            src="https://s.tradingview.com/widgetembed/?symbol={tv_ticker}&interval={selected_tf}&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=151922&theme=dark&style=1&timezone=Asia%2FKolkata&withdateranges=1&studies=RSI%40tv-basicstudies&locale=in&t={ts}" 
+            style="width: 100%; height: 550px; border: none;"
+            allowtransparency="true" 
+            scrolling="no" 
+            allowfullscreen>
+        </iframe>
+    </div>
     """
-    components.html(tv_iframe, height=560)
+    components.html(tv_widget_html, height=560)
 with tab2:
     st.write("##### Active Virtual Positions")
     if st.session_state.active_positions:
