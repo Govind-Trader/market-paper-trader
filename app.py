@@ -54,20 +54,20 @@ INITIAL_CAPITAL = 2000000.0  # ₹20 Lakh Virtual Capital
 TELEGRAM_BOT_TOKEN = "8620926844:AAF5mKGb820OWgUjRv9uXS4T-6amaCU5EI0"
 TELEGRAM_CHAT_ID = "6018016670"
 
-# 2 Indices + 10 Top Liquidity F&O Stocks
+# 2 Indices + 10 Top Liquidity F&O Stocks (Strategy execution remains 100% on NSE data)
 WATCHLIST = {
-    "^NSEI": {"name": "NIFTY 50", "type": "INDEX", "tv": "NSE:NIFTYBEES", "lot": 100, "step": 50},
-    "^NSEBANK": {"name": "BANK NIFTY", "type": "INDEX", "tv": "NSE:BANKBEES", "lot": 60, "step": 100},
-    "RELIANCE.NS": {"name": "RELIANCE", "type": "STOCK", "tv": "NSE:RELIANCE", "lot": 100, "step": 20},
-    "HDFCBANK.NS": {"name": "HDFC BANK", "type": "STOCK", "tv": "NSE:HDFCBANK", "lot": 100, "step": 10},
-    "ICICIBANK.NS": {"name": "ICICI BANK", "type": "STOCK", "tv": "NSE:ICICIBANK", "lot": 100, "step": 10},
-    "SBIN.NS": {"name": "SBI", "type": "STOCK", "tv": "NSE:SBIN", "lot": 100, "step": 5},
-    "TCS.NS": {"name": "TCS", "type": "STOCK", "tv": "NSE:TCS", "lot": 50, "step": 20},
-    "INFY.NS": {"name": "INFOSYS", "type": "STOCK", "tv": "NSE:INFY", "lot": 100, "step": 10},
-    "TATAMOTORS.NS": {"name": "TATA MOTORS", "type": "STOCK", "tv": "NSE:TATAMOTORS", "lot": 100, "step": 5},
-    "ITC.NS": {"name": "ITC", "type": "STOCK", "tv": "NSE:ITC", "lot": 200, "step": 5},
-    "BHARTIARTL.NS": {"name": "BHARTI AIRTEL", "type": "STOCK", "tv": "NSE:BHARTIARTL", "lot": 100, "step": 10},
-    "LT.NS": {"name": "L&T", "type": "STOCK", "tv": "NSE:LT", "lot": 50, "step": 20}
+    "^NSEI": {"name": "NIFTY 50", "type": "INDEX", "tv": "BSE:NIFTYBEES", "lot": 100, "step": 50},
+    "^NSEBANK": {"name": "BANK NIFTY", "type": "INDEX", "tv": "BSE:BANKBEES", "lot": 60, "step": 100},
+    "RELIANCE.NS": {"name": "RELIANCE", "type": "STOCK", "tv": "BSE:RELIANCE", "lot": 100, "step": 20},
+    "HDFCBANK.NS": {"name": "HDFC BANK", "type": "STOCK", "tv": "BSE:HDFCBANK", "lot": 100, "step": 10},
+    "ICICIBANK.NS": {"name": "ICICI BANK", "type": "STOCK", "tv": "BSE:ICICIBANK", "lot": 100, "step": 10},
+    "SBIN.NS": {"name": "SBI", "type": "STOCK", "tv": "BSE:SBIN", "lot": 100, "step": 5},
+    "TCS.NS": {"name": "TCS", "type": "STOCK", "tv": "BSE:TCS", "lot": 50, "step": 20},
+    "INFY.NS": {"name": "INFOSYS", "type": "STOCK", "tv": "BSE:INFY", "lot": 100, "step": 10},
+    "TATAMOTORS.NS": {"name": "TATA MOTORS", "type": "STOCK", "tv": "BSE:TATAMOTORS", "lot": 100, "step": 5},
+    "ITC.NS": {"name": "ITC", "type": "STOCK", "tv": "BSE:ITC", "lot": 200, "step": 5},
+    "BHARTIARTL.NS": {"name": "BHARTI AIRTEL", "type": "STOCK", "tv": "BSE:BHARTIARTL", "lot": 100, "step": 10},
+    "LT.NS": {"name": "L&T", "type": "STOCK", "tv": "BSE:LT", "lot": 50, "step": 20}
 }
 
 def send_telegram_notification(message: str):
@@ -122,7 +122,7 @@ def fetch_moneycontrol_news():
 data_map = fetch_all_tickers()
 news_items = fetch_moneycontrol_news()
 
-# Evaluation Loop (Liquidity Sweep + Volume Absorption)
+# Evaluation Loop (Liquidity Sweep + Volume Absorption for all 12 assets)
 for ticker, meta in WATCHLIST.items():
     if ticker not in data_map or len(data_map[ticker]) < 30:
         continue
@@ -278,113 +278,50 @@ with c3:
 tab1, tab2, tab3 = st.tabs(["📊 TradingView Pro Charts", "📋 Open & Closed Trades", "📰 News"])
 
 with tab1:
-    col_sel, col_tf = st.columns([3, 1])
-    with col_sel:
-        selected_asset = st.selectbox(
-            "Chart Asset Chuniye:", 
-            list(WATCHLIST.keys()), 
-            format_func=lambda x: WATCHLIST[x]["name"],
-            key="chart_asset_box"
-        )
-    with col_tf:
-        selected_tf = st.selectbox(
-            "Timeframe:",
-            ["1m", "5m", "15m", "60m", "1d"],
-            index=1,
-            format_func=lambda x: {"1m": "1 Minute", "5m": "5 Minute", "15m": "15 Minute", "60m": "1 Hour", "1d": "Daily"}[x],
-            key="chart_tf_box"
-        )
+    selected_asset = st.selectbox(
+        "Chart Asset Chuniye:", 
+        list(WATCHLIST.keys()), 
+        format_func=lambda x: WATCHLIST[x]["name"],
+        key="tv_asset_selector"
+    )
 
-    # Dynamic candle fetch based on selected timeframe
-    period_map = {"1m": "1d", "5m": "5d", "15m": "5d", "60m": "1mo", "1d": "1y"}
-    
-    with st.spinner("Candles load ho rahi hain..."):
-        try:
-            df_chart = yf.download(
-                tickers=selected_asset,
-                period=period_map[selected_tf],
-                interval=selected_tf,
-                progress=False
-            )
-            if isinstance(df_chart.columns, pd.MultiIndex):
-                df_chart.columns = df_chart.columns.droplevel(1)
-            df_chart = df_chart.dropna().tail(100)
-        except Exception:
-            df_chart = pd.DataFrame()
+    # Pick mapped TradingView ticker (BSE Cash stock or Benchmark ETF)
+    tv_ticker = WATCHLIST[selected_asset]["tv"]
 
-    if not df_chart.empty:
-        # Prepare JSON data for Lightweight Charts
-        candle_data = []
-        for idx, row in df_chart.iterrows():
-            ts = int(idx.timestamp())
-            candle_data.append({
-                "time": ts,
-                "open": float(row['Open']),
-                "high": float(row['High']),
-                "low": float(row['Low']),
-                "close": float(row['Close'])
-            })
-        
-        import json
-        json_candles = json.dumps(candle_data)
-        asset_name = WATCHLIST[selected_asset]['name']
-        last_price = float(df_chart['Close'].iloc[-1])
+    # TradingView Advanced Interactive Real-Time Chart
+    tv_widget_code = f"""
+    <div class="tradingview-widget-container" style="height:560px;width:100%;">
+      <div id="tradingview_chart_frame" style="height:calc(100% - 32px);width:100%;"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+      new TradingView.widget(
+      {{
+        "autosize": true,
+        "symbol": "{tv_ticker}",
+        "interval": "5",
+        "timezone": "Asia/Kolkata",
+        "theme": "dark",
+        "style": "1",
+        "locale": "in",
+        "toolbar_bg": "#151922",
+        "enable_publishing": false,
+        "allow_symbol_change": true,
+        "withdateranges": true,
+        "show_popup_button": true,
+        "popup_width": "1000",
+        "popup_height": "650",
+        "container_id": "tradingview_chart_frame",
+        "studies": [
+          "RSI@tv-basicstudies",
+          "MASimple@tv-basicstudies"
+        ]
+      }}
+      );
+      </script>
+    </div>
+    """
+    components.html(tv_widget_code, height=580)
 
-        # Lightweight Canvas Chart Embed (TradingView Official Engine)
-        lw_chart_html = f"""
-        <div style="background-color: #151922; border-radius: 8px; padding: 10px; border: 1px solid #232936;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; color: #fff; font-family: sans-serif;">
-                <span style="font-size: 1.1rem; font-weight: 700;">{asset_name} ({selected_tf.upper()})</span>
-                <span style="font-size: 1.1rem; font-weight: 700; color: #00c853;">₹{last_price:,.2f}</span>
-            </div>
-            <div id="lw_chart_container" style="width: 100%; height: 480px;"></div>
-        </div>
-        <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
-        <script>
-            const container = document.getElementById('lw_chart_container');
-            const chart = LightweightCharts.createChart(container, {{
-                width: container.clientWidth,
-                height: 480,
-                layout: {{
-                    background: {{ color: '#151922' }},
-                    textColor: '#d1d4dc',
-                }},
-                grid: {{
-                    vertLines: {{ color: '#232936' }},
-                    horzLines: {{ color: '#232936' }},
-                }},
-                crosshair: {{
-                    mode: LightweightCharts.CrosshairMode.Normal,
-                }},
-                timeScale: {{
-                    timeVisible: true,
-                    secondsVisible: false,
-                    borderColor: '#232936',
-                }},
-                rightPriceScale: {{
-                    borderColor: '#232936',
-                }}
-            }});
-
-            const candlestickSeries = chart.addCandlestickSeries({{
-                upColor: '#00c853',
-                downColor: '#ff5252',
-                borderVisible: false,
-                wickUpColor: '#00c853',
-                wickDownColor: '#ff5252',
-            }});
-
-            candlestickSeries.setData({json_candles});
-            chart.timeScale().fitContent();
-
-            window.addEventListener('resize', () => {{
-                chart.applyOptions({{ width: container.clientWidth }});
-            }});
-        </script>
-        """
-        components.html(lw_chart_html, height=540)
-    else:
-        st.warning(f"{WATCHLIST[selected_asset]['name']} ke liye {selected_tf} data abhi market feed par available nahi hai.")
 with tab2:
     st.write("##### Active Virtual Positions")
     if st.session_state.active_positions:
