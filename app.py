@@ -1,11 +1,10 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import yfinance as yf
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 # Page configuration
 st.set_page_config(
@@ -15,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom Financial Dark Theme
+# Dark theme styling
 st.markdown("""
 <style>
     .metric-card {
@@ -57,18 +56,18 @@ TELEGRAM_CHAT_ID = "6018016670"
 
 # 2 Indices + 10 Top Liquidity F&O Stocks
 WATCHLIST = {
-    "^NSEI": {"name": "NIFTY 50", "type": "INDEX", "lot": 100, "step": 50},
-    "^NSEBANK": {"name": "BANK NIFTY", "type": "INDEX", "lot": 60, "step": 100},
-    "RELIANCE.NS": {"name": "RELIANCE", "type": "STOCK", "lot": 100, "step": 20},
-    "HDFCBANK.NS": {"name": "HDFC BANK", "type": "STOCK", "lot": 100, "step": 10},
-    "ICICIBANK.NS": {"name": "ICICI BANK", "type": "STOCK", "lot": 100, "step": 10},
-    "SBIN.NS": {"name": "SBI", "type": "STOCK", "lot": 100, "step": 5},
-    "TCS.NS": {"name": "TCS", "type": "STOCK", "lot": 50, "step": 20},
-    "INFY.NS": {"name": "INFOSYS", "type": "STOCK", "lot": 100, "step": 10},
-    "TATAMOTORS.NS": {"name": "TATA MOTORS", "type": "STOCK", "lot": 100, "step": 5},
-    "ITC.NS": {"name": "ITC", "type": "STOCK", "lot": 200, "step": 5},
-    "BHARTIARTL.NS": {"name": "BHARTI AIRTEL", "type": "STOCK", "lot": 100, "step": 10},
-    "LT.NS": {"name": "L&T", "type": "STOCK", "lot": 50, "step": 20}
+    "^NSEI": {"name": "NIFTY 50", "type": "INDEX", "tv": "NSE:NIFTYBEES", "lot": 100, "step": 50},
+    "^NSEBANK": {"name": "BANK NIFTY", "type": "INDEX", "tv": "NSE:BANKBEES", "lot": 60, "step": 100},
+    "RELIANCE.NS": {"name": "RELIANCE", "type": "STOCK", "tv": "NSE:RELIANCE", "lot": 100, "step": 20},
+    "HDFCBANK.NS": {"name": "HDFC BANK", "type": "STOCK", "tv": "NSE:HDFCBANK", "lot": 100, "step": 10},
+    "ICICIBANK.NS": {"name": "ICICI BANK", "type": "STOCK", "tv": "NSE:ICICIBANK", "lot": 100, "step": 10},
+    "SBIN.NS": {"name": "SBI", "type": "STOCK", "tv": "NSE:SBIN", "lot": 100, "step": 5},
+    "TCS.NS": {"name": "TCS", "type": "STOCK", "tv": "NSE:TCS", "lot": 50, "step": 20},
+    "INFY.NS": {"name": "INFOSYS", "type": "STOCK", "tv": "NSE:INFY", "lot": 100, "step": 10},
+    "TATAMOTORS.NS": {"name": "TATA MOTORS", "type": "STOCK", "tv": "NSE:TATAMOTORS", "lot": 100, "step": 5},
+    "ITC.NS": {"name": "ITC", "type": "STOCK", "tv": "NSE:ITC", "lot": 200, "step": 5},
+    "BHARTIARTL.NS": {"name": "BHARTI AIRTEL", "type": "STOCK", "tv": "NSE:BHARTIARTL", "lot": 100, "step": 10},
+    "LT.NS": {"name": "L&T", "type": "STOCK", "tv": "NSE:LT", "lot": 50, "step": 20}
 }
 
 def send_telegram_notification(message: str):
@@ -276,65 +275,59 @@ with c3:
     </div>
     """, unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["📊 Interactive Candlestick Charts", "📋 Open & Closed Trades", "📰 News"])
+tab1, tab2, tab3 = st.tabs(["📊 TradingView Pro Charts", "📋 Open & Closed Trades", "📰 News"])
 
 with tab1:
-    selected_asset = st.selectbox(
-        "Chart Asset Chuniye:", 
-        list(WATCHLIST.keys()), 
-        format_func=lambda x: WATCHLIST[x]["name"]
-    )
-    
-    if selected_asset in data_map and not data_map[selected_asset].empty:
-        chart_df = data_map[selected_asset].tail(60).copy()
-        
-        fig = make_subplots(
-            rows=2, cols=1, 
-            shared_xaxes=True, 
-            vertical_spacing=0.04, 
-            row_heights=[0.75, 0.25]
+    col_sel, col_tf = st.columns([3, 1])
+    with col_sel:
+        selected_asset = st.selectbox(
+            "Chart Asset Chuniye:", 
+            list(WATCHLIST.keys()), 
+            format_func=lambda x: WATCHLIST[x]["name"]
         )
-        
-        # Candlestick Track
-        fig.add_trace(go.Candlestick(
-            x=chart_df.index,
-            open=chart_df['Open'],
-            high=chart_df['High'],
-            low=chart_df['Low'],
-            close=chart_df['Close'],
-            name="Price",
-            increasing_line_color='#00c853', 
-            decreasing_line_color='#ff5252'
-        ), row=1, col=1)
-        
-        # Volume Subplot Track
-        vol_colors = ['#00c853' if c >= o else '#ff5252' for c, o in zip(chart_df['Close'], chart_df['Open'])]
-        fig.add_trace(go.Bar(
-            x=chart_df.index,
-            y=chart_df['Volume'],
-            marker_color=vol_colors,
-            name="Volume",
-            opacity=0.6
-        ), row=2, col=1)
-        
-        curr_p = float(chart_df['Close'].iloc[-1])
-        fig.update_layout(
-            title=f"<b>{WATCHLIST[selected_asset]['name']}</b> — 5-Minute Live Feed (Current: ₹{curr_p:,.2f})",
-            title_font_color="#ffffff",
-            template="plotly_dark",
-            paper_bgcolor="#151922",
-            plot_bgcolor="#151922",
-            height=500,
-            margin=dict(l=10, r=10, t=40, b=10),
-            xaxis_rangeslider_visible=False,
-            showlegend=False
+    with col_tf:
+        selected_tf = st.selectbox(
+            "Timeframe:",
+            ["1", "5", "15", "60", "D"],
+            index=1,
+            format_func=lambda x: "1 Min" if x=="1" else ("5 Min" if x=="5" else ("15 Min" if x=="15" else ("1 Hour" if x=="60" else "Daily")))
         )
-        fig.update_xaxes(gridcolor="#232936")
-        fig.update_yaxes(gridcolor="#232936")
-        
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.warning("Data fetch ho raha hai... Kripya 5 seconds wait karein.")
+
+    tv_symbol = WATCHLIST[selected_asset]["tv"]
+
+    # TradingView Pro Widget with Symbol Search, Timeframes, Indicators & Full Drawing Tools
+    tv_widget_html = f"""
+    <div class="tradingview-widget-container" style="height:550px;width:100%;">
+      <div id="tradingview_full_chart" style="height:calc(100% - 32px);width:100%;"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+      new TradingView.widget(
+      {{
+        "autosize": true,
+        "symbol": "{tv_symbol}",
+        "interval": "{selected_tf}",
+        "timezone": "Asia/Kolkata",
+        "theme": "dark",
+        "style": "1",
+        "locale": "in",
+        "toolbar_bg": "#151922",
+        "enable_publishing": false,
+        "allow_symbol_change": true,
+        "withdateranges": true,
+        "show_popup_button": true,
+        "popup_width": "1000",
+        "popup_height": "650",
+        "container_id": "tradingview_full_chart",
+        "studies": [
+          "RSI@tv-basicstudies",
+          "MASimple@tv-basicstudies"
+        ]
+      }}
+      );
+      </script>
+    </div>
+    """
+    components.html(tv_widget_html, height=560)
 
 with tab2:
     st.write("##### Active Virtual Positions")
@@ -355,7 +348,7 @@ with tab2:
             </div>
             """, unsafe_allow_html=True)
     else:
-        st.info("Scanner active hai (Monitoring: Nifty 50, Bank Nifty + Top 10 Liquid Stocks).")
+        st.info("Scanner active hai (Monitoring 12 assets: Nifty, Bank Nifty + Top 10 Liquid Stocks).")
 
     if st.button("🔄 Scan & Re-evaluate All 12 Assets Now", use_container_width=True):
         st.rerun()
