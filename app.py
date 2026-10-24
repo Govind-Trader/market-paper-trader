@@ -293,42 +293,28 @@ with tab1:
             format_func=lambda x: "1 Min" if x=="1" else ("5 Min" if x=="5" else ("15 Min" if x=="15" else ("1 Hour" if x=="60" else "Daily")))
         )
 
-    tv_symbol = WATCHLIST[selected_asset]["tv"]
+    # Clean ticker extract (e.g. RELIANCE.NS -> RELIANCE)
+    raw_sym = selected_asset.replace(".NS", "").replace("^", "")
+    if raw_sym == "NSEI":
+        clean_symbol = "NIFTY"
+    elif raw_sym == "NSEBANK":
+        clean_symbol = "BANKNIFTY"
+    else:
+        clean_symbol = raw_sym
 
-    # TradingView Pro Widget with Symbol Search, Timeframes, Indicators & Full Drawing Tools
-    tv_widget_html = f"""
-    <div class="tradingview-widget-container" style="height:550px;width:100%;">
-      <div id="tradingview_full_chart" style="height:calc(100% - 32px);width:100%;"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-      <script type="text/javascript">
-      new TradingView.widget(
-      {{
-        "autosize": true,
-        "symbol": "{tv_symbol}",
-        "interval": "{selected_tf}",
-        "timezone": "Asia/Kolkata",
-        "theme": "dark",
-        "style": "1",
-        "locale": "in",
-        "toolbar_bg": "#151922",
-        "enable_publishing": false,
-        "allow_symbol_change": true,
-        "withdateranges": true,
-        "show_popup_button": true,
-        "popup_width": "1000",
-        "popup_height": "650",
-        "container_id": "tradingview_full_chart",
-        "studies": [
-          "RSI@tv-basicstudies",
-          "MASimple@tv-basicstudies"
-        ]
-      }}
-      );
-      </script>
-    </div>
+    # TradingView Public Web-Embed Frame (Bypasses third-party API restrictions)
+    tv_url = f"https://s.tradingview.com/widgetembed/?symbol=BSE%3A{clean_symbol}&interval={selected_tf}&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=151922&theme=dark&style=1&timezone=Asia%2FKolkata&withdateranges=1&studies=RSI%40tv-basicstudies&locale=in"
+    
+    tv_iframe = f"""
+    <iframe 
+        src="{tv_url}" 
+        style="width: 100%; height: 550px; border: none; border-radius: 8px;"
+        allowtransparency="true" 
+        scrolling="no" 
+        allowfullscreen>
+    </iframe>
     """
-    components.html(tv_widget_html, height=560)
-
+    components.html(tv_iframe, height=560)
 with tab2:
     st.write("##### Active Virtual Positions")
     if st.session_state.active_positions:
