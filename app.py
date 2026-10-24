@@ -285,42 +285,38 @@ with tab1:
         key="tv_asset_selector"
     )
 
-    # Pick mapped TradingView ticker (BSE Cash stock or Benchmark ETF)
+    # Pick mapped ticker
     tv_ticker = WATCHLIST[selected_asset]["tv"]
 
-    # TradingView Advanced Interactive Real-Time Chart
-    tv_widget_code = f"""
-    <div class="tradingview-widget-container" style="height:560px;width:100%;">
-      <div id="tradingview_chart_frame" style="height:calc(100% - 32px);width:100%;"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-      <script type="text/javascript">
-      new TradingView.widget(
-      {{
-        "autosize": true,
-        "symbol": "{tv_ticker}",
-        "interval": "5",
-        "timezone": "Asia/Kolkata",
-        "theme": "dark",
-        "style": "1",
-        "locale": "in",
-        "toolbar_bg": "#151922",
-        "enable_publishing": false,
-        "allow_symbol_change": true,
-        "withdateranges": true,
-        "show_popup_button": true,
-        "popup_width": "1000",
-        "popup_height": "650",
-        "container_id": "tradingview_chart_frame",
-        "studies": [
-          "RSI@tv-basicstudies",
-          "MASimple@tv-basicstudies"
-        ]
-      }}
-      );
-      </script>
+    # Official Direct TradingView Embed (No script freeze / No loading loop)
+    tv_embed_url = (
+        f"https://s.tradingview.com/widgetembed/"
+        f"?symbol={tv_ticker}"
+        f"&interval=5"
+        f"&hidesidetoolbar=0"
+        f"&symboledit=1"
+        f"&saveimage=1"
+        f"&toolbarbg=151922"
+        f"&theme=dark"
+        f"&style=1"
+        f"&timezone=Asia%2FKolkata"
+        f"&withdateranges=1"
+        f"&studies=RSI%40tv-basicstudies%2CMASimple%40tv-basicstudies"
+        f"&locale=in"
+    )
+
+    chart_html = f"""
+    <div style="width: 100%; height: 550px; background-color: #151922; border-radius: 8px; overflow: hidden; border: 1px solid #232936;">
+        <iframe 
+            src="{tv_embed_url}" 
+            style="width: 100%; height: 100%; border: none;" 
+            allowtransparency="true" 
+            scrolling="no" 
+            allowfullscreen>
+        </iframe>
     </div>
     """
-    components.html(tv_widget_code, height=580)
+    components.html(chart_html, height=560)
 
 with tab2:
     st.write("##### Active Virtual Positions")
