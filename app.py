@@ -293,17 +293,17 @@ with tab1:
             format_func=lambda x: "1 Min" if x=="1" else ("5 Min" if x=="5" else ("15 Min" if x=="15" else ("1 Hour" if x=="60" else "Daily")))
         )
 
-    # Clean ticker extract (e.g. RELIANCE.NS -> RELIANCE)
+    # Symbol router: Indices ke liye NIFTYBEES/BANKBEES aur Cash Stocks ke liye direct BSE ticker
     raw_sym = selected_asset.replace(".NS", "").replace("^", "")
     if raw_sym == "NSEI":
-        clean_symbol = "NIFTY"
+        tv_ticker = "BSE:NIFTYBEES"
     elif raw_sym == "NSEBANK":
-        clean_symbol = "BANKNIFTY"
+        tv_ticker = "BSE:BANKBEES"
     else:
-        clean_symbol = raw_sym
+        tv_ticker = f"BSE:{raw_sym}"
 
-    # TradingView Public Web-Embed Frame (Bypasses third-party API restrictions)
-    tv_url = f"https://s.tradingview.com/widgetembed/?symbol=BSE%3A{clean_symbol}&interval={selected_tf}&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=151922&theme=dark&style=1&timezone=Asia%2FKolkata&withdateranges=1&studies=RSI%40tv-basicstudies&locale=in"
+    # TradingView Direct Frame (No restriction error)
+    tv_url = f"https://s.tradingview.com/widgetembed/?symbol={tv_ticker}&interval={selected_tf}&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=151922&theme=dark&style=1&timezone=Asia%2FKolkata&withdateranges=1&studies=RSI%40tv-basicstudies&locale=in"
     
     tv_iframe = f"""
     <iframe 
