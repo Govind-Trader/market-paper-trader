@@ -113,4 +113,278 @@ def fetch_moneycontrol_news():
         soup = BeautifulSoup(res.content, features="xml")
         for item in soup.findAll("item")[:5]:
             news.append({
-                "title
+                "title": item.title.text,
+                "date": item.pubDate.text[:16] if item.pubDate else ""
+            })
+    except Exception:
+        news = [{"title": "Markets consolidate at structural swing zones.", "date": "Live Update"}]
+    return news
+
+data_map = fetch_all_tickers()
+news_items = fetch_moneycontrol_news()
+
+# Evaluation Loop (Liquidity Sweep + Volume Absorption)
+for ticker, meta in WATCHLIST.items():
+    if ticker not in data_map or len(data_map[ticker]) < 30:
+        continue
+    
+    df = data_map[ticker].copy()
+    high_low = df['High'] - df['Low']
+    high_close = abs(df['High'] - df['Close'].shift())
+    low_close = abs(df['Low'] - df['Close'].shift())
+    tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+    df['ATR'] = tr.rolling(14).mean()
+    df['Vol_SMA'] = df['Volume'].rolling(20).mean()
+
+    latest = df.iloc[-1]
+    prev_low = df['Low'].tail(30).iloc[:-2].min()
+    c_close = float(latest['Close'])
+    c_low = float(latest['Low'])
+    c_vol = float(latest['Volume'])
+    avg_vol = float(latest['Vol_SMA'])
+    atr = float(latest['ATR'])
+
+    is_sweep = (c_low < prev_low) and (c_close > prev_low)
+    is_volume = c_vol >= (avg_vol * 1.8)
+    is_green = c_close > float(latest['Open'])
+
+    # Entry Check
+    if ticker not in st.session_state.active_positions:
+        if is_sweep and is_volume and is_green:
+            hard_sl = c_low
+            risk_pts = c_close - hard_sl
+            if risk_pts <= 2:
+                risk_pts = max(5.0, c_close * 0.005)
+                hard_sl = c_close - risk_pts
+
+            target = c_close + (risk_pts * 2.0)
+            step = meta["step"]
+            atm_strike = round(c_close / step) * step
+            otm_strike = atm_strike + (step * 2)
+
+            spread_debit_est = max(15.0, risk_pts * 0.4)
+            capital_required = spread_debit_est * meta["lot"]
+
+            if st.session_state.virtual_cash >= capital_required:
+                st.session_state.virtual_cash -= capital_required
+                st.session_state.active_positions[ticker] = {
+                    "symbol": meta["name"],
+                    "ticker": ticker,
+                    "type": meta["type"],
+                    "strategy": "Bull Call Spread",
+                    "buy_leg": f"{atm_strike} CE",
+                    "sell_leg": f"{otm_strike} CE",
+                    "entry_spot": c_close,
+                    "entry_debit": spread_debit_est,
+                    "qty": meta["lot"],
+                    "hard_sl": round(hard_sl, 2),
+                    "target": round(target, 2),
+                    "current_sl": round(hard_sl, 2),
+                    "trailing_activated": False,
+                    "entry_time": datetime.now().strftime("%I:%M %p")
+                }
+                
+                alert_text = (
+                    f"⚡ *AUTO-ORDER EXECUTED: {meta['name']}*\n\n"
+                    f"• *Spot Entry:* ₹{c_close:,.2f}\n"
+                    f"• *Structure:* {atm_strike} CE / {otm_strike} CE\n"
+                    f"• *Quantity:* {meta['lot']}\n"
+                    f"• *Hard SL:* ₹{hard_sl:,.2f}\n"
+                    f"• *1:2 Target:* ₹{target:,.2f}"
+                )
+                send_telegram_notification(alert_text)
+
+    # Exit & Trailing Check
+    else:
+        pos = st.session_state.active_positions[ticker]
+        entry = pos["entry_spot"]
+        risk = entry - pos["hard_sl"]
+
+        if not pos["trailing_activated"] and (c_close >= entry + risk):
+            pos["current_sl"] = entry
+            pos["trailing_activated"] = True
+            send_telegram_notification(f"🎯 *TRAILING SL ACTIVATED*: {pos['symbol']} SL moved to breakeven (₹{entry:,.2f}).")
+        elif pos["trailing_activated"]:
+            atr_sl = c_close - (1.8 * atr)
+            if atr_sl > pos["current_sl"]:
+                pos["current_sl"] = round(atr_sl, 2)
+
+        if c_close >= pos["target"]:
+            profit = (pos["target"] - entry) * 0.40 * pos["qty"]
+            st.session_state.virtual_cash += (pos["entry_debit"] * pos["qty"]) + profit
+            st.session_state.realized_pnl += profit
+            pos["status"] = "TARGET ACHIEVED"
+            pos["exit_spot"] = c_close
+            pos["pnl"] = profit
+            st.session_state.trade_history.append(pos)
+            del st.session_state.active_positions[ticker]
+
+            send_telegram_notification(f"✅ *TARGET HIT: {pos['symbol']}* | Profit: +₹{profit:,.2f}")
+        elif c_close <= pos["current_sl"]:
+            loss = (entry - pos["current_sl"]) * 0.35 * pos["qty"]
+            st.session_state.virtual_cash += max(0.0, (pos["entry_debit"] * pos["qty"]) - loss)
+            st.session_state.realized_pnl -= loss
+            pos["status"] = "SL TRIGGERED"
+            pos["exit_spot"] = c_close
+            pos["pnl"] = -loss
+            st.session_state.trade_history.append(pos)
+            del st.session_state.active_positions[ticker]
+
+            send_telegram_notification(f"🛑 *STOP-LOSS HIT: {pos['symbol']}* | Loss: -₹{loss:,.2f}")
+
+st.title("⚡ Multi-Asset Paper Trader")
+
+# Floating P&L calculation
+floating_pnl = 0.0
+for ticker, pos in st.session_state.active_positions.items():
+    if ticker in data_map and not data_map[ticker].empty:
+        curr_price = float(data_map[ticker]['Close'].iloc[-1])
+        floating_pnl += (curr_price - pos["entry_spot"]) * 0.35 * pos["qty"]
+
+total_portfolio = st.session_state.virtual_cash + st.session_state.realized_pnl + floating_pnl
+total_return = total_portfolio - INITIAL_CAPITAL
+return_pct = (total_return / INITIAL_CAPITAL) * 100
+
+# Top metrics cards
+c1, c2, c3 = st.columns(3)
+with c1:
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="metric-title">Active Universe</div>
+        <div class="metric-value">12 Assets</div>
+        <div style="font-size:0.8rem; color:#848e9c;">2 Indices + 10 Liquid Stocks</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with c2:
+    pnl_c = "#00c853" if (floating_pnl + st.session_state.realized_pnl) >= 0 else "#ff5252"
+    pnl_pfx = "+" if (floating_pnl + st.session_state.realized_pnl) >= 0 else ""
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="metric-title">Total P&L (Net)</div>
+        <div class="metric-value" style="color:{pnl_c};">{pnl_pfx}₹{(floating_pnl + st.session_state.realized_pnl):,.2f}</div>
+        <div style="font-size:0.8rem; color:#848e9c;">Open Pos: {len(st.session_state.active_positions)}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with c3:
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="metric-title">Portfolio Capital</div>
+        <div class="metric-value">₹{total_portfolio:,.2f}</div>
+        <div style="font-size:0.8rem; color:#848e9c;">Seed: ₹20 Lakh ({pnl_pfx}{return_pct:.2f}%)</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+tab1, tab2, tab3 = st.tabs(["📊 Interactive Candlestick Charts", "📋 Open & Closed Trades", "📰 News"])
+
+with tab1:
+    selected_asset = st.selectbox(
+        "Chart Asset Chuniye:", 
+        list(WATCHLIST.keys()), 
+        format_func=lambda x: WATCHLIST[x]["name"]
+    )
+    
+    if selected_asset in data_map and not data_map[selected_asset].empty:
+        chart_df = data_map[selected_asset].tail(60).copy()
+        
+        fig = make_subplots(
+            rows=2, cols=1, 
+            shared_xaxes=True, 
+            vertical_spacing=0.04, 
+            row_heights=[0.75, 0.25]
+        )
+        
+        # Candlestick Track
+        fig.add_trace(go.Candlestick(
+            x=chart_df.index,
+            open=chart_df['Open'],
+            high=chart_df['High'],
+            low=chart_df['Low'],
+            close=chart_df['Close'],
+            name="Price",
+            increasing_line_color='#00c853', 
+            decreasing_line_color='#ff5252'
+        ), row=1, col=1)
+        
+        # Volume Subplot Track
+        vol_colors = ['#00c853' if c >= o else '#ff5252' for c, o in zip(chart_df['Close'], chart_df['Open'])]
+        fig.add_trace(go.Bar(
+            x=chart_df.index,
+            y=chart_df['Volume'],
+            marker_color=vol_colors,
+            name="Volume",
+            opacity=0.6
+        ), row=2, col=1)
+        
+        curr_p = float(chart_df['Close'].iloc[-1])
+        fig.update_layout(
+            title=f"<b>{WATCHLIST[selected_asset]['name']}</b> — 5-Minute Live Feed (Current: ₹{curr_p:,.2f})",
+            title_font_color="#ffffff",
+            template="plotly_dark",
+            paper_bgcolor="#151922",
+            plot_bgcolor="#151922",
+            height=500,
+            margin=dict(l=10, r=10, t=40, b=10),
+            xaxis_rangeslider_visible=False,
+            showlegend=False
+        )
+        fig.update_xaxes(gridcolor="#232936")
+        fig.update_yaxes(gridcolor="#232936")
+        
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("Data fetch ho raha hai... Kripya 5 seconds wait karein.")
+
+with tab2:
+    st.write("##### Active Virtual Positions")
+    if st.session_state.active_positions:
+        for tkr, pos in st.session_state.active_positions.items():
+            st.markdown(f"""
+            <div class="trade-card">
+                <div style="display:flex; justify-content:space-between; font-weight:700;">
+                    <span style="color:#00c853;">{pos['symbol']} — {pos['strategy']} ({pos['qty']} Qty)</span>
+                    <span style="color:#00c853; font-size:0.8rem; background-color:#163820; padding:2px 8px; border-radius:4px;">RUNNING</span>
+                </div>
+                <div style="font-size:0.88rem; color:#d1d4dc; margin: 6px 0;">
+                    Spread: <b>{pos['buy_leg']}</b> / <b>{pos['sell_leg']}</b>
+                </div>
+                <div style="font-size:0.82rem; color:#848e9c;">
+                    Entry: <b>₹{pos['entry_spot']}</b> | Trailing SL: <b style="color:#ff5252;">₹{pos['current_sl']}</b> | Target: <b style="color:#00c853;">₹{pos['target']}</b>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("Scanner active hai (Monitoring: Nifty 50, Bank Nifty + Top 10 Liquid Stocks).")
+
+    if st.button("🔄 Scan & Re-evaluate All 12 Assets Now", use_container_width=True):
+        st.rerun()
+
+    st.write("##### Closed Trade History")
+    if st.session_state.trade_history:
+        for t in reversed(st.session_state.trade_history):
+            pnl_badge = f"+₹{t['pnl']:,.2f}" if t['pnl'] >= 0 else f"-₹{abs(t['pnl']):,.2f}"
+            pnl_col = "#00c853" if t['pnl'] >= 0 else "#ff5252"
+            st.markdown(f"""
+            <div class="trade-card-closed">
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                    <b>{t['symbol']} ({t['buy_leg']})</b>
+                    <b style="color:{pnl_col};">{pnl_badge}</b>
+                </div>
+                <div style="font-size:0.75rem; color:#848e9c; margin-top:3px;">
+                    Result: {t['status']} | Exit: ₹{t.get('exit_spot', 0.0)}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.caption("No closed trades yet.")
+
+with tab3:
+    st.write("##### Market News Feed")
+    for news in news_items:
+        st.markdown(f"""
+        <div class="news-box">
+            <div style="font-size:0.88rem; font-weight:600; color:#e0e3eb;">{news['title']}</div>
+            <div style="font-size:0.75rem; color:#848e9c; margin-top:3px;">{news['date']}</div>
+        </div>
+        """, unsafe_allow_html=True)
