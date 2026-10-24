@@ -284,43 +284,107 @@ with tab1:
             "Chart Asset Chuniye:", 
             list(WATCHLIST.keys()), 
             format_func=lambda x: WATCHLIST[x]["name"],
-            key="asset_selector_dropdown"
+            key="chart_asset_box"
         )
     with col_tf:
         selected_tf = st.selectbox(
             "Timeframe:",
-            ["1", "5", "15", "60", "D"],
+            ["1m", "5m", "15m", "60m", "1d"],
             index=1,
-            format_func=lambda x: "1 Min" if x=="1" else ("5 Min" if x=="5" else ("15 Min" if x=="15" else ("1 Hour" if x=="60" else "Daily"))),
-            key="tf_selector_dropdown"
+            format_func=lambda x: {"1m": "1 Minute", "5m": "5 Minute", "15m": "15 Minute", "60m": "1 Hour", "1d": "Daily"}[x],
+            key="chart_tf_box"
         )
 
-    # Symbol router: Indices ke liye liquid ETF aur Cash Stocks ke liye direct BSE ticker
-    raw_sym = selected_asset.replace(".NS", "").replace("^", "")
-    if raw_sym == "NSEI":
-        tv_ticker = "BSE:NIFTYBEES"
-    elif raw_sym == "NSEBANK":
-        tv_ticker = "BSE:BANKBEES"
+    # Dynamic candle fetch based on selected timeframe
+    period_map = {"1m": "1d", "5m": "5d", "15m": "5d", "60m": "1mo", "1d": "1y"}
+    
+    with st.spinner("Candles load ho rahi hain..."):
+        try:
+            df_chart = yf.download(
+                tickers=selected_asset,
+                period=period_map[selected_tf],
+                interval=selected_tf,
+                progress=False
+            )
+            if isinstance(df_chart.columns, pd.MultiIndex):
+                df_chart.columns = df_chart.columns.droplevel(1)
+            df_chart = df_chart.dropna().tail(100)
+        except Exception:
+            df_chart = pd.DataFrame()
+
+    if not df_chart.empty:
+        # Prepare JSON data for Lightweight Charts
+        candle_data = []
+        for idx, row in df_chart.iterrows():
+            ts = int(idx.timestamp())
+            candle_data.append({
+                "time": ts,
+                "open": float(row['Open']),
+                "high": float(row['High']),
+                "low": float(row['Low']),
+                "close": float(row['Close'])
+            })
+        
+        import json
+        json_candles = json.dumps(candle_data)
+        asset_name = WATCHLIST[selected_asset]['name']
+        last_price = float(df_chart['Close'].iloc[-1])
+
+        # Lightweight Canvas Chart Embed (TradingView Official Engine)
+        lw_chart_html = f"""
+        <div style="background-color: #151922; border-radius: 8px; padding: 10px; border: 1px solid #232936;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; color: #fff; font-family: sans-serif;">
+                <span style="font-size: 1.1rem; font-weight: 700;">{asset_name} ({selected_tf.upper()})</span>
+                <span style="font-size: 1.1rem; font-weight: 700; color: #00c853;">₹{last_price:,.2f}</span>
+            </div>
+            <div id="lw_chart_container" style="width: 100%; height: 480px;"></div>
+        </div>
+        <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+        <script>
+            const container = document.getElementById('lw_chart_container');
+            const chart = LightweightCharts.createChart(container, {{
+                width: container.clientWidth,
+                height: 480,
+                layout: {{
+                    background: {{ color: '#151922' }},
+                    textColor: '#d1d4dc',
+                }},
+                grid: {{
+                    vertLines: {{ color: '#232936' }},
+                    horzLines: {{ color: '#232936' }},
+                }},
+                crosshair: {{
+                    mode: LightweightCharts.CrosshairMode.Normal,
+                }},
+                timeScale: {{
+                    timeVisible: true,
+                    secondsVisible: false,
+                    borderColor: '#232936',
+                }},
+                rightPriceScale: {{
+                    borderColor: '#232936',
+                }}
+            }});
+
+            const candlestickSeries = chart.addCandlestickSeries({{
+                upColor: '#00c853',
+                downColor: '#ff5252',
+                borderVisible: false,
+                wickUpColor: '#00c853',
+                wickDownColor: '#ff5252',
+            }});
+
+            candlestickSeries.setData({json_candles});
+            chart.timeScale().fitContent();
+
+            window.addEventListener('resize', () => {{
+                chart.applyOptions({{ width: container.clientWidth }});
+            }});
+        </script>
+        """
+        components.html(lw_chart_html, height=540)
     else:
-        tv_ticker = f"BSE:{raw_sym}"
-
-    import time
-    ts = int(time.time())
-
-    # Direct embed with cache-busting timestamp & proper container
-    tv_widget_html = f"""
-    <div style="width:100%; height:550px; background-color:#151922; border-radius:8px; overflow:hidden;">
-        <iframe 
-            key="{tv_ticker}_{selected_tf}_{ts}"
-            src="https://s.tradingview.com/widgetembed/?symbol={tv_ticker}&interval={selected_tf}&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=151922&theme=dark&style=1&timezone=Asia%2FKolkata&withdateranges=1&studies=RSI%40tv-basicstudies&locale=in&t={ts}" 
-            style="width: 100%; height: 550px; border: none;"
-            allowtransparency="true" 
-            scrolling="no" 
-            allowfullscreen>
-        </iframe>
-    </div>
-    """
-    components.html(tv_widget_html, height=560)
+        st.warning(f"{WATCHLIST[selected_asset]['name']} ke liye {selected_tf} data abhi market feed par available nahi hai.")
 with tab2:
     st.write("##### Active Virtual Positions")
     if st.session_state.active_positions:
