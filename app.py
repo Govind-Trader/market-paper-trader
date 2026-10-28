@@ -1,432 +1,444 @@
+from datetime import datetime, time
+import math
+import time as tm
+import pandas as pd
+import pytz
+import requests
 import streamlit as st
 import streamlit.components.v1 as components
 import yfinance as yf
-import pandas as pd
-import requests
-from bs4 import BeautifulSoup
-from datetime import datetime
-import os
 
-# Page configuration
+# ==============================================================================
+# 1. PAGE SETUP & CONFIGURATION
+# ==============================================================================
 st.set_page_config(
-    page_title="Govind Multi-Asset AI Terminal",
-    page_icon="⚡",
+    page_title="Institutional Liquidity Terminal (14 Assets)",
+    page_icon="🎯",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded",
 )
 
-# Dark theme styling
-st.markdown("""
-<style>
-    .metric-card {
-        background-color: #151922;
-        border: 1px solid #232936;
-        border-radius: 10px;
-        padding: 12px 14px;
-        margin-bottom: 10px;
-    }
-    .metric-title { font-size: 0.72rem; color: #848e9c; text-transform: uppercase; font-weight: 600; }
-    .metric-value { font-size: 1.25rem; font-weight: 700; color: #ffffff; }
-    .trade-card {
-        background-color: #151922;
-        border-radius: 8px;
-        padding: 12px;
-        border-left: 4px solid #00c853;
-        margin-bottom: 10px;
-    }
-    .trade-card-closed {
-        background-color: #151922;
-        border-radius: 8px;
-        padding: 12px;
-        border-left: 4px solid #848e9c;
-        margin-bottom: 10px;
-    }
-    .news-box {
-        background-color: #12151c;
-        border-radius: 6px;
-        padding: 10px 12px;
-        margin-bottom: 8px;
-        border: 1px solid #1f2430;
-    }
-</style>
-""", unsafe_allow_html=True)
+# ==============================================================================
+# 2. TELEGRAM ALERT CREDENTIALS
+# ==============================================================================
+# Puraane bot ka Token aur Chat ID yahan daalein
+# Agar Streamlit Secrets use kar rahe hain toh yeh automatically detect ho jayega
+TELEGRAM_BOT_TOKEN = st.secrets.get("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
+TELEGRAM_CHAT_ID = st.secrets.get("TELEGRAM_CHAT_ID", "YOUR_CHAT_ID_HERE")
 
-INITIAL_CAPITAL = 2000000.0  # ₹20 Lakh Virtual Capital
-TELEGRAM_BOT_TOKEN = "8620926844:AAF5mKGb820OWgUjRv9uXS4T-6amaCU5EI0"
-TELEGRAM_CHAT_ID = "6018016670"
-CSV_FILE_PATH = "trade_history.csv"
 
-# 2 Indices + 10 Top Liquidity F&O Stocks
-WATCHLIST = {
-    "^NSEI": {"name": "NIFTY 50", "type": "INDEX", "tv": "BSE:NIFTYBEES", "lot": 100, "step": 50},
-    "^NSEBANK": {"name": "BANK NIFTY", "type": "INDEX", "tv": "BSE:BANKBEES", "lot": 60, "step": 100},
-    "RELIANCE.NS": {"name": "RELIANCE", "type": "STOCK", "tv": "BSE:RELIANCE", "lot": 100, "step": 20},
-    "HDFCBANK.NS": {"name": "HDFC BANK", "type": "STOCK", "tv": "BSE:HDFCBANK", "lot": 100, "step": 10},
-    "ICICIBANK.NS": {"name": "ICICI BANK", "type": "STOCK", "tv": "BSE:ICICIBANK", "lot": 100, "step": 10},
-    "SBIN.NS": {"name": "SBI", "type": "STOCK", "tv": "BSE:SBIN", "lot": 100, "step": 5},
-    "TCS.NS": {"name": "TCS", "type": "STOCK", "tv": "BSE:TCS", "lot": 50, "step": 20},
-    "INFY.NS": {"name": "INFOSYS", "type": "STOCK", "tv": "BSE:INFY", "lot": 100, "step": 10},
-    "TATAMOTORS.NS": {"name": "TATA MOTORS", "type": "STOCK", "tv": "BSE:TATAMOTORS", "lot": 100, "step": 5},
-    "ITC.NS": {"name": "ITC", "type": "STOCK", "tv": "BSE:ITC", "lot": 200, "step": 5},
-    "BHARTIARTL.NS": {"name": "BHARTI AIRTEL", "type": "STOCK", "tv": "BSE:BHARTIARTL", "lot": 100, "step": 10},
-    "LT.NS": {"name": "L&T", "type": "STOCK", "tv": "BSE:LT", "lot": 50, "step": 20}
+def send_telegram_alert(message: str):
+    """Telegram channel/group par instant alert send karta hai."""
+    if (
+        TELEGRAM_BOT_TOKEN == "YOUR_BOT_TOKEN_HERE"
+        or TELEGRAM_CHAT_ID == "YOUR_CHAT_ID_HERE"
+    ):
+        return
+
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": message,
+        "parse_mode": "Markdown",
+    }
+    try:
+        requests.post(url, json=payload, timeout=5)
+    except Exception as e:
+        print(f"Telegram notification error: {e}")
+
+
+# ==============================================================================
+# 3. 14 ASSETS UNIVERSE (INDICES + MCX CRUDE + 10 HEAVYWEIGHT F&O STOCKS)
+# ==============================================================================
+ASSETS = {
+    # --- INDICES ---
+    "NIFTY": {
+        "symbol": "^NSEI",
+        "market": "NSE",
+        "lot_size": 25,
+        "strike_step": 50,
+        "spread_width": 100,
+        "margin_per_lot": 45000,
+    },
+    "BANKNIFTY": {
+        "symbol": "^NSEBANK",
+        "market": "NSE",
+        "lot_size": 15,
+        "strike_step": 100,
+        "spread_width": 200,
+        "margin_per_lot": 50000,
+    },
+    "FINNIFTY": {
+        "symbol": "NIFTY_FIN_SERVICE.NS",
+        "market": "NSE",
+        "lot_size": 25,
+        "strike_step": 50,
+        "spread_width": 100,
+        "margin_per_lot": 45000,
+    },
+    # --- COMMODITY ---
+    "CRUDEOIL": {
+        "symbol": "CL=F",
+        "market": "MCX",
+        "lot_size": 100,
+        "strike_step": 50,
+        "spread_width": 100,
+        "margin_per_lot": 55000,
+    },
+    # --- 10 HIGH-BETA STOCKS ---
+    "RELIANCE": {
+        "symbol": "RELIANCE.NS",
+        "market": "NSE",
+        "lot_size": 250,
+        "strike_step": 20,
+        "spread_width": 40,
+        "margin_per_lot": 65000,
+    },
+    "HDFCBANK": {
+        "symbol": "HDFCBANK.NS",
+        "market": "NSE",
+        "lot_size": 550,
+        "strike_step": 10,
+        "spread_width": 20,
+        "margin_per_lot": 60000,
+    },
+    "ICICIBANK": {
+        "symbol": "ICICIBANK.NS",
+        "market": "NSE",
+        "lot_size": 700,
+        "strike_step": 10,
+        "spread_width": 20,
+        "margin_per_lot": 55000,
+    },
+    "SBIN": {
+        "symbol": "SBIN.NS",
+        "market": "NSE",
+        "lot_size": 750,
+        "strike_step": 5,
+        "spread_width": 10,
+        "margin_per_lot": 50000,
+    },
+    "INFY": {
+        "symbol": "INFY.NS",
+        "market": "NSE",
+        "lot_size": 400,
+        "strike_step": 20,
+        "spread_width": 40,
+        "margin_per_lot": 55000,
+    },
+    "TCS": {
+        "symbol": "TCS.NS",
+        "market": "NSE",
+        "lot_size": 175,
+        "strike_step": 50,
+        "spread_width": 100,
+        "margin_per_lot": 65000,
+    },
+    "LT": {
+        "symbol": "LT.NS",
+        "market": "NSE",
+        "lot_size": 150,
+        "strike_step": 20,
+        "spread_width": 40,
+        "margin_per_lot": 60000,
+    },
+    "AXISBANK": {
+        "symbol": "AXISBANK.NS",
+        "market": "NSE",
+        "lot_size": 625,
+        "strike_step": 10,
+        "spread_width": 20,
+        "margin_per_lot": 55000,
+    },
+    "BHARTIARTL": {
+        "symbol": "BHARTIARTL.NS",
+        "market": "NSE",
+        "lot_size": 475,
+        "strike_step": 10,
+        "spread_width": 20,
+        "margin_per_lot": 50000,
+    },
+    "TATASTEEL": {
+        "symbol": "TATASTEEL.NS",
+        "market": "NSE",
+        "lot_size": 5500,
+        "strike_step": 2.5,
+        "spread_width": 5,
+        "margin_per_lot": 50000,
+    },
 }
 
-def send_telegram_notification(message: str):
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
-    try:
-        requests.post(url, data=payload, timeout=5)
-    except Exception as e:
-        print(f"Telegram error: {e}")
-
-# Permanent Storage Helpers
-def load_trade_history():
-    if os.path.exists(CSV_FILE_PATH):
-        try:
-            df = pd.read_csv(CSV_FILE_PATH)
-            return df.to_dict('records')
-        except Exception:
-            return []
-    return []
-
-def save_trade_to_csv(trade_dict):
-    df_new = pd.DataFrame([trade_dict])
-    if not os.path.exists(CSV_FILE_PATH):
-        df_new.to_csv(CSV_FILE_PATH, index=False)
-    else:
-        df_new.to_csv(CSV_FILE_PATH, mode='a', header=False, index=False)
-
-# Session state initialization
+# ==============================================================================
+# 4. SESSION STATE INITIALIZATION
+# ==============================================================================
+if "virtual_capital" not in st.session_state:
+    st.session_state.virtual_capital = 2000000.0  # ₹20 Lakhs virtual seed
 if "trade_history" not in st.session_state:
-    st.session_state.trade_history = load_trade_history()
+    st.session_state.trade_history = []
+if "open_positions" not in st.session_state:
+    st.session_state.open_positions = []
 
-# Calculate initial realized PnL from historical trades
-saved_realized_pnl = sum([float(t.get("pnl", 0.0)) for t in st.session_state.trade_history])
+# ==============================================================================
+# 5. CORE ALGORITHMIC ENGINE
+# ==============================================================================
 
-if "virtual_cash" not in st.session_state:
-    st.session_state.virtual_cash = INITIAL_CAPITAL + saved_realized_pnl
-if "realized_pnl" not in st.session_state:
-    st.session_state.realized_pnl = saved_realized_pnl
-if "active_positions" not in st.session_state:
-    st.session_state.active_positions = {}
 
-@st.cache_data(ttl=60)
-def fetch_all_tickers():
-    tickers = " ".join(WATCHLIST.keys())
-    data_dict = {}
+def is_market_trading_hours(market_type: str) -> bool:
+    """Checks trading hours in Indian Standard Time (IST)."""
+    ist = pytz.timezone("Asia/Kolkata")
+    now_time = datetime.now(ist).time()
+
+    if market_type == "NSE":
+        return time(9, 15) <= now_time <= time(15, 30)
+    elif market_type == "MCX":
+        # MCX trades from 09:00 AM to 11:30 PM IST
+        return time(9, 0) <= now_time <= time(23, 30)
+    return False
+
+
+def get_volume_multiplier(asset_name: str) -> float:
+    """MCX Crude Oil US opening overlap (06:00 PM - 09:30 PM IST) ke dauran 2.2x volume threshold require karta hai."""
+    ist = pytz.timezone("Asia/Kolkata")
+    now_time = datetime.now(ist).time()
+
+    if asset_name == "CRUDEOIL" and (time(18, 0) <= now_time <= time(21, 30)):
+        return 2.2
+    return 1.8
+
+
+def scan_asset_for_setup(name: str, config: dict):
+    """5-Minute Liquidity Sweep + Dynamic Volume Absorption rule verify karta hai."""
     try:
-        raw_df = yf.download(tickers=tickers, period="5d", interval="5m", group_by='ticker', progress=False)
-        for ticker in WATCHLIST.keys():
-            if ticker in raw_df:
-                sub = raw_df[ticker].dropna()
-                if not sub.empty:
-                    data_dict[ticker] = sub
-    except Exception:
-        pass
-    return data_dict
+        ticker = yf.Ticker(config["symbol"])
+        df = ticker.history(period="5d", interval="5m")
 
-@st.cache_data(ttl=300)
-def fetch_moneycontrol_news():
-    news = []
-    try:
-        url = "https://www.moneycontrol.com/rss/marketreports.xml"
-        res = requests.get(url, timeout=5)
-        soup = BeautifulSoup(res.content, features="xml")
-        for item in soup.findAll("item")[:5]:
-            news.append({
-                "title": item.title.text,
-                "date": item.pubDate.text[:16] if item.pubDate else ""
-            })
-    except Exception:
-        news = [{"title": "Markets consolidate at structural swing zones.", "date": "Live Update"}]
-    return news
+        if df.empty or len(df) < 35:
+            return None
 
-data_map = fetch_all_tickers()
-news_items = fetch_moneycontrol_news()
+        # 20-period Volume Moving Average
+        df["Vol_MA20"] = df["Volume"].rolling(window=20).mean()
 
-# Strategy Loop (Liquidity Sweep + Volume Absorption for all 12 instruments)
-for ticker, meta in WATCHLIST.items():
-    if ticker not in data_map or len(data_map[ticker]) < 30:
-        continue
-    
-    df = data_map[ticker].copy()
-    high_low = df['High'] - df['Low']
-    high_close = abs(df['High'] - df['Close'].shift())
-    low_close = abs(df['Low'] - df['Close'].shift())
-    tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
-    df['ATR'] = tr.rolling(14).mean()
-    df['Vol_SMA'] = df['Volume'].rolling(20).mean()
+        # Pichhle 30 candles ka lowest swing point (excluding trigger candle)
+        prev_30_low = df["Low"].iloc[-31:-1].min()
 
-    latest = df.iloc[-1]
-    prev_low = df['Low'].tail(30).iloc[:-2].min()
-    c_close = float(latest['Close'])
-    c_low = float(latest['Low'])
-    c_vol = float(latest['Volume'])
-    avg_vol = float(latest['Vol_SMA'])
-    atr = float(latest['ATR'])
+        # Trigger candle parameters
+        curr = df.iloc[-1]
+        c_open, c_high, c_low, c_close, c_vol = (
+            curr["Open"],
+            curr["High"],
+            curr["Low"],
+            curr["Close"],
+            curr["Volume"],
+        )
+        avg_vol = curr["Vol_MA20"]
 
-    is_sweep = (c_low < prev_low) and (c_close > prev_low)
-    is_volume = c_vol >= (avg_vol * 1.8)
-    is_green = c_close > float(latest['Open'])
+        required_mult = get_volume_multiplier(name)
 
-    # Entry Logic
-    if ticker not in st.session_state.active_positions:
-        if is_sweep and is_volume and is_green:
-            hard_sl = c_low
-            risk_pts = c_close - hard_sl
-            if risk_pts <= 2:
-                risk_pts = max(5.0, c_close * 0.005)
-                hard_sl = c_close - risk_pts
+        # 1. Sweep Rule: Low undercut previous 30-low, but closed back above it
+        is_sweep = (c_low < prev_30_low) and (c_close > prev_30_low)
+        # 2. Bullish Rejection Candle
+        is_green = c_close > c_open
+        # 3. Institutional Volume Absorption Spike
+        has_volume = c_vol >= (avg_vol * required_mult) if avg_vol > 0 else False
 
-            target = c_close + (risk_pts * 2.0)
-            step = meta["step"]
-            atm_strike = round(c_close / step) * step
-            otm_strike = atm_strike + (step * 2)
+        if is_sweep and is_green and has_volume:
+            # Bull Call Spread strike computation
+            atm_strike = int(
+                round(c_close / config["strike_step"]) * config["strike_step"]
+            )
+            otm_strike = atm_strike + config["spread_width"]
 
-            spread_debit_est = max(15.0, risk_pts * 0.4)
-            capital_required = spread_debit_est * meta["lot"]
+            # Risk-Reward 1:2 Setup
+            risk_points = round(c_close - c_low, 2)
+            target_points = round(risk_points * 2, 2)
 
-            if st.session_state.virtual_cash >= capital_required:
-                st.session_state.virtual_cash -= capital_required
-                st.session_state.active_positions[ticker] = {
-                    "symbol": meta["name"],
-                    "ticker": ticker,
-                    "type": meta["type"],
-                    "strategy": "Bull Call Spread",
-                    "buy_leg": f"{atm_strike} CE",
-                    "sell_leg": f"{otm_strike} CE",
-                    "entry_spot": round(c_close, 2),
-                    "entry_debit": round(spread_debit_est, 2),
-                    "qty": meta["lot"],
-                    "hard_sl": round(hard_sl, 2),
-                    "target": round(target, 2),
-                    "current_sl": round(hard_sl, 2),
-                    "trailing_activated": False,
-                    "entry_time": datetime.now().strftime("%Y-%m-%d %I:%M %p")
-                }
-                
-                alert_text = (
-                    f"⚡ *AUTO-ORDER EXECUTED: {meta['name']}*\n\n"
-                    f"• *Spot Entry:* ₹{c_close:,.2f}\n"
-                    f"• *Structure:* {atm_strike} CE / {otm_strike} CE\n"
-                    f"• *Quantity:* {meta['lot']}\n"
-                    f"• *Hard SL:* ₹{hard_sl:,.2f}\n"
-                    f"• *1:2 Target:* ₹{target:,.2f}"
-                )
-                send_telegram_notification(alert_text)
-
-    # Exit & Trailing SL Logic
-    else:
-        pos = st.session_state.active_positions[ticker]
-        entry = pos["entry_spot"]
-        risk = entry - pos["hard_sl"]
-
-        if not pos["trailing_activated"] and (c_close >= entry + risk):
-            pos["current_sl"] = entry
-            pos["trailing_activated"] = True
-            send_telegram_notification(f"🎯 *TRAILING SL ACTIVATED*: {pos['symbol']} SL moved to breakeven (₹{entry:,.2f}).")
-        elif pos["trailing_activated"]:
-            atr_sl = c_close - (1.8 * atr)
-            if atr_sl > pos["current_sl"]:
-                pos["current_sl"] = round(atr_sl, 2)
-
-        if c_close >= pos["target"]:
-            profit = round((pos["target"] - entry) * 0.40 * pos["qty"], 2)
-            st.session_state.virtual_cash += (pos["entry_debit"] * pos["qty"]) + profit
-            st.session_state.realized_pnl += profit
-            
-            record = {
-                "symbol": pos["symbol"],
-                "strategy": pos["strategy"],
-                "buy_leg": pos["buy_leg"],
-                "sell_leg": pos["sell_leg"],
-                "qty": pos["qty"],
-                "entry_time": pos["entry_time"],
-                "exit_time": datetime.now().strftime("%Y-%m-%d %I:%M %p"),
-                "entry_spot": pos["entry_spot"],
-                "exit_spot": round(c_close, 2),
-                "status": "TARGET ACHIEVED",
-                "pnl": profit
+            return {
+                "asset": name,
+                "market": config["market"],
+                "trigger_time": datetime.now(pytz.timezone("Asia/Kolkata")),
+                "spot_price": round(c_close, 2),
+                "sweep_low": round(c_low, 2),
+                "vol_ratio": round(c_vol / avg_vol, 2),
+                "required_mult": required_mult,
+                "atm_buy": f"{atm_strike} CE",
+                "otm_sell": f"{otm_strike} CE",
+                "spread_width": config["spread_width"],
+                "lot_size": config["lot_size"],
+                "capital_used": config["margin_per_lot"],  # Capital Tracking
+                "stop_loss": round(c_low, 2),
+                "target": round(c_close + target_points, 2),
+                "status": "ACTIVE",
             }
-            save_trade_to_csv(record)
-            st.session_state.trade_history.append(record)
-            del st.session_state.active_positions[ticker]
+    except Exception as e:
+        print(f"Scanning exception on {name}: {e}")
 
-            send_telegram_notification(f"✅ *TARGET HIT: {pos['symbol']}* | Profit: +₹{profit:,.2f}")
+    return None
 
-        elif c_close <= pos["current_sl"]:
-            loss = round((entry - pos["current_sl"]) * 0.35 * pos["qty"], 2)
-            st.session_state.virtual_cash += max(0.0, (pos["entry_debit"] * pos["qty"]) - loss)
-            st.session_state.realized_pnl -= loss
-            
-            record = {
-                "symbol": pos["symbol"],
-                "strategy": pos["strategy"],
-                "buy_leg": pos["buy_leg"],
-                "sell_leg": pos["sell_leg"],
-                "qty": pos["qty"],
-                "entry_time": pos["entry_time"],
-                "exit_time": datetime.now().strftime("%Y-%m-%d %I:%M %p"),
-                "entry_spot": pos["entry_spot"],
-                "exit_spot": round(c_close, 2),
-                "status": "SL TRIGGERED",
-                "pnl": -loss
-            }
-            save_trade_to_csv(record)
-            st.session_state.trade_history.append(record)
-            del st.session_state.active_positions[ticker]
 
-            send_telegram_notification(f"🛑 *STOP-LOSS HIT: {pos['symbol']}* | Loss: -₹{loss:,.2f}")
+# ==============================================================================
+# 6. USER INTERFACE (STREAMLIT DASHBOARD)
+# ==============================================================================
+st.title("🎯 Institutional Liquidity Terminal")
+st.caption(
+    "Automated 5m 30-Candle Swing Low Sweep + 1.8x/2.2x Volume Absorption Bull Call Spreads"
+)
 
-st.title("⚡ Multi-Asset Paper Trader")
+# Header Metric Bar (Capital Deployed & Free Margin tracking)
+used_capital = sum(
+    pos["capital_used"] for pos in st.session_state.open_positions
+)
+available_capital = st.session_state.virtual_capital - used_capital
 
-# Floating P&L calculation
-floating_pnl = 0.0
-for ticker, pos in st.session_state.active_positions.items():
-    if ticker in data_map and not data_map[ticker].empty:
-        curr_price = float(data_map[ticker]['Close'].iloc[-1])
-        floating_pnl += (curr_price - pos["entry_spot"]) * 0.35 * pos["qty"]
+m1, m2, m3, m4 = st.columns(4)
+m1.metric("Virtual Total Capital", f"₹{st.session_state.virtual_capital:,.2f}")
+m2.metric(
+    "Active Capital Deployed",
+    f"₹{used_capital:,.2f}",
+    delta=f"{len(st.session_state.open_positions)} Open Spreads",
+)
+m3.metric("Available Free Margin", f"₹{available_capital:,.2f}")
+m4.metric("Active Assets", "14 (NSE + MCX)")
 
-total_portfolio = st.session_state.virtual_cash + st.session_state.realized_pnl + floating_pnl
-total_return = total_portfolio - INITIAL_CAPITAL
-return_pct = (total_return / INITIAL_CAPITAL) * 100
+st.divider()
 
-# Top metrics cards
-c1, c2, c3 = st.columns(3)
-with c1:
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-title">Active Universe</div>
-        <div class="metric-value">12 Assets</div>
-        <div style="font-size:0.8rem; color:#848e9c;">2 Indices + 10 Liquid Stocks</div>
-    </div>
-    """, unsafe_allow_html=True)
+# Tab Navigation
+tab1, tab2 = st.tabs(["📊 Interactive Live Charts", "⚙️ Scanner & Trade Log"])
 
-with c2:
-    pnl_c = "#00c853" if (floating_pnl + st.session_state.realized_pnl) >= 0 else "#ff5252"
-    pnl_pfx = "+" if (floating_pnl + st.session_state.realized_pnl) >= 0 else ""
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-title">Total P&L (Net)</div>
-        <div class="metric-value" style="color:{pnl_c};">{pnl_pfx}₹{(floating_pnl + st.session_state.realized_pnl):,.2f}</div>
-        <div style="font-size:0.8rem; color:#848e9c;">Open Pos: {len(st.session_state.active_positions)}</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with c3:
-    st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-title">Portfolio Capital</div>
-        <div class="metric-value">₹{total_portfolio:,.2f}</div>
-        <div style="font-size:0.8rem; color:#848e9c;">Seed: ₹20 Lakh ({pnl_pfx}{return_pct:.2f}%)</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-tab1, tab2, tab3 = st.tabs(["📊 TradingView Pro Charts", "📋 Open & Closed Trades", "📰 News"])
-
+# ------------------------------------------------------------------------------
+# TAB 1: TRADINGVIEW ADVANCED PRO WIDGET
+# ------------------------------------------------------------------------------
 with tab1:
-    selected_asset = st.selectbox(
-        "Chart Asset Chuniye:", 
-        list(WATCHLIST.keys()), 
-        format_func=lambda x: WATCHLIST[x]["name"],
-        key="tv_asset_selector"
-    )
-
-    tv_ticker = WATCHLIST[selected_asset]["tv"]
-
-    # Official Direct TradingView Embed (High performance / No loading freeze)
-    tv_embed_url = (
-        f"https://s.tradingview.com/widgetembed/"
-        f"?symbol={tv_ticker}"
-        f"&interval=5"
-        f"&hidesidetoolbar=0"
-        f"&symboledit=1"
-        f"&saveimage=1"
-        f"&toolbarbg=151922"
-        f"&theme=dark"
-        f"&style=1"
-        f"&timezone=Asia%2FKolkata"
-        f"&withdateranges=1"
-        f"&studies=RSI%40tv-basicstudies%2CMASimple%40tv-basicstudies"
-        f"&locale=in"
-    )
-
-    chart_html = f"""
-    <div style="width: 100%; height: 550px; background-color: #151922; border-radius: 8px; overflow: hidden; border: 1px solid #232936;">
-        <iframe 
-            src="{tv_embed_url}" 
-            style="width: 100%; height: 100%; border: none;" 
-            allowtransparency="true" 
-            scrolling="no" 
-            allowfullscreen>
-        </iframe>
-    </div>
-    """
-    components.html(chart_html, height=560)
-
-with tab2:
-    st.write("##### Active Virtual Positions")
-    if st.session_state.active_positions:
-        for tkr, pos in st.session_state.active_positions.items():
-            st.markdown(f"""
-            <div class="trade-card">
-                <div style="display:flex; justify-content:space-between; font-weight:700;">
-                    <span style="color:#00c853;">{pos['symbol']} — {pos['strategy']} ({pos['qty']} Qty)</span>
-                    <span style="color:#00c853; font-size:0.8rem; background-color:#163820; padding:2px 8px; border-radius:4px;">RUNNING</span>
-                </div>
-                <div style="font-size:0.88rem; color:#d1d4dc; margin: 6px 0;">
-                    Spread: <b>{pos['buy_leg']}</b> / <b>{pos['sell_leg']}</b>
-                </div>
-                <div style="font-size:0.82rem; color:#848e9c;">
-                    Entry: <b>₹{pos['entry_spot']}</b> | Trailing SL: <b style="color:#ff5252;">₹{pos['current_sl']}</b> | Target: <b style="color:#00c853;">₹{pos['target']}</b> | Time: {pos.get('entry_time', '')}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.info("Scanner active hai (Monitoring 12 assets: Nifty, Bank Nifty + Top 10 Liquid Stocks).")
-
-    if st.button("🔄 Scan & Re-evaluate All 12 Assets Now", use_container_width=True):
-        st.rerun()
-
-    st.write("##### Closed Trade History (Permanent Record)")
-    
-    # Download Tradebook Button
-    if st.session_state.trade_history:
-        df_history = pd.DataFrame(st.session_state.trade_history)
-        csv_data = df_history.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="📥 Download Trade Book (CSV / Excel)",
-            data=csv_data,
-            file_name=f"trade_book_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
-            mime="text/csv",
-            use_container_width=True
+    col_chart_select, _ = st.columns([2, 3])
+    with col_chart_select:
+        selected_instrument = st.selectbox(
+            "Select Asset to Load Live TradingView Chart:",
+            [
+                "MCX:CRUDEOIL1! (MCX Crude Continuous)",
+                "NSE:NIFTY (Nifty 50)",
+                "NSE:BANKNIFTY (Bank Nifty)",
+                "NSE:FINNIFTY (Fin Nifty)",
+                "NSE:RELIANCE (Reliance Industries)",
+                "NSE:HDFCBANK (HDFC Bank)",
+                "NSE:ICICIBANK (ICICI Bank)",
+                "NSE:SBIN (State Bank of India)",
+            ],
+            index=0,
         )
 
-        for t in reversed(st.session_state.trade_history):
-            pnl_val = float(t.get('pnl', 0.0))
-            pnl_badge = f"+₹{pnl_val:,.2f}" if pnl_val >= 0 else f"-₹{abs(pnl_val):,.2f}"
-            pnl_col = "#00c853" if pnl_val >= 0 else "#ff5252"
-            st.markdown(f"""
-            <div class="trade-card-closed">
-                <div style="display:flex; justify-content:space-between; font-size:0.88rem;">
-                    <b>{t.get('symbol')} ({t.get('buy_leg')})</b>
-                    <b style="color:{pnl_col};">{pnl_badge}</b>
-                </div>
-                <div style="font-size:0.75rem; color:#848e9c; margin-top:4px;">
-                    Result: <b>{t.get('status')}</b> | Entry: ₹{t.get('entry_spot')} → Exit: ₹{t.get('exit_spot')} | Out: {t.get('exit_time', '')}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.caption("No closed trades in record yet.")
+    chart_symbol = selected_instrument.split(" ")[0]
 
-with tab3:
-    st.write("##### Market News Feed")
-    for news in news_items:
-        st.markdown(f"""
-        <div class="news-box">
-            <div style="font-size:0.88rem; font-weight:600; color:#e0e3eb;">{news['title']}</div>
-            <div style="font-size:0.75rem; color:#848e9c; margin-top:3px;">{news['date']}</div>
-        </div>
-        """, unsafe_allow_html=True)
+    tradingview_html = f"""
+    <div class="tradingview-widget-container" style="height:620px;width:100%">
+      <div id="tv_chart_main" style="height:600px;width:100%"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+      new TradingView.widget({{
+        "autosize": true,
+        "symbol": "{chart_symbol}",
+        "interval": "5",
+        "timezone": "Asia/Kolkata",
+        "theme": "dark",
+        "style": "1",
+        "locale": "in",
+        "enable_publishing": false,
+        "container_id": "tv_chart_main",
+        "studies": [
+          "Volume@tv-basicstudies",
+          "MASimple@tv-basicstudies"
+        ]
+      }});
+      </script>
+    </div>
+    """
+    components.html(tradingview_html, height=620, scrolling=False)
+
+# ------------------------------------------------------------------------------
+# TAB 2: LIVE SCANNER, ACTIVE POSITIONS & TRADE AUDIT
+# ------------------------------------------------------------------------------
+with tab2:
+    scan_col, info_col = st.columns([2, 3])
+    with scan_col:
+        trigger_scan = st.button(
+            "🔄 Scan & Re-evaluate All 14 Assets Now", use_container_width=True
+        )
+
+    if trigger_scan:
+        with st.spinner("Scanning 14 assets across NSE & MCX order-flow..."):
+            found_trades = 0
+            for asset_name, config in ASSETS.items():
+                signal = scan_asset_for_setup(asset_name, config)
+                if signal:
+                    found_trades += 1
+                    # Capital Margin Check
+                    if available_capital >= signal["capital_used"]:
+                        st.session_state.open_positions.append(signal)
+                        st.session_state.trade_history.append(signal)
+
+                        # Telegram Instant Notification Payload
+                        alert_text = (
+                            f"🚨 *NEW TRADE TRIGGERED* 🚨\n\n"
+                            f"*Asset:* `{signal['asset']}` ({signal['market']})\n"
+                            f"*Spot Price:* ₹{signal['spot_price']}\n"
+                            f"*Volume Surge:* `{signal['vol_ratio']}x` (Req: {signal['required_mult']}x)\n\n"
+                            f"*Leg 1 (Buy ATM):* `{signal['atm_buy']}`\n"
+                            f"*Leg 2 (Sell OTM):* `{signal['otm_sell']}`\n"
+                            f"*Capital Deployed:* `₹{signal['capital_used']:,}`\n"
+                            f"*Stop-Loss:* ₹{signal['stop_loss']}\n"
+                            f"*Target (1:2):* ₹{signal['target']}"
+                        )
+                        send_telegram_alert(alert_text)
+                        st.success(
+                            f"✅ Trigger on {signal['asset']}! Capital Deployed: ₹{signal['capital_used']:,}"
+                        )
+                    else:
+                        st.warning(
+                            f"⚠️ Signal on {signal['asset']}, but insufficient margin (Required: ₹{signal['capital_used']:,})."
+                        )
+
+            if found_trades == 0:
+                st.info(
+                    "Scanner Complete: 14 assets mein kisi par bhi 1.8x/2.2x volume absorption qualify nahi hua."
+                )
+
+    # 1. ACTIVE OPEN POSITIONS
+    st.subheader("📌 Open Positions & Live Capital Deployed")
+    if st.session_state.open_positions:
+        pos_rows = []
+        for p in st.session_state.open_positions:
+            pos_rows.append(
+                {
+                    "Asset": p["asset"],
+                    "Market": p["market"],
+                    "Spot Entry": f"₹{p['spot_price']}",
+                    "ATM Buy": p["atm_buy"],
+                    "OTM Sell": p["otm_sell"],
+                    "Capital Deployed": f"₹{p['capital_used']:,}",
+                    "Stop Loss": f"₹{p['stop_loss']}",
+                    "Target (1:2)": f"₹{p['target']}",
+                    "Volume Ratio": f"{p['vol_ratio']}x",
+                }
+            )
+        st.dataframe(pd.DataFrame(pos_rows), use_container_width=True)
+    else:
+        st.caption("Filhal koi open position active nahi hai.")
+
+    # 2. COMPLETE TRADE AUDIT LOG
+    st.subheader("📜 Paper Trading Complete Audit History")
+    if st.session_state.trade_history:
+        hist_rows = []
+        for t in st.session_state.trade_history:
+            hist_rows.append(
+                {
+                    "Trigger Time (IST)": t["trigger_time"].strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
+                    "Asset": t["asset"],
+                    "Market": t["market"],
+                    "Hedged Spread": f"{t['atm_buy']} / {t['otm_sell']}",
+                    "Capital Deployed": f"₹{t['capital_used']:,}",
+                    "Status": t["status"],
+                }
+            )
+        st.dataframe(pd.DataFrame(hist_rows), use_container_width=True)
+    else:
+        st.caption("Pichhla koi trade record nahi hai.")
