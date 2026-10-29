@@ -1,7 +1,1287 @@
 [
     {
-        "entry_time": "2026-08-24 01:30:00",
-        "exit_time": "2026-08-24 02:05:00",
+        "entry_time": "2026-08-05 13:00:00",
+        "exit_time": "2026-08-05 13:05:00",
+        "date": "2026-08-05",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24550 CE / 24650 CE",
+        "entry_price": 24530.8,
+        "exit_price": 24513.7,
+        "stop_loss": 24513.7,
+        "target": 24604.39,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.43x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-06 13:15:00",
+        "exit_time": "2026-08-06 13:50:00",
+        "date": "2026-08-06",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24650 CE / 24750 CE",
+        "entry_price": 24651.6,
+        "exit_price": 24611.85,
+        "stop_loss": 24611.85,
+        "target": 24731.1,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "2.45x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-10 15:00:00",
+        "exit_time": "2026-08-10 15:10:00",
+        "date": "2026-08-10",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24550 CE / 24650 CE",
+        "entry_price": 24572.0,
+        "exit_price": 24547.6,
+        "stop_loss": 24547.6,
+        "target": 24645.72,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "2.02x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-11 09:55:00",
+        "exit_time": "2026-08-11 11:00:00",
+        "date": "2026-08-11",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24500 CE / 24600 CE",
+        "entry_price": 24486.85,
+        "exit_price": 24461.0,
+        "stop_loss": 24461.0,
+        "target": 24560.31,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.38x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-14 09:30:00",
+        "exit_time": "2026-08-14 10:30:00",
+        "date": "2026-08-14",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24350 CE / 24450 CE",
+        "entry_price": 24325.1,
+        "exit_price": 24304.6,
+        "stop_loss": 24304.6,
+        "target": 24398.07,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.78x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-18 14:25:00",
+        "exit_time": "2026-08-18 15:10:00",
+        "date": "2026-08-18",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24200 CE / 24300 CE",
+        "entry_price": 24199.1,
+        "exit_price": 24181.75,
+        "stop_loss": 24181.75,
+        "target": 24271.7,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.9x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-21 15:10:00",
+        "exit_time": "2026-08-24 09:15:00",
+        "date": "2026-08-21",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24250 CE / 24350 CE",
+        "entry_price": 24234.75,
+        "exit_price": 24307.45,
+        "stop_loss": 24223.6,
+        "target": 24307.45,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.65x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-01 13:55:00",
+        "exit_time": "2026-09-01 14:00:00",
+        "date": "2026-09-01",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24000 CE / 24100 CE",
+        "entry_price": 23999.95,
+        "exit_price": 23988.05,
+        "stop_loss": 23988.05,
+        "target": 24071.95,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.4x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-01 14:25:00",
+        "exit_time": "2026-09-01 15:25:00",
+        "date": "2026-09-01",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24000 CE / 24100 CE",
+        "entry_price": 23981.6,
+        "exit_price": 24053.54,
+        "stop_loss": 23952.6,
+        "target": 24053.54,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.58x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-07 11:40:00",
+        "exit_time": "2026-09-07 12:30:00",
+        "date": "2026-09-07",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "23750 CE / 23850 CE",
+        "entry_price": 23771.9,
+        "exit_price": 23757.8,
+        "stop_loss": 23757.8,
+        "target": 23843.22,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.43x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-08 10:05:00",
+        "exit_time": "2026-09-08 11:50:00",
+        "date": "2026-09-08",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "23700 CE / 23800 CE",
+        "entry_price": 23681.65,
+        "exit_price": 23657.2,
+        "stop_loss": 23657.2,
+        "target": 23752.7,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.48x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-09 15:05:00",
+        "exit_time": "2026-09-09 15:25:00",
+        "date": "2026-09-09",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "23450 CE / 23550 CE",
+        "entry_price": 23470.35,
+        "exit_price": 23451.1,
+        "stop_loss": 23451.1,
+        "target": 23540.76,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.31x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-10 14:40:00",
+        "exit_time": "2026-09-10 15:00:00",
+        "date": "2026-09-10",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "23400 CE / 23500 CE",
+        "entry_price": 23414.35,
+        "exit_price": 23397.8,
+        "stop_loss": 23397.8,
+        "target": 23484.59,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.46x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-22 14:00:00",
+        "exit_time": "2026-09-22 14:10:00",
+        "date": "2026-09-22",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "23300 CE / 23400 CE",
+        "entry_price": 23308.4,
+        "exit_price": 23378.33,
+        "stop_loss": 23285.95,
+        "target": 23378.33,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.56x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-01 09:25:00",
+        "exit_time": "2026-10-01 10:05:00",
+        "date": "2026-10-01",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22550 CE / 22650 CE",
+        "entry_price": 22539.8,
+        "exit_price": 22607.42,
+        "stop_loss": 22508.35,
+        "target": 22607.42,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.32x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-01 12:30:00",
+        "exit_time": "2026-10-01 12:40:00",
+        "date": "2026-10-01",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22500 CE / 22600 CE",
+        "entry_price": 22476.15,
+        "exit_price": 22458.15,
+        "stop_loss": 22458.15,
+        "target": 22543.58,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.28x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-01 14:05:00",
+        "exit_time": "2026-10-01 14:50:00",
+        "date": "2026-10-01",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22250 CE / 22350 CE",
+        "entry_price": 22273.2,
+        "exit_price": 22384.3,
+        "stop_loss": 22217.65,
+        "target": 22384.3,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.57x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-07 09:40:00",
+        "exit_time": "2026-10-07 10:00:00",
+        "date": "2026-10-07",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22600 CE / 22700 CE",
+        "entry_price": 22617.1,
+        "exit_price": 22585.4,
+        "stop_loss": 22585.4,
+        "target": 22684.95,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.82x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-07 13:10:00",
+        "exit_time": "2026-10-07 14:00:00",
+        "date": "2026-10-07",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22600 CE / 22700 CE",
+        "entry_price": 22578.2,
+        "exit_price": 22552.6,
+        "stop_loss": 22552.6,
+        "target": 22645.93,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.51x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-08 13:20:00",
+        "exit_time": "2026-10-08 13:30:00",
+        "date": "2026-10-08",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22250 CE / 22350 CE",
+        "entry_price": 22263.65,
+        "exit_price": 22232.4,
+        "stop_loss": 22232.4,
+        "target": 22330.44,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.43x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-14 11:35:00",
+        "exit_time": "2026-10-14 12:55:00",
+        "date": "2026-10-14",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22700 CE / 22800 CE",
+        "entry_price": 22690.55,
+        "exit_price": 22656.3,
+        "stop_loss": 22656.3,
+        "target": 22759.05,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.41x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-14 13:15:00",
+        "exit_time": "2026-10-14 13:45:00",
+        "date": "2026-10-14",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22550 CE / 22650 CE",
+        "entry_price": 22574.1,
+        "exit_price": 22641.82,
+        "stop_loss": 22558.95,
+        "target": 22641.82,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.27x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-16 09:35:00",
+        "exit_time": "2026-10-16 09:55:00",
+        "date": "2026-10-16",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22950 CE / 23050 CE",
+        "entry_price": 22938.0,
+        "exit_price": 23006.81,
+        "stop_loss": 22914.3,
+        "target": 23006.81,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.27x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-16 14:25:00",
+        "exit_time": "2026-10-19 09:15:00",
+        "date": "2026-10-16",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "23100 CE / 23200 CE",
+        "entry_price": 23085.35,
+        "exit_price": 23154.61,
+        "stop_loss": 23072.35,
+        "target": 23154.61,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.38x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-19 12:05:00",
+        "exit_time": "2026-10-19 12:15:00",
+        "date": "2026-10-19",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22950 CE / 23050 CE",
+        "entry_price": 22960.8,
+        "exit_price": 22939.6,
+        "stop_loss": 22939.6,
+        "target": 23029.68,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.36x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-22 09:35:00",
+        "exit_time": "2026-10-22 11:10:00",
+        "date": "2026-10-22",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22650 CE / 22750 CE",
+        "entry_price": 22626.35,
+        "exit_price": 22768.85,
+        "stop_loss": 22555.1,
+        "target": 22768.85,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.98x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-27 14:15:00",
+        "exit_time": "2026-10-27 14:35:00",
+        "date": "2026-10-27",
+        "asset": "NIFTY",
+        "market": "NSE_INDEX",
+        "spread": "22650 CE / 22750 CE",
+        "entry_price": 22672.05,
+        "exit_price": 22741.95,
+        "stop_loss": 22637.1,
+        "target": 22741.95,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.35x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-05 13:00:00",
+        "exit_time": "2026-08-05 13:05:00",
+        "date": "2026-08-05",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "57600 CE / 57800 CE",
+        "entry_price": 57580.55,
+        "exit_price": 57529.5,
+        "stop_loss": 57529.5,
+        "target": 57753.29,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.43x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-14 09:30:00",
+        "exit_time": "2026-08-14 10:30:00",
+        "date": "2026-08-14",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "57500 CE / 57700 CE",
+        "entry_price": 57514.4,
+        "exit_price": 57461.35,
+        "stop_loss": 57461.35,
+        "target": 57686.94,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "2.43x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-21 12:15:00",
+        "exit_time": "2026-08-21 12:15:00",
+        "date": "2026-08-21",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "57700 CE / 57900 CE",
+        "entry_price": 57659.2,
+        "exit_price": 57668.85,
+        "stop_loss": 57622.2,
+        "target": 57832.18,
+        "outcome": "EXPIRED",
+        "capital_deployed": 50000,
+        "net_pnl": 540.0,
+        "vol_ratio": "1.32x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-27 09:30:00",
+        "exit_time": "2026-08-27 10:50:00",
+        "date": "2026-08-27",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "57800 CE / 58000 CE",
+        "entry_price": 57819.9,
+        "exit_price": 57744.65,
+        "stop_loss": 57744.65,
+        "target": 57993.36,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.46x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-27 12:25:00",
+        "exit_time": "2026-08-27 13:15:00",
+        "date": "2026-08-27",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "57600 CE / 57800 CE",
+        "entry_price": 57623.1,
+        "exit_price": 57795.97,
+        "stop_loss": 57571.3,
+        "target": 57795.97,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 50000,
+        "net_pnl": 1800.0,
+        "vol_ratio": "1.43x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-03 13:25:00",
+        "exit_time": "2026-09-03 14:55:00",
+        "date": "2026-09-03",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "57500 CE / 57700 CE",
+        "entry_price": 57517.25,
+        "exit_price": 57472.5,
+        "stop_loss": 57472.5,
+        "target": 57689.8,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.71x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-04 15:05:00",
+        "exit_time": "2026-09-04 15:10:00",
+        "date": "2026-09-04",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "57500 CE / 57700 CE",
+        "entry_price": 57456.1,
+        "exit_price": 57428.9,
+        "stop_loss": 57428.9,
+        "target": 57628.47,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.35x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-07 12:30:00",
+        "exit_time": "2026-09-07 12:50:00",
+        "date": "2026-09-07",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "57100 CE / 57300 CE",
+        "entry_price": 57065.4,
+        "exit_price": 57017.25,
+        "stop_loss": 57017.25,
+        "target": 57236.59,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.69x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-08 10:05:00",
+        "exit_time": "2026-09-08 11:50:00",
+        "date": "2026-09-08",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "56900 CE / 57100 CE",
+        "entry_price": 56911.3,
+        "exit_price": 56850.25,
+        "stop_loss": 56850.25,
+        "target": 57082.03,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.31x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-10 14:40:00",
+        "exit_time": "2026-09-10 15:00:00",
+        "date": "2026-09-10",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "56300 CE / 56500 CE",
+        "entry_price": 56324.55,
+        "exit_price": 56258.05,
+        "stop_loss": 56258.05,
+        "target": 56493.52,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.69x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-15 11:10:00",
+        "exit_time": "2026-09-15 11:30:00",
+        "date": "2026-09-15",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "56200 CE / 56400 CE",
+        "entry_price": 56182.9,
+        "exit_price": 56111.75,
+        "stop_loss": 56111.75,
+        "target": 56351.45,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.33x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-22 14:00:00",
+        "exit_time": "2026-09-22 14:10:00",
+        "date": "2026-09-22",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "56200 CE / 56400 CE",
+        "entry_price": 56150.05,
+        "exit_price": 56318.5,
+        "stop_loss": 56106.95,
+        "target": 56318.5,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 50000,
+        "net_pnl": 1800.0,
+        "vol_ratio": "1.31x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-24 09:20:00",
+        "exit_time": "2026-09-24 09:35:00",
+        "date": "2026-09-24",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "55700 CE / 55900 CE",
+        "entry_price": 55742.55,
+        "exit_price": 55641.5,
+        "stop_loss": 55641.5,
+        "target": 55944.65,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "2.86x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-24 09:45:00",
+        "exit_time": "2026-09-24 09:45:00",
+        "date": "2026-09-24",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "55600 CE / 55800 CE",
+        "entry_price": 55588.4,
+        "exit_price": 55595.15,
+        "stop_loss": 55506.6,
+        "target": 55755.16,
+        "outcome": "EXPIRED",
+        "capital_deployed": 50000,
+        "net_pnl": 540.0,
+        "vol_ratio": "1.4x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-24 13:45:00",
+        "exit_time": "2026-09-24 13:55:00",
+        "date": "2026-09-24",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "55500 CE / 55700 CE",
+        "entry_price": 55467.0,
+        "exit_price": 55377.8,
+        "stop_loss": 55377.8,
+        "target": 55645.4,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "2.02x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-25 12:55:00",
+        "exit_time": "2026-09-25 14:00:00",
+        "date": "2026-09-25",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "55500 CE / 55700 CE",
+        "entry_price": 55496.45,
+        "exit_price": 55662.94,
+        "stop_loss": 55424.3,
+        "target": 55662.94,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 50000,
+        "net_pnl": 1800.0,
+        "vol_ratio": "1.93x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-29 09:40:00",
+        "exit_time": "2026-09-29 10:20:00",
+        "date": "2026-09-29",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "53900 CE / 54100 CE",
+        "entry_price": 53869.75,
+        "exit_price": 53789.45,
+        "stop_loss": 53789.45,
+        "target": 54031.36,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.81x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-01 12:30:00",
+        "exit_time": "2026-10-01 12:40:00",
+        "date": "2026-10-01",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "54700 CE / 54900 CE",
+        "entry_price": 54725.75,
+        "exit_price": 54653.35,
+        "stop_loss": 54653.35,
+        "target": 54889.93,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.53x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-01 14:05:00",
+        "exit_time": "2026-10-01 14:50:00",
+        "date": "2026-10-01",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "54200 CE / 54400 CE",
+        "entry_price": 54206.25,
+        "exit_price": 54478.45,
+        "stop_loss": 54070.15,
+        "target": 54478.45,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 50000,
+        "net_pnl": 1800.0,
+        "vol_ratio": "1.34x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-07 09:40:00",
+        "exit_time": "2026-10-07 10:10:00",
+        "date": "2026-10-07",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "54700 CE / 54900 CE",
+        "entry_price": 54737.2,
+        "exit_price": 54936.39,
+        "stop_loss": 54637.6,
+        "target": 54936.39,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 50000,
+        "net_pnl": 1800.0,
+        "vol_ratio": "1.96x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-07 13:10:00",
+        "exit_time": "2026-10-07 14:25:00",
+        "date": "2026-10-07",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "54900 CE / 55100 CE",
+        "entry_price": 54891.15,
+        "exit_price": 55071.65,
+        "stop_loss": 54800.9,
+        "target": 55071.65,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 50000,
+        "net_pnl": 1800.0,
+        "vol_ratio": "1.58x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-08 09:20:00",
+        "exit_time": "2026-10-08 09:20:00",
+        "date": "2026-10-08",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "54800 CE / 55000 CE",
+        "entry_price": 54850.0,
+        "exit_price": 54855.5,
+        "stop_loss": 54767.55,
+        "target": 55014.9,
+        "outcome": "EXPIRED",
+        "capital_deployed": 50000,
+        "net_pnl": 540.0,
+        "vol_ratio": "1.98x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-08 13:20:00",
+        "exit_time": "2026-10-08 13:25:00",
+        "date": "2026-10-08",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "54700 CE / 54900 CE",
+        "entry_price": 54675.7,
+        "exit_price": 54589.2,
+        "stop_loss": 54589.2,
+        "target": 54848.7,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.38x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-08 13:30:00",
+        "exit_time": "2026-10-08 13:45:00",
+        "date": "2026-10-08",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "54700 CE / 54900 CE",
+        "entry_price": 54660.6,
+        "exit_price": 54569.8,
+        "stop_loss": 54569.8,
+        "target": 54842.2,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.33x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-15 14:15:00",
+        "exit_time": "2026-10-15 14:25:00",
+        "date": "2026-10-15",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "55900 CE / 56100 CE",
+        "entry_price": 55856.35,
+        "exit_price": 55766.65,
+        "stop_loss": 55766.65,
+        "target": 56035.76,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 50000,
+        "net_pnl": -1050.0,
+        "vol_ratio": "1.57x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-19 09:30:00",
+        "exit_time": "2026-10-19 09:30:00",
+        "date": "2026-10-19",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "55600 CE / 55800 CE",
+        "entry_price": 55589.45,
+        "exit_price": 55569.9,
+        "stop_loss": 55335.05,
+        "target": 56098.25,
+        "outcome": "EXPIRED",
+        "capital_deployed": 50000,
+        "net_pnl": -420.0,
+        "vol_ratio": "2.93x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-19 13:45:00",
+        "exit_time": "2026-10-21 09:15:00",
+        "date": "2026-10-19",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "55400 CE / 55600 CE",
+        "entry_price": 55440.8,
+        "exit_price": 55619.4,
+        "stop_loss": 55351.5,
+        "target": 55619.4,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 50000,
+        "net_pnl": 1800.0,
+        "vol_ratio": "1.46x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-26 09:25:00",
+        "exit_time": "2026-10-26 10:05:00",
+        "date": "2026-10-26",
+        "asset": "BANKNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "54000 CE / 54200 CE",
+        "entry_price": 53964.05,
+        "exit_price": 54337.15,
+        "stop_loss": 53777.5,
+        "target": 54337.15,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 50000,
+        "net_pnl": 1800.0,
+        "vol_ratio": "1.8x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-05 13:00:00",
+        "exit_time": "2026-08-05 13:05:00",
+        "date": "2026-08-05",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "26700 CE / 26800 CE",
+        "entry_price": 26711.7,
+        "exit_price": 26687.35,
+        "stop_loss": 26687.35,
+        "target": 26791.83,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.55x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-14 09:20:00",
+        "exit_time": "2026-08-14 09:25:00",
+        "date": "2026-08-14",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "26250 CE / 26350 CE",
+        "entry_price": 26274.55,
+        "exit_price": 26253.4,
+        "stop_loss": 26253.4,
+        "target": 26353.37,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.71x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-14 09:30:00",
+        "exit_time": "2026-08-14 10:30:00",
+        "date": "2026-08-14",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "26250 CE / 26350 CE",
+        "entry_price": 26259.7,
+        "exit_price": 26238.75,
+        "stop_loss": 26238.75,
+        "target": 26338.48,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.98x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-21 12:15:00",
+        "exit_time": "2026-08-21 13:50:00",
+        "date": "2026-08-21",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "26250 CE / 26350 CE",
+        "entry_price": 26262.05,
+        "exit_price": 26242.15,
+        "stop_loss": 26242.15,
+        "target": 26340.84,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.71x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-27 09:30:00",
+        "exit_time": "2026-08-27 09:35:00",
+        "date": "2026-08-27",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "26400 CE / 26500 CE",
+        "entry_price": 26407.2,
+        "exit_price": 26377.75,
+        "stop_loss": 26377.75,
+        "target": 26486.42,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.36x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-27 14:10:00",
+        "exit_time": "2026-08-27 15:25:00",
+        "date": "2026-08-27",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "26350 CE / 26450 CE",
+        "entry_price": 26327.2,
+        "exit_price": 26312.8,
+        "stop_loss": 26312.8,
+        "target": 26406.18,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.44x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-01 14:25:00",
+        "exit_time": "2026-09-01 15:10:00",
+        "date": "2026-09-01",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "25950 CE / 26050 CE",
+        "entry_price": 25938.05,
+        "exit_price": 25905.9,
+        "stop_loss": 25905.9,
+        "target": 26015.86,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.37x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-08 10:05:00",
+        "exit_time": "2026-09-08 11:30:00",
+        "date": "2026-09-08",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "25750 CE / 25850 CE",
+        "entry_price": 25770.95,
+        "exit_price": 25733.85,
+        "stop_loss": 25733.85,
+        "target": 25848.26,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.71x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-08 11:50:00",
+        "exit_time": "2026-09-08 12:05:00",
+        "date": "2026-09-08",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "25750 CE / 25850 CE",
+        "entry_price": 25736.45,
+        "exit_price": 25708.6,
+        "stop_loss": 25708.6,
+        "target": 25813.66,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.53x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-10 14:40:00",
+        "exit_time": "2026-09-10 15:00:00",
+        "date": "2026-09-10",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "25450 CE / 25550 CE",
+        "entry_price": 25449.15,
+        "exit_price": 25430.3,
+        "stop_loss": 25430.3,
+        "target": 25525.5,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.31x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-15 11:10:00",
+        "exit_time": "2026-09-15 11:20:00",
+        "date": "2026-09-15",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "25300 CE / 25400 CE",
+        "entry_price": 25323.4,
+        "exit_price": 25287.0,
+        "stop_loss": 25287.0,
+        "target": 25399.37,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.32x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-24 09:20:00",
+        "exit_time": "2026-09-24 09:20:00",
+        "date": "2026-09-24",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "25100 CE / 25200 CE",
+        "entry_price": 25105.25,
+        "exit_price": 25122.15,
+        "stop_loss": 25036.45,
+        "target": 25242.85,
+        "outcome": "EXPIRED",
+        "capital_deployed": 45000,
+        "net_pnl": 450.0,
+        "vol_ratio": "3.16x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-24 12:25:00",
+        "exit_time": "2026-09-24 12:35:00",
+        "date": "2026-09-24",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "25100 CE / 25200 CE",
+        "entry_price": 25075.7,
+        "exit_price": 25051.7,
+        "stop_loss": 25051.7,
+        "target": 25150.93,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.36x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-25 12:55:00",
+        "exit_time": "2026-09-25 14:00:00",
+        "date": "2026-09-25",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24950 CE / 25050 CE",
+        "entry_price": 24973.55,
+        "exit_price": 25048.47,
+        "stop_loss": 24942.3,
+        "target": 25048.47,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.81x (Rng)"
+    },
+    {
+        "entry_time": "2026-09-29 09:40:00",
+        "exit_time": "2026-09-29 10:40:00",
+        "date": "2026-09-29",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24400 CE / 24500 CE",
+        "entry_price": 24390.45,
+        "exit_price": 24463.62,
+        "stop_loss": 24361.25,
+        "target": 24463.62,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "2.12x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-01 14:05:00",
+        "exit_time": "2026-10-01 14:55:00",
+        "date": "2026-10-01",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24400 CE / 24500 CE",
+        "entry_price": 24423.25,
+        "exit_price": 24548.95,
+        "stop_loss": 24360.4,
+        "target": 24548.95,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.45x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-07 13:10:00",
+        "exit_time": "2026-10-07 14:25:00",
+        "date": "2026-10-07",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24850 CE / 24950 CE",
+        "entry_price": 24851.5,
+        "exit_price": 24931.1,
+        "stop_loss": 24811.7,
+        "target": 24931.1,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.56x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-08 13:30:00",
+        "exit_time": "2026-10-08 13:45:00",
+        "date": "2026-10-08",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24650 CE / 24750 CE",
+        "entry_price": 24670.4,
+        "exit_price": 24626.45,
+        "stop_loss": 24626.45,
+        "target": 24758.3,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.43x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-14 13:15:00",
+        "exit_time": "2026-10-14 13:45:00",
+        "date": "2026-10-14",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24900 CE / 25000 CE",
+        "entry_price": 24910.3,
+        "exit_price": 24985.03,
+        "stop_loss": 24885.4,
+        "target": 24985.03,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.34x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-16 09:35:00",
+        "exit_time": "2026-10-16 09:55:00",
+        "date": "2026-10-16",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "25150 CE / 25250 CE",
+        "entry_price": 25171.25,
+        "exit_price": 25246.76,
+        "stop_loss": 25139.6,
+        "target": 25246.76,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.36x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-19 09:30:00",
+        "exit_time": "2026-10-19 09:30:00",
+        "date": "2026-10-19",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "25200 CE / 25300 CE",
+        "entry_price": 25199.3,
+        "exit_price": 25084.2,
+        "stop_loss": 25066.7,
+        "target": 25464.5,
+        "outcome": "EXPIRED",
+        "capital_deployed": 45000,
+        "net_pnl": -350.0,
+        "vol_ratio": "3.29x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-19 11:40:00",
+        "exit_time": "2026-10-19 11:55:00",
+        "date": "2026-10-19",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "25050 CE / 25150 CE",
+        "entry_price": 25071.9,
+        "exit_price": 25040.6,
+        "stop_loss": 25040.6,
+        "target": 25147.12,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.25x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-19 12:05:00",
+        "exit_time": "2026-10-19 12:15:00",
+        "date": "2026-10-19",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "25000 CE / 25100 CE",
+        "entry_price": 25020.55,
+        "exit_price": 25000.95,
+        "stop_loss": 25000.95,
+        "target": 25095.61,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 45000,
+        "net_pnl": -875.0,
+        "vol_ratio": "1.27x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-19 13:45:00",
+        "exit_time": "2026-10-19 14:55:00",
+        "date": "2026-10-19",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24950 CE / 25050 CE",
+        "entry_price": 24945.0,
+        "exit_price": 25019.84,
+        "stop_loss": 24911.6,
+        "target": 25019.84,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "1.29x (Rng)"
+    },
+    {
+        "entry_time": "2026-10-26 09:25:00",
+        "exit_time": "2026-10-26 09:55:00",
+        "date": "2026-10-26",
+        "asset": "FINNIFTY",
+        "market": "NSE_INDEX",
+        "spread": "24250 CE / 24350 CE",
+        "entry_price": 24263.1,
+        "exit_price": 24460.5,
+        "stop_loss": 24164.4,
+        "target": 24460.5,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 1500.0,
+        "vol_ratio": "2.11x (Rng)"
+    },
+    {
+        "entry_time": "2026-08-24 11:00:00",
+        "exit_time": "2026-08-24 11:35:00",
         "date": "2026-08-24",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -13,11 +1293,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "1.86x"
+        "vol_ratio": "1.86x (Vol)"
     },
     {
-        "entry_time": "2026-08-24 02:15:00",
-        "exit_time": "2026-08-24 02:30:00",
+        "entry_time": "2026-08-24 11:45:00",
+        "exit_time": "2026-08-24 12:00:00",
         "date": "2026-08-24",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -29,11 +1309,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.07x"
+        "vol_ratio": "2.07x (Vol)"
     },
     {
-        "entry_time": "2026-08-24 02:40:00",
-        "exit_time": "2026-08-24 03:00:00",
+        "entry_time": "2026-08-24 12:10:00",
+        "exit_time": "2026-08-24 12:30:00",
         "date": "2026-08-24",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -41,47 +1321,15 @@
         "entry_price": 85.23,
         "exit_price": 85.15,
         "stop_loss": 85.15,
-        "target": 85.39,
+        "target": 85.49,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "1.82x"
+        "vol_ratio": "1.82x (Vol)"
     },
     {
-        "entry_time": "2026-08-24 11:30:00",
-        "exit_time": "2026-08-24 12:20:00",
-        "date": "2026-08-24",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 84.65,
-        "exit_price": 85.23,
-        "stop_loss": 84.36,
-        "target": 85.23,
-        "outcome": "TARGET_HIT",
-        "capital_deployed": 55000,
-        "net_pnl": 6000.0,
-        "vol_ratio": "2.01x"
-    },
-    {
-        "entry_time": "2026-08-24 21:00:00",
-        "exit_time": "2026-08-24 22:05:00",
-        "date": "2026-08-24",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 85.07,
-        "exit_price": 85.75,
-        "stop_loss": 84.73,
-        "target": 85.75,
-        "outcome": "TARGET_HIT",
-        "capital_deployed": 55000,
-        "net_pnl": 6000.0,
-        "vol_ratio": "5.14x"
-    },
-    {
-        "entry_time": "2026-08-25 01:30:00",
-        "exit_time": "2026-08-25 01:45:00",
+        "entry_time": "2026-08-25 11:00:00",
+        "exit_time": "2026-08-25 11:15:00",
         "date": "2026-08-25",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -93,11 +1341,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.73x"
+        "vol_ratio": "2.73x (Vol)"
     },
     {
-        "entry_time": "2026-08-25 07:50:00",
-        "exit_time": "2026-08-25 08:10:00",
+        "entry_time": "2026-08-25 17:20:00",
+        "exit_time": "2026-08-25 17:40:00",
         "date": "2026-08-25",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -109,27 +1357,11 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 6000.0,
-        "vol_ratio": "2.4x"
+        "vol_ratio": "2.4x (Vol)"
     },
     {
-        "entry_time": "2026-08-26 14:25:00",
-        "exit_time": "2026-08-26 14:45:00",
-        "date": "2026-08-26",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 82.25,
-        "exit_price": 82.07,
-        "stop_loss": 82.07,
-        "target": 82.61,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 55000,
-        "net_pnl": -3500.0,
-        "vol_ratio": "3.73x"
-    },
-    {
-        "entry_time": "2026-08-27 01:30:00",
-        "exit_time": "2026-08-27 01:55:00",
+        "entry_time": "2026-08-27 11:00:00",
+        "exit_time": "2026-08-27 11:25:00",
         "date": "2026-08-27",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -141,11 +1373,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "5.55x"
+        "vol_ratio": "5.55x (Vol)"
     },
     {
-        "entry_time": "2026-08-27 02:00:00",
-        "exit_time": "2026-08-27 02:05:00",
+        "entry_time": "2026-08-27 11:30:00",
+        "exit_time": "2026-08-27 11:35:00",
         "date": "2026-08-27",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -153,15 +1385,15 @@
         "entry_price": 81.49,
         "exit_price": 81.39,
         "stop_loss": 81.39,
-        "target": 81.69,
+        "target": 81.73,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "1.86x"
+        "vol_ratio": "1.86x (Vol)"
     },
     {
-        "entry_time": "2026-08-27 02:15:00",
-        "exit_time": "2026-08-27 02:20:00",
+        "entry_time": "2026-08-27 11:45:00",
+        "exit_time": "2026-08-27 11:50:00",
         "date": "2026-08-27",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -169,15 +1401,15 @@
         "entry_price": 81.38,
         "exit_price": 81.31,
         "stop_loss": 81.31,
-        "target": 81.52,
+        "target": 81.62,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.05x"
+        "vol_ratio": "2.05x (Vol)"
     },
     {
-        "entry_time": "2026-08-27 02:40:00",
-        "exit_time": "2026-08-27 02:45:00",
+        "entry_time": "2026-08-27 12:10:00",
+        "exit_time": "2026-08-27 12:15:00",
         "date": "2026-08-27",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -185,47 +1417,15 @@
         "entry_price": 81.1,
         "exit_price": 81.03,
         "stop_loss": 81.03,
-        "target": 81.24,
+        "target": 81.34,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.04x"
+        "vol_ratio": "2.04x (Vol)"
     },
     {
-        "entry_time": "2026-08-27 20:15:00",
-        "exit_time": "2026-08-27 20:30:00",
-        "date": "2026-08-27",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 83.44,
-        "exit_price": 83.35,
-        "stop_loss": 83.35,
-        "target": 83.62,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 55000,
-        "net_pnl": -3500.0,
-        "vol_ratio": "2.56x"
-    },
-    {
-        "entry_time": "2026-08-27 20:35:00",
-        "exit_time": "2026-08-27 20:45:00",
-        "date": "2026-08-27",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 83.36,
-        "exit_price": 83.29,
-        "stop_loss": 83.29,
-        "target": 83.5,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 55000,
-        "net_pnl": -3500.0,
-        "vol_ratio": "2.45x"
-    },
-    {
-        "entry_time": "2026-08-28 09:05:00",
-        "exit_time": "2026-08-28 09:05:00",
+        "entry_time": "2026-08-28 18:35:00",
+        "exit_time": "2026-08-28 18:35:00",
         "date": "2026-08-28",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -237,11 +1437,11 @@
         "outcome": "EXPIRED",
         "capital_deployed": 55000,
         "net_pnl": 1800.0,
-        "vol_ratio": "3.3x"
+        "vol_ratio": "3.3x (Vol)"
     },
     {
-        "entry_time": "2026-08-31 03:20:00",
-        "exit_time": "2026-08-31 03:40:00",
+        "entry_time": "2026-08-31 12:50:00",
+        "exit_time": "2026-08-31 13:10:00",
         "date": "2026-08-31",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -253,11 +1453,11 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 6000.0,
-        "vol_ratio": "2.51x"
+        "vol_ratio": "2.51x (Vol)"
     },
     {
-        "entry_time": "2026-09-02 02:40:00",
-        "exit_time": "2026-09-02 03:00:00",
+        "entry_time": "2026-09-02 12:10:00",
+        "exit_time": "2026-09-02 12:30:00",
         "date": "2026-09-02",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -269,11 +1469,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "3.64x"
+        "vol_ratio": "3.64x (Vol)"
     },
     {
-        "entry_time": "2026-09-02 03:10:00",
-        "exit_time": "2026-09-02 03:40:00",
+        "entry_time": "2026-09-02 12:40:00",
+        "exit_time": "2026-09-02 13:10:00",
         "date": "2026-09-02",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -285,27 +1485,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "1.96x"
+        "vol_ratio": "1.96x (Vol)"
     },
     {
-        "entry_time": "2026-09-02 10:00:00",
-        "exit_time": "2026-09-02 10:05:00",
-        "date": "2026-09-02",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 89.15,
-        "exit_price": 89.51,
-        "stop_loss": 88.97,
-        "target": 89.51,
-        "outcome": "TARGET_HIT",
-        "capital_deployed": 55000,
-        "net_pnl": 6000.0,
-        "vol_ratio": "2.05x"
-    },
-    {
-        "entry_time": "2026-09-03 01:40:00",
-        "exit_time": "2026-09-03 01:50:00",
+        "entry_time": "2026-09-03 11:10:00",
+        "exit_time": "2026-09-03 11:20:00",
         "date": "2026-09-03",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -317,27 +1501,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.3x"
+        "vol_ratio": "2.3x (Vol)"
     },
     {
-        "entry_time": "2026-09-03 14:15:00",
-        "exit_time": "2026-09-03 14:35:00",
-        "date": "2026-09-03",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 91.06,
-        "exit_price": 91.46,
-        "stop_loss": 90.86,
-        "target": 91.46,
-        "outcome": "TARGET_HIT",
-        "capital_deployed": 55000,
-        "net_pnl": 6000.0,
-        "vol_ratio": "2.42x"
-    },
-    {
-        "entry_time": "2026-09-04 03:50:00",
-        "exit_time": "2026-09-04 04:10:00",
+        "entry_time": "2026-09-04 13:20:00",
+        "exit_time": "2026-09-04 13:40:00",
         "date": "2026-09-04",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -349,11 +1517,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "3.09x"
+        "vol_ratio": "3.09x (Vol)"
     },
     {
-        "entry_time": "2026-09-04 09:40:00",
-        "exit_time": "2026-09-04 09:50:00",
+        "entry_time": "2026-09-04 19:10:00",
+        "exit_time": "2026-09-04 19:20:00",
         "date": "2026-09-04",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -365,11 +1533,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.75x"
+        "vol_ratio": "2.75x (Vol)"
     },
     {
-        "entry_time": "2026-09-08 08:30:00",
-        "exit_time": "2026-09-08 08:35:00",
+        "entry_time": "2026-09-08 18:00:00",
+        "exit_time": "2026-09-08 18:05:00",
         "date": "2026-09-08",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -381,11 +1549,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "3.73x"
+        "vol_ratio": "3.73x (Vol)"
     },
     {
-        "entry_time": "2026-09-09 01:30:00",
-        "exit_time": "2026-09-09 01:35:00",
+        "entry_time": "2026-09-09 11:00:00",
+        "exit_time": "2026-09-09 11:05:00",
         "date": "2026-09-09",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -397,27 +1565,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.65x"
+        "vol_ratio": "2.65x (Vol)"
     },
     {
-        "entry_time": "2026-09-09 20:20:00",
-        "exit_time": "2026-09-09 21:00:00",
-        "date": "2026-09-09",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 96.59,
-        "exit_price": 96.51,
-        "stop_loss": 96.51,
-        "target": 96.75,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 55000,
-        "net_pnl": -3500.0,
-        "vol_ratio": "3.19x"
-    },
-    {
-        "entry_time": "2026-09-11 01:05:00",
-        "exit_time": "2026-09-11 01:10:00",
+        "entry_time": "2026-09-11 10:35:00",
+        "exit_time": "2026-09-11 10:40:00",
         "date": "2026-09-11",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -429,11 +1581,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "3.23x"
+        "vol_ratio": "3.23x (Vol)"
     },
     {
-        "entry_time": "2026-09-11 01:40:00",
-        "exit_time": "2026-09-11 01:45:00",
+        "entry_time": "2026-09-11 11:10:00",
+        "exit_time": "2026-09-11 11:15:00",
         "date": "2026-09-11",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -441,15 +1593,15 @@
         "entry_price": 101.14,
         "exit_price": 101.05,
         "stop_loss": 101.05,
-        "target": 101.32,
+        "target": 101.44,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "1.86x"
+        "vol_ratio": "1.86x (Vol)"
     },
     {
-        "entry_time": "2026-09-14 02:30:00",
-        "exit_time": "2026-09-14 03:05:00",
+        "entry_time": "2026-09-14 12:00:00",
+        "exit_time": "2026-09-14 12:35:00",
         "date": "2026-09-14",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -461,11 +1613,11 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 6000.0,
-        "vol_ratio": "2.49x"
+        "vol_ratio": "2.49x (Vol)"
     },
     {
-        "entry_time": "2026-09-15 08:50:00",
-        "exit_time": "2026-09-15 08:55:00",
+        "entry_time": "2026-09-15 18:20:00",
+        "exit_time": "2026-09-15 18:25:00",
         "date": "2026-09-15",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -477,11 +1629,11 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 6000.0,
-        "vol_ratio": "2.69x"
+        "vol_ratio": "2.69x (Vol)"
     },
     {
-        "entry_time": "2026-09-16 07:00:00",
-        "exit_time": "2026-09-16 07:00:00",
+        "entry_time": "2026-09-16 16:30:00",
+        "exit_time": "2026-09-16 16:30:00",
         "date": "2026-09-16",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -493,11 +1645,11 @@
         "outcome": "EXPIRED",
         "capital_deployed": 55000,
         "net_pnl": 1800.0,
-        "vol_ratio": "3.82x"
+        "vol_ratio": "3.82x (Vol)"
     },
     {
-        "entry_time": "2026-09-17 02:10:00",
-        "exit_time": "2026-09-17 02:20:00",
+        "entry_time": "2026-09-17 11:40:00",
+        "exit_time": "2026-09-17 11:50:00",
         "date": "2026-09-17",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -509,11 +1661,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.55x"
+        "vol_ratio": "2.55x (Vol)"
     },
     {
-        "entry_time": "2026-09-17 08:10:00",
-        "exit_time": "2026-09-17 09:10:00",
+        "entry_time": "2026-09-17 17:40:00",
+        "exit_time": "2026-09-17 18:40:00",
         "date": "2026-09-17",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -525,27 +1677,11 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 6000.0,
-        "vol_ratio": "2.23x"
+        "vol_ratio": "2.23x (Vol)"
     },
     {
-        "entry_time": "2026-09-17 20:15:00",
-        "exit_time": "2026-09-17 21:15:00",
-        "date": "2026-09-17",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 100.97,
-        "exit_price": 101.39,
-        "stop_loss": 100.76,
-        "target": 101.39,
-        "outcome": "TARGET_HIT",
-        "capital_deployed": 55000,
-        "net_pnl": 6000.0,
-        "vol_ratio": "2.99x"
-    },
-    {
-        "entry_time": "2026-09-18 02:35:00",
-        "exit_time": "2026-09-18 02:50:00",
+        "entry_time": "2026-09-18 12:05:00",
+        "exit_time": "2026-09-18 12:20:00",
         "date": "2026-09-18",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -553,31 +1689,15 @@
         "entry_price": 100.08,
         "exit_price": 99.95,
         "stop_loss": 99.95,
-        "target": 100.34,
+        "target": 100.38,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "3.39x"
+        "vol_ratio": "3.39x (Vol)"
     },
     {
-        "entry_time": "2026-09-20 20:40:00",
-        "exit_time": "2026-09-20 21:00:00",
-        "date": "2026-09-20",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 94.86,
-        "exit_price": 94.33,
-        "stop_loss": 94.33,
-        "target": 95.92,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 55000,
-        "net_pnl": -3500.0,
-        "vol_ratio": "3.19x"
-    },
-    {
-        "entry_time": "2026-09-21 04:25:00",
-        "exit_time": "2026-09-21 05:00:00",
+        "entry_time": "2026-09-21 13:55:00",
+        "exit_time": "2026-09-21 14:30:00",
         "date": "2026-09-21",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -589,11 +1709,11 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 6000.0,
-        "vol_ratio": "2.69x"
+        "vol_ratio": "2.69x (Vol)"
     },
     {
-        "entry_time": "2026-09-21 06:40:00",
-        "exit_time": "2026-09-21 06:40:00",
+        "entry_time": "2026-09-21 16:10:00",
+        "exit_time": "2026-09-21 16:10:00",
         "date": "2026-09-21",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -604,12 +1724,12 @@
         "target": 93.81,
         "outcome": "EXPIRED",
         "capital_deployed": 55000,
-        "net_pnl": -1750.0,
-        "vol_ratio": "1.82x"
+        "net_pnl": -1400.0,
+        "vol_ratio": "1.82x (Vol)"
     },
     {
-        "entry_time": "2026-09-22 04:25:00",
-        "exit_time": "2026-09-22 04:35:00",
+        "entry_time": "2026-09-22 13:55:00",
+        "exit_time": "2026-09-22 14:05:00",
         "date": "2026-09-22",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -621,27 +1741,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "3.22x"
+        "vol_ratio": "3.22x (Vol)"
     },
     {
-        "entry_time": "2026-09-22 20:00:00",
-        "exit_time": "2026-09-22 20:20:00",
-        "date": "2026-09-22",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 89.62,
-        "exit_price": 89.92,
-        "stop_loss": 89.47,
-        "target": 89.92,
-        "outcome": "TARGET_HIT",
-        "capital_deployed": 55000,
-        "net_pnl": 6000.0,
-        "vol_ratio": "9.41x"
-    },
-    {
-        "entry_time": "2026-09-23 00:05:00",
-        "exit_time": "2026-09-23 00:15:00",
+        "entry_time": "2026-09-23 09:35:00",
+        "exit_time": "2026-09-23 09:45:00",
         "date": "2026-09-23",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -653,11 +1757,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.04x"
+        "vol_ratio": "2.04x (Vol)"
     },
     {
-        "entry_time": "2026-09-24 12:20:00",
-        "exit_time": "2026-09-24 12:35:00",
+        "entry_time": "2026-09-24 21:50:00",
+        "exit_time": "2026-09-24 22:05:00",
         "date": "2026-09-24",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -669,27 +1773,27 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.59x"
+        "vol_ratio": "2.59x (Vol)"
     },
     {
-        "entry_time": "2026-09-25 02:10:00",
-        "exit_time": "2026-09-25 02:15:00",
+        "entry_time": "2026-09-25 11:40:00",
+        "exit_time": "2026-09-25 11:45:00",
         "date": "2026-09-25",
         "asset": "CRUDEOIL",
         "market": "MCX",
         "spread": "100 CE / 200 CE",
         "entry_price": 92.51,
-        "exit_price": 92.77,
+        "exit_price": 92.79,
         "stop_loss": 92.38,
-        "target": 92.77,
+        "target": 92.79,
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 6000.0,
-        "vol_ratio": "2.36x"
+        "vol_ratio": "2.36x (Vol)"
     },
     {
-        "entry_time": "2026-09-30 02:15:00",
-        "exit_time": "2026-09-30 02:30:00",
+        "entry_time": "2026-09-30 11:45:00",
+        "exit_time": "2026-09-30 12:00:00",
         "date": "2026-09-30",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -701,43 +1805,11 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 6000.0,
-        "vol_ratio": "2.17x"
+        "vol_ratio": "2.17x (Vol)"
     },
     {
-        "entry_time": "2026-10-01 09:10:00",
-        "exit_time": "2026-10-01 09:20:00",
-        "date": "2026-10-01",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 90.97,
-        "exit_price": 90.71,
-        "stop_loss": 90.71,
-        "target": 91.49,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 55000,
-        "net_pnl": -3500.0,
-        "vol_ratio": "2.12x"
-    },
-    {
-        "entry_time": "2026-10-01 22:10:00",
-        "exit_time": "2026-10-01 22:55:00",
-        "date": "2026-10-01",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 92.83,
-        "exit_price": 92.64,
-        "stop_loss": 92.64,
-        "target": 93.21,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 55000,
-        "net_pnl": -3500.0,
-        "vol_ratio": "1.94x"
-    },
-    {
-        "entry_time": "2026-10-02 02:30:00",
-        "exit_time": "2026-10-02 02:35:00",
+        "entry_time": "2026-10-02 12:00:00",
+        "exit_time": "2026-10-02 12:05:00",
         "date": "2026-10-02",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -745,15 +1817,15 @@
         "entry_price": 92.19,
         "exit_price": 92.07,
         "stop_loss": 92.07,
-        "target": 92.43,
+        "target": 92.47,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "1.94x"
+        "vol_ratio": "1.94x (Vol)"
     },
     {
-        "entry_time": "2026-10-02 03:05:00",
-        "exit_time": "2026-10-02 03:10:00",
+        "entry_time": "2026-10-02 12:35:00",
+        "exit_time": "2026-10-02 12:40:00",
         "date": "2026-10-02",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -765,11 +1837,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.92x"
+        "vol_ratio": "2.92x (Vol)"
     },
     {
-        "entry_time": "2026-10-02 04:10:00",
-        "exit_time": "2026-10-02 04:45:00",
+        "entry_time": "2026-10-02 13:40:00",
+        "exit_time": "2026-10-02 14:15:00",
         "date": "2026-10-02",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -781,11 +1853,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.24x"
+        "vol_ratio": "2.24x (Vol)"
     },
     {
-        "entry_time": "2026-10-05 02:15:00",
-        "exit_time": "2026-10-05 02:50:00",
+        "entry_time": "2026-10-05 11:45:00",
+        "exit_time": "2026-10-05 12:20:00",
         "date": "2026-10-05",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -797,11 +1869,11 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 6000.0,
-        "vol_ratio": "2.54x"
+        "vol_ratio": "2.54x (Vol)"
     },
     {
-        "entry_time": "2026-10-05 09:20:00",
-        "exit_time": "2026-10-05 10:05:00",
+        "entry_time": "2026-10-05 18:50:00",
+        "exit_time": "2026-10-05 19:35:00",
         "date": "2026-10-05",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -813,11 +1885,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.89x"
+        "vol_ratio": "2.89x (Vol)"
     },
     {
-        "entry_time": "2026-10-06 02:20:00",
-        "exit_time": "2026-10-06 02:35:00",
+        "entry_time": "2026-10-06 11:50:00",
+        "exit_time": "2026-10-06 12:05:00",
         "date": "2026-10-06",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -829,11 +1901,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "3.33x"
+        "vol_ratio": "3.33x (Vol)"
     },
     {
-        "entry_time": "2026-10-06 08:10:00",
-        "exit_time": "2026-10-06 08:20:00",
+        "entry_time": "2026-10-06 17:40:00",
+        "exit_time": "2026-10-06 17:50:00",
         "date": "2026-10-06",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -845,11 +1917,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.09x"
+        "vol_ratio": "2.09x (Vol)"
     },
     {
-        "entry_time": "2026-10-07 01:55:00",
-        "exit_time": "2026-10-07 03:10:00",
+        "entry_time": "2026-10-07 11:25:00",
+        "exit_time": "2026-10-07 12:40:00",
         "date": "2026-10-07",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -861,27 +1933,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.16x"
+        "vol_ratio": "2.16x (Vol)"
     },
     {
-        "entry_time": "2026-10-08 09:20:00",
-        "exit_time": "2026-10-08 09:30:00",
-        "date": "2026-10-08",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 91.73,
-        "exit_price": 92.13,
-        "stop_loss": 91.53,
-        "target": 92.13,
-        "outcome": "TARGET_HIT",
-        "capital_deployed": 55000,
-        "net_pnl": 6000.0,
-        "vol_ratio": "1.99x"
-    },
-    {
-        "entry_time": "2026-10-13 03:00:00",
-        "exit_time": "2026-10-13 03:40:00",
+        "entry_time": "2026-10-13 12:30:00",
+        "exit_time": "2026-10-13 13:10:00",
         "date": "2026-10-13",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -893,43 +1949,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "3.63x"
+        "vol_ratio": "3.63x (Vol)"
     },
     {
-        "entry_time": "2026-10-14 16:30:00",
-        "exit_time": "2026-10-14 19:05:00",
-        "date": "2026-10-14",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 95.03,
-        "exit_price": 94.88,
-        "stop_loss": 94.88,
-        "target": 95.33,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 55000,
-        "net_pnl": -3500.0,
-        "vol_ratio": "1.85x"
-    },
-    {
-        "entry_time": "2026-10-18 21:00:00",
-        "exit_time": "2026-10-18 21:00:00",
-        "date": "2026-10-18",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 97.66,
-        "exit_price": 97.55,
-        "stop_loss": 97.4,
-        "target": 98.18,
-        "outcome": "EXPIRED",
-        "capital_deployed": 55000,
-        "net_pnl": -1750.0,
-        "vol_ratio": "2.84x"
-    },
-    {
-        "entry_time": "2026-10-20 08:45:00",
-        "exit_time": "2026-10-20 09:35:00",
+        "entry_time": "2026-10-20 18:15:00",
+        "exit_time": "2026-10-20 19:05:00",
         "date": "2026-10-20",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -941,11 +1965,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.68x"
+        "vol_ratio": "2.68x (Vol)"
     },
     {
-        "entry_time": "2026-10-20 10:30:00",
-        "exit_time": "2026-10-20 11:35:00",
+        "entry_time": "2026-10-20 20:00:00",
+        "exit_time": "2026-10-20 21:05:00",
         "date": "2026-10-20",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -957,27 +1981,11 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 6000.0,
-        "vol_ratio": "3.34x"
+        "vol_ratio": "3.34x (Vol)"
     },
     {
-        "entry_time": "2026-10-26 13:55:00",
-        "exit_time": "2026-10-26 15:50:00",
-        "date": "2026-10-26",
-        "asset": "CRUDEOIL",
-        "market": "MCX",
-        "spread": "100 CE / 200 CE",
-        "entry_price": 101.91,
-        "exit_price": 101.5,
-        "stop_loss": 101.5,
-        "target": 102.73,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 55000,
-        "net_pnl": -3500.0,
-        "vol_ratio": "2.57x"
-    },
-    {
-        "entry_time": "2026-10-27 01:30:00",
-        "exit_time": "2026-10-27 02:15:00",
+        "entry_time": "2026-10-27 11:00:00",
+        "exit_time": "2026-10-27 11:45:00",
         "date": "2026-10-27",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -989,11 +1997,11 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 6000.0,
-        "vol_ratio": "4.56x"
+        "vol_ratio": "4.56x (Vol)"
     },
     {
-        "entry_time": "2026-10-27 06:45:00",
-        "exit_time": "2026-10-27 07:30:00",
+        "entry_time": "2026-10-27 16:15:00",
+        "exit_time": "2026-10-27 17:00:00",
         "date": "2026-10-27",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -1005,11 +2013,11 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "5.46x"
+        "vol_ratio": "5.46x (Vol)"
     },
     {
-        "entry_time": "2026-10-28 04:30:00",
-        "exit_time": "2026-10-28 06:00:00",
+        "entry_time": "2026-10-28 14:00:00",
+        "exit_time": "2026-10-28 15:30:00",
         "date": "2026-10-28",
         "asset": "CRUDEOIL",
         "market": "MCX",
@@ -1021,7 +2029,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -3500.0,
-        "vol_ratio": "1.99x"
+        "vol_ratio": "1.99x (Vol)"
     },
     {
         "entry_time": "2026-08-07 14:30:00",
@@ -1033,11 +2041,11 @@
         "entry_price": 1326.8,
         "exit_price": 1325.5,
         "stop_loss": 1325.5,
-        "target": 1329.4,
+        "target": 1330.78,
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.03x"
+        "vol_ratio": "2.03x (Vol)"
     },
     {
         "entry_time": "2026-08-19 15:10:00",
@@ -1053,7 +2061,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 65000,
         "net_pnl": 6000.0,
-        "vol_ratio": "2.59x"
+        "vol_ratio": "2.59x (Vol)"
     },
     {
         "entry_time": "2026-08-27 10:25:00",
@@ -1065,11 +2073,11 @@
         "entry_price": 1296.3,
         "exit_price": 1295.1,
         "stop_loss": 1295.1,
-        "target": 1298.7,
+        "target": 1300.19,
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -3500.0,
-        "vol_ratio": "2.51x"
+        "vol_ratio": "2.51x (Vol)"
     },
     {
         "entry_time": "2026-08-31 09:25:00",
@@ -1079,13 +2087,13 @@
         "market": "NSE",
         "spread": "1280 CE / 1320 CE",
         "entry_price": 1272.7,
-        "exit_price": 1275.9,
+        "exit_price": 1276.52,
         "stop_loss": 1271.1,
-        "target": 1275.9,
+        "target": 1276.52,
         "outcome": "TARGET_HIT",
         "capital_deployed": 65000,
         "net_pnl": 6000.0,
-        "vol_ratio": "1.88x"
+        "vol_ratio": "1.88x (Vol)"
     },
     {
         "entry_time": "2026-09-10 15:10:00",
@@ -1095,13 +2103,13 @@
         "market": "NSE",
         "spread": "1260 CE / 1300 CE",
         "entry_price": 1268.7,
-        "exit_price": 1272.1,
+        "exit_price": 1272.51,
         "stop_loss": 1267.0,
-        "target": 1272.1,
+        "target": 1272.51,
         "outcome": "TARGET_HIT",
         "capital_deployed": 65000,
         "net_pnl": 6000.0,
-        "vol_ratio": "2.67x"
+        "vol_ratio": "2.67x (Vol)"
     },
     {
         "entry_time": "2026-09-16 15:10:00",
@@ -1113,11 +2121,11 @@
         "entry_price": 1247.6,
         "exit_price": 1246.5,
         "stop_loss": 1246.5,
-        "target": 1249.8,
+        "target": 1251.34,
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -3500.0,
-        "vol_ratio": "1.88x"
+        "vol_ratio": "1.88x (Vol)"
     },
     {
         "entry_time": "2026-09-25 13:35:00",
@@ -1127,13 +2135,13 @@
         "market": "NSE",
         "spread": "1220 CE / 1260 CE",
         "entry_price": 1216.8,
-        "exit_price": 1220.2,
+        "exit_price": 1220.45,
         "stop_loss": 1215.1,
-        "target": 1220.2,
+        "target": 1220.45,
         "outcome": "TARGET_HIT",
         "capital_deployed": 65000,
         "net_pnl": 6000.0,
-        "vol_ratio": "1.94x"
+        "vol_ratio": "1.94x (Vol)"
     },
     {
         "entry_time": "2026-10-12 11:15:00",
@@ -1145,11 +2153,11 @@
         "entry_price": 1161.8,
         "exit_price": 1160.2,
         "stop_loss": 1160.2,
-        "target": 1165.0,
+        "target": 1165.29,
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -3500.0,
-        "vol_ratio": "1.85x"
+        "vol_ratio": "1.85x (Vol)"
     },
     {
         "entry_time": "2026-10-28 12:55:00",
@@ -1165,7 +2173,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -3500.0,
-        "vol_ratio": "4.05x"
+        "vol_ratio": "4.05x (Vol)"
     },
     {
         "entry_time": "2026-08-05 13:00:00",
@@ -1177,11 +2185,11 @@
         "entry_price": 734.5,
         "exit_price": 733.75,
         "stop_loss": 733.75,
-        "target": 736.0,
+        "target": 736.7,
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -3850.0,
-        "vol_ratio": "2.41x"
+        "vol_ratio": "2.41x (Vol)"
     },
     {
         "entry_time": "2026-08-05 15:05:00",
@@ -1191,29 +2199,13 @@
         "market": "NSE",
         "spread": "730 CE / 750 CE",
         "entry_price": 733.05,
-        "exit_price": 733.85,
+        "exit_price": 735.25,
         "stop_loss": 732.65,
-        "target": 733.85,
+        "target": 735.25,
         "outcome": "TARGET_HIT",
         "capital_deployed": 60000,
         "net_pnl": 6600.0,
-        "vol_ratio": "1.93x"
-    },
-    {
-        "entry_time": "2026-08-07 09:15:00",
-        "exit_time": "2026-08-07 10:40:00",
-        "date": "2026-08-07",
-        "asset": "HDFCBANK",
-        "market": "NSE",
-        "spread": "730 CE / 750 CE",
-        "entry_price": 734.65,
-        "exit_price": 732.95,
-        "stop_loss": 732.95,
-        "target": 738.05,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 60000,
-        "net_pnl": -3850.0,
-        "vol_ratio": "2.71x"
+        "vol_ratio": "1.93x (Vol)"
     },
     {
         "entry_time": "2026-08-10 14:45:00",
@@ -1225,11 +2217,11 @@
         "entry_price": 731.35,
         "exit_price": 730.95,
         "stop_loss": 730.95,
-        "target": 732.15,
+        "target": 733.54,
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -3850.0,
-        "vol_ratio": "1.86x"
+        "vol_ratio": "1.86x (Vol)"
     },
     {
         "entry_time": "2026-08-27 09:25:00",
@@ -1245,7 +2237,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -3850.0,
-        "vol_ratio": "2.96x"
+        "vol_ratio": "2.96x (Vol)"
     },
     {
         "entry_time": "2026-09-02 15:00:00",
@@ -1255,13 +2247,13 @@
         "market": "NSE",
         "spread": "700 CE / 720 CE",
         "entry_price": 701.0,
-        "exit_price": 702.9,
+        "exit_price": 703.1,
         "stop_loss": 700.05,
-        "target": 702.9,
+        "target": 703.1,
         "outcome": "TARGET_HIT",
         "capital_deployed": 60000,
         "net_pnl": 6600.0,
-        "vol_ratio": "2.92x"
+        "vol_ratio": "2.92x (Vol)"
     },
     {
         "entry_time": "2026-09-08 14:50:00",
@@ -1277,7 +2269,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -3850.0,
-        "vol_ratio": "2.12x"
+        "vol_ratio": "2.12x (Vol)"
     },
     {
         "entry_time": "2026-09-10 15:05:00",
@@ -1287,29 +2279,13 @@
         "market": "NSE",
         "spread": "690 CE / 710 CE",
         "entry_price": 690.7,
-        "exit_price": 691.9,
+        "exit_price": 692.77,
         "stop_loss": 690.1,
-        "target": 691.9,
+        "target": 692.77,
         "outcome": "TARGET_HIT",
         "capital_deployed": 60000,
         "net_pnl": 6600.0,
-        "vol_ratio": "2.22x"
-    },
-    {
-        "entry_time": "2026-09-25 09:15:00",
-        "exit_time": "2026-09-25 09:15:00",
-        "date": "2026-09-25",
-        "asset": "HDFCBANK",
-        "market": "NSE",
-        "spread": "730 CE / 750 CE",
-        "entry_price": 730.25,
-        "exit_price": 734.0,
-        "stop_loss": 725.95,
-        "target": 738.85,
-        "outcome": "EXPIRED",
-        "capital_deployed": 60000,
-        "net_pnl": 1980.0,
-        "vol_ratio": "3.4x"
+        "vol_ratio": "2.22x (Vol)"
     },
     {
         "entry_time": "2026-10-08 13:20:00",
@@ -1325,7 +2301,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -3850.0,
-        "vol_ratio": "2.25x"
+        "vol_ratio": "2.25x (Vol)"
     },
     {
         "entry_time": "2026-10-19 13:45:00",
@@ -1341,7 +2317,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 60000,
         "net_pnl": 6600.0,
-        "vol_ratio": "2.87x"
+        "vol_ratio": "2.87x (Vol)"
     },
     {
         "entry_time": "2026-10-22 09:35:00",
@@ -1357,7 +2333,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -3850.0,
-        "vol_ratio": "1.99x"
+        "vol_ratio": "1.99x (Vol)"
     },
     {
         "entry_time": "2026-10-26 09:20:00",
@@ -1369,11 +2345,11 @@
         "entry_price": 688.7,
         "exit_price": 688.0,
         "stop_loss": 688.0,
-        "target": 690.1,
+        "target": 690.77,
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -3850.0,
-        "vol_ratio": "2.78x"
+        "vol_ratio": "2.78x (Vol)"
     },
     {
         "entry_time": "2026-10-27 14:15:00",
@@ -1389,7 +2365,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -3850.0,
-        "vol_ratio": "3.07x"
+        "vol_ratio": "3.07x (Vol)"
     },
     {
         "entry_time": "2026-08-05 13:00:00",
@@ -1405,7 +2381,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "2.5x"
+        "vol_ratio": "2.5x (Vol)"
     },
     {
         "entry_time": "2026-08-11 12:40:00",
@@ -1421,7 +2397,7 @@
         "outcome": "EXPIRED",
         "capital_deployed": 55000,
         "net_pnl": 2520.0,
-        "vol_ratio": "3.51x"
+        "vol_ratio": "3.51x (Vol)"
     },
     {
         "entry_time": "2026-08-12 12:55:00",
@@ -1433,11 +2409,11 @@
         "entry_price": 1423.7,
         "exit_price": 1422.2,
         "stop_loss": 1422.2,
-        "target": 1426.7,
+        "target": 1427.97,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "3.2x"
+        "vol_ratio": "3.2x (Vol)"
     },
     {
         "entry_time": "2026-08-12 14:50:00",
@@ -1447,13 +2423,13 @@
         "market": "NSE",
         "spread": "1420 CE / 1440 CE",
         "entry_price": 1423.5,
-        "exit_price": 1427.7,
+        "exit_price": 1427.77,
         "stop_loss": 1421.4,
-        "target": 1427.7,
+        "target": 1427.77,
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 8400.0,
-        "vol_ratio": "2.51x"
+        "vol_ratio": "2.51x (Vol)"
     },
     {
         "entry_time": "2026-08-19 12:05:00",
@@ -1465,11 +2441,11 @@
         "entry_price": 1396.2,
         "exit_price": 1395.0,
         "stop_loss": 1395.0,
-        "target": 1398.6,
+        "target": 1400.39,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "1.81x"
+        "vol_ratio": "1.81x (Vol)"
     },
     {
         "entry_time": "2026-08-26 14:40:00",
@@ -1481,11 +2457,11 @@
         "entry_price": 1436.0,
         "exit_price": 1434.7,
         "stop_loss": 1434.7,
-        "target": 1438.6,
+        "target": 1440.31,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "1.81x"
+        "vol_ratio": "1.81x (Vol)"
     },
     {
         "entry_time": "2026-09-04 14:50:00",
@@ -1497,11 +2473,11 @@
         "entry_price": 1426.9,
         "exit_price": 1425.6,
         "stop_loss": 1425.6,
-        "target": 1429.5,
+        "target": 1431.18,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "2.7x"
+        "vol_ratio": "2.7x (Vol)"
     },
     {
         "entry_time": "2026-09-07 14:55:00",
@@ -1517,7 +2493,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "1.93x"
+        "vol_ratio": "1.93x (Vol)"
     },
     {
         "entry_time": "2026-09-08 10:55:00",
@@ -1533,23 +2509,23 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "2.36x"
+        "vol_ratio": "2.36x (Vol)"
     },
     {
         "entry_time": "2026-09-11 13:40:00",
-        "exit_time": "2026-09-11 13:55:00",
+        "exit_time": "2026-09-11 14:00:00",
         "date": "2026-09-11",
         "asset": "ICICIBANK",
         "market": "NSE",
         "spread": "1380 CE / 1400 CE",
         "entry_price": 1379.0,
-        "exit_price": 1381.8,
+        "exit_price": 1383.14,
         "stop_loss": 1377.6,
-        "target": 1381.8,
+        "target": 1383.14,
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 8400.0,
-        "vol_ratio": "1.86x"
+        "vol_ratio": "1.86x (Vol)"
     },
     {
         "entry_time": "2026-09-15 11:10:00",
@@ -1561,11 +2537,11 @@
         "entry_price": 1354.1,
         "exit_price": 1352.2,
         "stop_loss": 1352.2,
-        "target": 1357.9,
+        "target": 1358.16,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "2.75x"
+        "vol_ratio": "2.75x (Vol)"
     },
     {
         "entry_time": "2026-09-24 09:20:00",
@@ -1581,7 +2557,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 8400.0,
-        "vol_ratio": "2.68x"
+        "vol_ratio": "2.68x (Vol)"
     },
     {
         "entry_time": "2026-09-30 14:40:00",
@@ -1597,7 +2573,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "2.57x"
+        "vol_ratio": "2.57x (Vol)"
     },
     {
         "entry_time": "2026-10-07 10:00:00",
@@ -1613,7 +2589,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 8400.0,
-        "vol_ratio": "2.16x"
+        "vol_ratio": "2.16x (Vol)"
     },
     {
         "entry_time": "2026-10-12 10:35:00",
@@ -1625,11 +2601,11 @@
         "entry_price": 1343.9,
         "exit_price": 1342.1,
         "stop_loss": 1342.1,
-        "target": 1347.5,
+        "target": 1347.93,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "3.18x"
+        "vol_ratio": "3.18x (Vol)"
     },
     {
         "entry_time": "2026-10-14 13:05:00",
@@ -1641,11 +2617,11 @@
         "entry_price": 1343.5,
         "exit_price": 1342.0,
         "stop_loss": 1342.0,
-        "target": 1346.5,
+        "target": 1347.53,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "2.34x"
+        "vol_ratio": "2.34x (Vol)"
     },
     {
         "entry_time": "2026-10-19 09:30:00",
@@ -1661,7 +2637,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "2.84x"
+        "vol_ratio": "2.84x (Vol)"
     },
     {
         "entry_time": "2026-10-19 13:45:00",
@@ -1673,11 +2649,11 @@
         "entry_price": 1379.9,
         "exit_price": 1378.4,
         "stop_loss": 1378.4,
-        "target": 1382.9,
+        "target": 1384.04,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "3.57x"
+        "vol_ratio": "3.57x (Vol)"
     },
     {
         "entry_time": "2026-10-23 13:15:00",
@@ -1689,11 +2665,11 @@
         "entry_price": 1379.7,
         "exit_price": 1378.5,
         "stop_loss": 1378.5,
-        "target": 1382.1,
+        "target": 1383.84,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "3.33x"
+        "vol_ratio": "3.33x (Vol)"
     },
     {
         "entry_time": "2026-10-27 14:15:00",
@@ -1709,7 +2685,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4900.0,
-        "vol_ratio": "3.61x"
+        "vol_ratio": "3.61x (Vol)"
     },
     {
         "entry_time": "2026-08-10 14:50:00",
@@ -1721,11 +2697,11 @@
         "entry_price": 1073.5,
         "exit_price": 1072.0,
         "stop_loss": 1072.0,
-        "target": 1076.5,
+        "target": 1076.72,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -2625.0,
-        "vol_ratio": "2.25x"
+        "vol_ratio": "2.25x (Vol)"
     },
     {
         "entry_time": "2026-08-10 15:10:00",
@@ -1741,7 +2717,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -2625.0,
-        "vol_ratio": "2.29x"
+        "vol_ratio": "2.29x (Vol)"
     },
     {
         "entry_time": "2026-08-13 15:05:00",
@@ -1753,11 +2729,11 @@
         "entry_price": 1076.7,
         "exit_price": 1075.5,
         "stop_loss": 1075.5,
-        "target": 1079.1,
+        "target": 1079.93,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -2625.0,
-        "vol_ratio": "2.13x"
+        "vol_ratio": "2.13x (Vol)"
     },
     {
         "entry_time": "2026-08-14 11:35:00",
@@ -1773,7 +2749,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -2625.0,
-        "vol_ratio": "4.5x"
+        "vol_ratio": "4.5x (Vol)"
     },
     {
         "entry_time": "2026-08-14 13:35:00",
@@ -1789,23 +2765,23 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -2625.0,
-        "vol_ratio": "1.86x"
+        "vol_ratio": "1.86x (Vol)"
     },
     {
         "entry_time": "2026-08-20 11:55:00",
-        "exit_time": "2026-08-20 12:45:00",
+        "exit_time": "2026-08-20 12:50:00",
         "date": "2026-08-20",
         "asset": "SBIN",
         "market": "NSE",
         "spread": "1045 CE / 1055 CE",
         "entry_price": 1046.9,
-        "exit_price": 1049.1,
+        "exit_price": 1050.04,
         "stop_loss": 1045.8,
-        "target": 1049.1,
+        "target": 1050.04,
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
         "net_pnl": 4500.0,
-        "vol_ratio": "3.19x"
+        "vol_ratio": "3.19x (Vol)"
     },
     {
         "entry_time": "2026-08-21 13:50:00",
@@ -1821,7 +2797,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -2625.0,
-        "vol_ratio": "2.26x"
+        "vol_ratio": "2.26x (Vol)"
     },
     {
         "entry_time": "2026-08-24 11:40:00",
@@ -1837,7 +2813,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -2625.0,
-        "vol_ratio": "2.18x"
+        "vol_ratio": "2.18x (Vol)"
     },
     {
         "entry_time": "2026-08-24 13:05:00",
@@ -1853,7 +2829,7 @@
         "outcome": "EXPIRED",
         "capital_deployed": 50000,
         "net_pnl": 1350.0,
-        "vol_ratio": "4.09x"
+        "vol_ratio": "4.09x (Vol)"
     },
     {
         "entry_time": "2026-08-27 12:50:00",
@@ -1865,11 +2841,11 @@
         "entry_price": 1044.8,
         "exit_price": 1044.0,
         "stop_loss": 1044.0,
-        "target": 1046.4,
+        "target": 1047.93,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -2625.0,
-        "vol_ratio": "2.68x"
+        "vol_ratio": "2.68x (Vol)"
     },
     {
         "entry_time": "2026-08-27 14:15:00",
@@ -1885,7 +2861,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
         "net_pnl": 4500.0,
-        "vol_ratio": "2.15x"
+        "vol_ratio": "2.15x (Vol)"
     },
     {
         "entry_time": "2026-09-02 15:05:00",
@@ -1901,7 +2877,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
         "net_pnl": 4500.0,
-        "vol_ratio": "2.21x"
+        "vol_ratio": "2.21x (Vol)"
     },
     {
         "entry_time": "2026-09-09 15:05:00",
@@ -1917,7 +2893,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -2625.0,
-        "vol_ratio": "2.11x"
+        "vol_ratio": "2.11x (Vol)"
     },
     {
         "entry_time": "2026-09-11 09:20:00",
@@ -1933,7 +2909,7 @@
         "outcome": "EXPIRED",
         "capital_deployed": 50000,
         "net_pnl": 1350.0,
-        "vol_ratio": "2.09x"
+        "vol_ratio": "2.09x (Vol)"
     },
     {
         "entry_time": "2026-09-22 12:45:00",
@@ -1945,27 +2921,27 @@
         "entry_price": 985.0,
         "exit_price": 984.4,
         "stop_loss": 984.4,
-        "target": 986.2,
+        "target": 987.96,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -2625.0,
-        "vol_ratio": "1.95x"
+        "vol_ratio": "1.95x (Vol)"
     },
     {
         "entry_time": "2026-09-23 15:10:00",
-        "exit_time": "2026-09-23 15:15:00",
+        "exit_time": "2026-09-24 09:15:00",
         "date": "2026-09-23",
         "asset": "SBIN",
         "market": "NSE",
         "spread": "990 CE / 1000 CE",
         "entry_price": 991.8,
-        "exit_price": 993.2,
+        "exit_price": 991.1,
         "stop_loss": 991.1,
-        "target": 993.2,
-        "outcome": "TARGET_HIT",
+        "target": 994.78,
+        "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": 4500.0,
-        "vol_ratio": "2.52x"
+        "net_pnl": -2625.0,
+        "vol_ratio": "2.52x (Vol)"
     },
     {
         "entry_time": "2026-09-30 15:05:00",
@@ -1981,7 +2957,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -2625.0,
-        "vol_ratio": "2.1x"
+        "vol_ratio": "2.1x (Vol)"
     },
     {
         "entry_time": "2026-10-05 11:50:00",
@@ -1997,23 +2973,23 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
         "net_pnl": 4500.0,
-        "vol_ratio": "1.8x"
+        "vol_ratio": "1.8x (Vol)"
     },
     {
         "entry_time": "2026-10-15 15:10:00",
-        "exit_time": "2026-10-15 15:25:00",
+        "exit_time": "2026-10-16 09:15:00",
         "date": "2026-10-15",
         "asset": "SBIN",
         "market": "NSE",
         "spread": "960 CE / 970 CE",
         "entry_price": 958.15,
-        "exit_price": 959.75,
+        "exit_price": 957.35,
         "stop_loss": 957.35,
-        "target": 959.75,
-        "outcome": "TARGET_HIT",
+        "target": 961.02,
+        "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": 4500.0,
-        "vol_ratio": "2.35x"
+        "net_pnl": -2625.0,
+        "vol_ratio": "2.35x (Vol)"
     },
     {
         "entry_time": "2026-10-27 14:15:00",
@@ -2029,23 +3005,23 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
         "net_pnl": 4500.0,
-        "vol_ratio": "4.66x"
+        "vol_ratio": "4.66x (Vol)"
     },
     {
         "entry_time": "2026-08-12 12:10:00",
-        "exit_time": "2026-08-12 12:15:00",
+        "exit_time": "2026-08-12 13:00:00",
         "date": "2026-08-12",
         "asset": "INFY",
         "market": "NSE",
         "spread": "1160 CE / 1200 CE",
         "entry_price": 1165.9,
-        "exit_price": 1167.1,
+        "exit_price": 1165.3,
         "stop_loss": 1165.3,
-        "target": 1167.1,
-        "outcome": "TARGET_HIT",
+        "target": 1169.4,
+        "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
-        "net_pnl": 9600.0,
-        "vol_ratio": "1.87x"
+        "net_pnl": -5600.0,
+        "vol_ratio": "1.87x (Vol)"
     },
     {
         "entry_time": "2026-08-17 11:10:00",
@@ -2057,11 +3033,11 @@
         "entry_price": 1140.5,
         "exit_price": 1139.2,
         "stop_loss": 1139.2,
-        "target": 1143.1,
+        "target": 1143.92,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "2.08x"
+        "vol_ratio": "2.08x (Vol)"
     },
     {
         "entry_time": "2026-08-18 11:20:00",
@@ -2077,7 +3053,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "2.58x"
+        "vol_ratio": "2.58x (Vol)"
     },
     {
         "entry_time": "2026-08-20 15:10:00",
@@ -2093,23 +3069,23 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "2.45x"
+        "vol_ratio": "2.45x (Vol)"
     },
     {
         "entry_time": "2026-08-21 15:10:00",
-        "exit_time": "2026-08-21 15:15:00",
+        "exit_time": "2026-08-24 09:15:00",
         "date": "2026-08-21",
         "asset": "INFY",
         "market": "NSE",
         "spread": "1120 CE / 1160 CE",
         "entry_price": 1119.0,
-        "exit_price": 1120.0,
+        "exit_price": 1122.36,
         "stop_loss": 1118.5,
-        "target": 1120.0,
+        "target": 1122.36,
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 9600.0,
-        "vol_ratio": "3.15x"
+        "vol_ratio": "3.15x (Vol)"
     },
     {
         "entry_time": "2026-08-25 13:50:00",
@@ -2125,23 +3101,23 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 9600.0,
-        "vol_ratio": "1.99x"
+        "vol_ratio": "1.99x (Vol)"
     },
     {
         "entry_time": "2026-08-28 14:50:00",
-        "exit_time": "2026-08-28 15:05:00",
+        "exit_time": "2026-08-28 15:10:00",
         "date": "2026-08-28",
         "asset": "INFY",
         "market": "NSE",
         "spread": "1140 CE / 1180 CE",
         "entry_price": 1136.2,
-        "exit_price": 1139.0,
+        "exit_price": 1139.61,
         "stop_loss": 1134.8,
-        "target": 1139.0,
+        "target": 1139.61,
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 9600.0,
-        "vol_ratio": "3.57x"
+        "vol_ratio": "3.57x (Vol)"
     },
     {
         "entry_time": "2026-09-02 15:05:00",
@@ -2151,13 +3127,13 @@
         "market": "NSE",
         "spread": "1120 CE / 1160 CE",
         "entry_price": 1129.7,
-        "exit_price": 1131.1,
+        "exit_price": 1133.09,
         "stop_loss": 1129.0,
-        "target": 1131.1,
+        "target": 1133.09,
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 9600.0,
-        "vol_ratio": "2.21x"
+        "vol_ratio": "2.21x (Vol)"
     },
     {
         "entry_time": "2026-09-08 12:15:00",
@@ -2172,8 +3148,8 @@
         "target": 1093.3,
         "outcome": "EXPIRED",
         "capital_deployed": 55000,
-        "net_pnl": -2800.0,
-        "vol_ratio": "1.96x"
+        "net_pnl": -2240.0,
+        "vol_ratio": "1.96x (Vol)"
     },
     {
         "entry_time": "2026-09-09 14:25:00",
@@ -2185,11 +3161,11 @@
         "entry_price": 1032.7,
         "exit_price": 1032.0,
         "stop_loss": 1032.0,
-        "target": 1034.1,
+        "target": 1035.8,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "2.08x"
+        "vol_ratio": "2.08x (Vol)"
     },
     {
         "entry_time": "2026-09-09 15:05:00",
@@ -2205,23 +3181,23 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 9600.0,
-        "vol_ratio": "2.95x"
+        "vol_ratio": "2.95x (Vol)"
     },
     {
         "entry_time": "2026-09-10 15:05:00",
-        "exit_time": "2026-09-10 15:10:00",
+        "exit_time": "2026-09-10 15:15:00",
         "date": "2026-09-10",
         "asset": "INFY",
         "market": "NSE",
         "spread": "1020 CE / 1060 CE",
         "entry_price": 1029.6,
-        "exit_price": 1030.8,
+        "exit_price": 1032.69,
         "stop_loss": 1029.0,
-        "target": 1030.8,
+        "target": 1032.69,
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 9600.0,
-        "vol_ratio": "3.22x"
+        "vol_ratio": "3.22x (Vol)"
     },
     {
         "entry_time": "2026-09-11 14:50:00",
@@ -2233,11 +3209,11 @@
         "entry_price": 1038.0,
         "exit_price": 1037.2,
         "stop_loss": 1037.2,
-        "target": 1039.6,
+        "target": 1041.11,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "2.06x"
+        "vol_ratio": "2.06x (Vol)"
     },
     {
         "entry_time": "2026-09-18 15:10:00",
@@ -2253,7 +3229,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "15.21x"
+        "vol_ratio": "15.21x (Vol)"
     },
     {
         "entry_time": "2026-09-22 09:20:00",
@@ -2269,7 +3245,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "1.81x"
+        "vol_ratio": "1.81x (Vol)"
     },
     {
         "entry_time": "2026-09-22 09:30:00",
@@ -2285,7 +3261,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "2.23x"
+        "vol_ratio": "2.23x (Vol)"
     },
     {
         "entry_time": "2026-09-23 12:45:00",
@@ -2297,11 +3273,11 @@
         "entry_price": 1022.5,
         "exit_price": 1021.0,
         "stop_loss": 1021.0,
-        "target": 1025.5,
+        "target": 1025.57,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "2.65x"
+        "vol_ratio": "2.65x (Vol)"
     },
     {
         "entry_time": "2026-09-25 09:20:00",
@@ -2317,7 +3293,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 9600.0,
-        "vol_ratio": "3.38x"
+        "vol_ratio": "3.38x (Vol)"
     },
     {
         "entry_time": "2026-09-30 12:30:00",
@@ -2333,7 +3309,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "3.73x"
+        "vol_ratio": "3.73x (Vol)"
     },
     {
         "entry_time": "2026-09-30 13:50:00",
@@ -2349,7 +3325,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "1.88x"
+        "vol_ratio": "1.88x (Vol)"
     },
     {
         "entry_time": "2026-09-30 14:30:00",
@@ -2361,11 +3337,11 @@
         "entry_price": 994.0,
         "exit_price": 993.0,
         "stop_loss": 993.0,
-        "target": 996.0,
+        "target": 996.98,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -5600.0,
-        "vol_ratio": "2.47x"
+        "vol_ratio": "2.47x (Vol)"
     },
     {
         "entry_time": "2026-10-06 14:30:00",
@@ -2375,13 +3351,13 @@
         "market": "NSE",
         "spread": "1000 CE / 1040 CE",
         "entry_price": 1004.55,
-        "exit_price": 1006.95,
+        "exit_price": 1007.56,
         "stop_loss": 1003.35,
-        "target": 1006.95,
+        "target": 1007.56,
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 9600.0,
-        "vol_ratio": "1.97x"
+        "vol_ratio": "1.97x (Vol)"
     },
     {
         "entry_time": "2026-10-08 15:05:00",
@@ -2397,23 +3373,23 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 9600.0,
-        "vol_ratio": "2.87x"
+        "vol_ratio": "2.87x (Vol)"
     },
     {
         "entry_time": "2026-10-19 13:45:00",
-        "exit_time": "2026-10-19 14:00:00",
+        "exit_time": "2026-10-19 14:50:00",
         "date": "2026-10-19",
         "asset": "INFY",
         "market": "NSE",
         "spread": "1120 CE / 1160 CE",
         "entry_price": 1127.25,
-        "exit_price": 1129.75,
+        "exit_price": 1126.0,
         "stop_loss": 1126.0,
-        "target": 1129.75,
-        "outcome": "TARGET_HIT",
+        "target": 1130.63,
+        "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
-        "net_pnl": 9600.0,
-        "vol_ratio": "2.0x"
+        "net_pnl": -5600.0,
+        "vol_ratio": "2.0x (Vol)"
     },
     {
         "entry_time": "2026-10-26 09:20:00",
@@ -2429,7 +3405,7 @@
         "outcome": "EXPIRED",
         "capital_deployed": 55000,
         "net_pnl": 2880.0,
-        "vol_ratio": "3.65x"
+        "vol_ratio": "3.65x (Vol)"
     },
     {
         "entry_time": "2026-08-05 12:35:00",
@@ -2441,11 +3417,11 @@
         "entry_price": 2426.4,
         "exit_price": 2423.0,
         "stop_loss": 2423.0,
-        "target": 2433.2,
+        "target": 2433.68,
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -6125.0,
-        "vol_ratio": "2.26x"
+        "vol_ratio": "2.26x (Vol)"
     },
     {
         "entry_time": "2026-08-10 15:10:00",
@@ -2461,7 +3437,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 65000,
         "net_pnl": 10500.0,
-        "vol_ratio": "1.92x"
+        "vol_ratio": "1.92x (Vol)"
     },
     {
         "entry_time": "2026-08-12 11:05:00",
@@ -2477,23 +3453,23 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -6125.0,
-        "vol_ratio": "5.84x"
+        "vol_ratio": "5.84x (Vol)"
     },
     {
         "entry_time": "2026-08-20 15:10:00",
-        "exit_time": "2026-08-20 15:15:00",
+        "exit_time": "2026-08-21 09:15:00",
         "date": "2026-08-20",
         "asset": "TCS",
         "market": "NSE",
         "spread": "2300 CE / 2400 CE",
         "entry_price": 2291.6,
-        "exit_price": 2297.4,
+        "exit_price": 2288.7,
         "stop_loss": 2288.7,
-        "target": 2297.4,
-        "outcome": "TARGET_HIT",
+        "target": 2298.47,
+        "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
-        "net_pnl": 10500.0,
-        "vol_ratio": "3.84x"
+        "net_pnl": -6125.0,
+        "vol_ratio": "3.84x (Vol)"
     },
     {
         "entry_time": "2026-08-21 13:55:00",
@@ -2505,27 +3481,27 @@
         "entry_price": 2296.3,
         "exit_price": 2293.1,
         "stop_loss": 2293.1,
-        "target": 2302.7,
+        "target": 2303.19,
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -6125.0,
-        "vol_ratio": "3.29x"
+        "vol_ratio": "3.29x (Vol)"
     },
     {
         "entry_time": "2026-08-21 14:15:00",
-        "exit_time": "2026-08-21 14:35:00",
+        "exit_time": "2026-08-21 15:15:00",
         "date": "2026-08-21",
         "asset": "TCS",
         "market": "NSE",
         "spread": "2300 CE / 2400 CE",
         "entry_price": 2289.5,
-        "exit_price": 2294.1,
+        "exit_price": 2296.37,
         "stop_loss": 2287.2,
-        "target": 2294.1,
+        "target": 2296.37,
         "outcome": "TARGET_HIT",
         "capital_deployed": 65000,
         "net_pnl": 10500.0,
-        "vol_ratio": "3.42x"
+        "vol_ratio": "3.42x (Vol)"
     },
     {
         "entry_time": "2026-08-24 14:50:00",
@@ -2537,11 +3513,11 @@
         "entry_price": 2284.5,
         "exit_price": 2281.6,
         "stop_loss": 2281.6,
-        "target": 2290.3,
+        "target": 2291.35,
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -6125.0,
-        "vol_ratio": "2.41x"
+        "vol_ratio": "2.41x (Vol)"
     },
     {
         "entry_time": "2026-08-24 15:10:00",
@@ -2557,7 +3533,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 65000,
         "net_pnl": 10500.0,
-        "vol_ratio": "4.43x"
+        "vol_ratio": "4.43x (Vol)"
     },
     {
         "entry_time": "2026-09-04 15:05:00",
@@ -2573,7 +3549,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -6125.0,
-        "vol_ratio": "3.7x"
+        "vol_ratio": "3.7x (Vol)"
     },
     {
         "entry_time": "2026-09-08 15:10:00",
@@ -2585,11 +3561,11 @@
         "entry_price": 2261.9,
         "exit_price": 2260.0,
         "stop_loss": 2260.0,
-        "target": 2265.7,
+        "target": 2268.69,
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -6125.0,
-        "vol_ratio": "2.59x"
+        "vol_ratio": "2.59x (Vol)"
     },
     {
         "entry_time": "2026-09-10 12:10:00",
@@ -2605,23 +3581,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -6125.0,
-        "vol_ratio": "1.94x"
-    },
-    {
-        "entry_time": "2026-09-11 09:15:00",
-        "exit_time": "2026-09-11 09:15:00",
-        "date": "2026-09-11",
-        "asset": "TCS",
-        "market": "NSE",
-        "spread": "2200 CE / 2300 CE",
-        "entry_price": 2222.8,
-        "exit_price": 2211.0,
-        "stop_loss": 2186.2,
-        "target": 2296.0,
-        "outcome": "EXPIRED",
-        "capital_deployed": 65000,
-        "net_pnl": -3062.5,
-        "vol_ratio": "7.05x"
+        "vol_ratio": "1.94x (Vol)"
     },
     {
         "entry_time": "2026-09-16 11:20:00",
@@ -2633,11 +3593,11 @@
         "entry_price": 2221.6,
         "exit_price": 2219.0,
         "stop_loss": 2219.0,
-        "target": 2226.8,
+        "target": 2228.26,
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -6125.0,
-        "vol_ratio": "2.2x"
+        "vol_ratio": "2.2x (Vol)"
     },
     {
         "entry_time": "2026-09-18 09:20:00",
@@ -2653,7 +3613,7 @@
         "outcome": "EXPIRED",
         "capital_deployed": 65000,
         "net_pnl": 3150.0,
-        "vol_ratio": "2.2x"
+        "vol_ratio": "2.2x (Vol)"
     },
     {
         "entry_time": "2026-09-18 15:05:00",
@@ -2669,7 +3629,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -6125.0,
-        "vol_ratio": "2.89x"
+        "vol_ratio": "2.89x (Vol)"
     },
     {
         "entry_time": "2026-09-22 15:10:00",
@@ -2685,23 +3645,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -6125.0,
-        "vol_ratio": "8.48x"
-    },
-    {
-        "entry_time": "2026-09-24 09:15:00",
-        "exit_time": "2026-09-24 09:15:00",
-        "date": "2026-09-24",
-        "asset": "TCS",
-        "market": "NSE",
-        "spread": "2100 CE / 2200 CE",
-        "entry_price": 2087.0,
-        "exit_price": 2092.3,
-        "stop_loss": 2068.7,
-        "target": 2123.6,
-        "outcome": "EXPIRED",
-        "capital_deployed": 65000,
-        "net_pnl": 3150.0,
-        "vol_ratio": "3.07x"
+        "vol_ratio": "8.48x (Vol)"
     },
     {
         "entry_time": "2026-09-28 15:05:00",
@@ -2717,7 +3661,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 65000,
         "net_pnl": -6125.0,
-        "vol_ratio": "2.48x"
+        "vol_ratio": "2.48x (Vol)"
     },
     {
         "entry_time": "2026-10-26 09:20:00",
@@ -2733,7 +3677,7 @@
         "outcome": "EXPIRED",
         "capital_deployed": 65000,
         "net_pnl": 3150.0,
-        "vol_ratio": "2.84x"
+        "vol_ratio": "2.84x (Vol)"
     },
     {
         "entry_time": "2026-10-29 12:25:00",
@@ -2748,8 +3692,8 @@
         "target": 2494.1,
         "outcome": "EXPIRED",
         "capital_deployed": 65000,
-        "net_pnl": -3062.5,
-        "vol_ratio": "3.82x"
+        "net_pnl": -2450.0,
+        "vol_ratio": "3.82x (Vol)"
     },
     {
         "entry_time": "2026-08-05 15:05:00",
@@ -2765,7 +3709,7 @@
         "outcome": "EXPIRED",
         "capital_deployed": 60000,
         "net_pnl": 1080.0,
-        "vol_ratio": "2.26x"
+        "vol_ratio": "2.26x (Vol)"
     },
     {
         "entry_time": "2026-08-06 13:15:00",
@@ -2777,11 +3721,11 @@
         "entry_price": 4057.2,
         "exit_price": 4052.3,
         "stop_loss": 4052.3,
-        "target": 4067.0,
+        "target": 4069.37,
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "3.29x"
+        "vol_ratio": "3.29x (Vol)"
     },
     {
         "entry_time": "2026-08-20 15:10:00",
@@ -2791,29 +3735,29 @@
         "market": "NSE",
         "spread": "4080 CE / 4120 CE",
         "entry_price": 4074.7,
-        "exit_price": 4086.7,
+        "exit_price": 4086.92,
         "stop_loss": 4068.7,
-        "target": 4086.7,
+        "target": 4086.92,
         "outcome": "TARGET_HIT",
         "capital_deployed": 60000,
         "net_pnl": 3600.0,
-        "vol_ratio": "3.49x"
+        "vol_ratio": "3.49x (Vol)"
     },
     {
         "entry_time": "2026-08-27 11:25:00",
-        "exit_time": "2026-08-27 11:30:00",
+        "exit_time": "2026-08-27 11:45:00",
         "date": "2026-08-27",
         "asset": "LT",
         "market": "NSE",
         "spread": "4020 CE / 4060 CE",
         "entry_price": 4028.0,
-        "exit_price": 4033.8,
+        "exit_price": 4025.1,
         "stop_loss": 4025.1,
-        "target": 4033.8,
-        "outcome": "TARGET_HIT",
+        "target": 4040.08,
+        "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
-        "net_pnl": 3600.0,
-        "vol_ratio": "1.81x"
+        "net_pnl": -2100.0,
+        "vol_ratio": "1.81x (Vol)"
     },
     {
         "entry_time": "2026-08-28 13:05:00",
@@ -2828,8 +3772,8 @@
         "target": 4055.3,
         "outcome": "EXPIRED",
         "capital_deployed": 60000,
-        "net_pnl": -1050.0,
-        "vol_ratio": "2.17x"
+        "net_pnl": -840.0,
+        "vol_ratio": "2.17x (Vol)"
     },
     {
         "entry_time": "2026-08-31 09:20:00",
@@ -2841,27 +3785,11 @@
         "entry_price": 4002.4,
         "exit_price": 3999.6,
         "stop_loss": 3999.6,
-        "target": 4008.0,
+        "target": 4014.41,
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "2.12x"
-    },
-    {
-        "entry_time": "2026-09-02 09:15:00",
-        "exit_time": "2026-09-02 09:45:00",
-        "date": "2026-09-02",
-        "asset": "LT",
-        "market": "NSE",
-        "spread": "3980 CE / 4020 CE",
-        "entry_price": 3984.3,
-        "exit_price": 3965.1,
-        "stop_loss": 3965.1,
-        "target": 4022.7,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 60000,
-        "net_pnl": -2100.0,
-        "vol_ratio": "3.07x"
+        "vol_ratio": "2.12x (Vol)"
     },
     {
         "entry_time": "2026-09-04 15:05:00",
@@ -2877,23 +3805,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "2.02x"
-    },
-    {
-        "entry_time": "2026-09-09 09:15:00",
-        "exit_time": "2026-09-09 09:15:00",
-        "date": "2026-09-09",
-        "asset": "LT",
-        "market": "NSE",
-        "spread": "3980 CE / 4020 CE",
-        "entry_price": 3986.0,
-        "exit_price": 3980.7,
-        "stop_loss": 3941.2,
-        "target": 4075.6,
-        "outcome": "EXPIRED",
-        "capital_deployed": 60000,
-        "net_pnl": -1050.0,
-        "vol_ratio": "6.38x"
+        "vol_ratio": "2.02x (Vol)"
     },
     {
         "entry_time": "2026-09-09 15:05:00",
@@ -2909,7 +3821,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "2.29x"
+        "vol_ratio": "2.29x (Vol)"
     },
     {
         "entry_time": "2026-09-15 14:20:00",
@@ -2921,11 +3833,11 @@
         "entry_price": 3852.9,
         "exit_price": 3848.2,
         "stop_loss": 3848.2,
-        "target": 3862.3,
+        "target": 3864.46,
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "1.94x"
+        "vol_ratio": "1.94x (Vol)"
     },
     {
         "entry_time": "2026-09-24 13:45:00",
@@ -2941,7 +3853,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "3.13x"
+        "vol_ratio": "3.13x (Vol)"
     },
     {
         "entry_time": "2026-09-25 13:55:00",
@@ -2957,7 +3869,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 60000,
         "net_pnl": 3600.0,
-        "vol_ratio": "1.99x"
+        "vol_ratio": "1.99x (Vol)"
     },
     {
         "entry_time": "2026-09-29 14:45:00",
@@ -2969,11 +3881,11 @@
         "entry_price": 3754.8,
         "exit_price": 3752.0,
         "stop_loss": 3752.0,
-        "target": 3760.4,
+        "target": 3766.06,
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "1.8x"
+        "vol_ratio": "1.8x (Vol)"
     },
     {
         "entry_time": "2026-09-30 14:30:00",
@@ -2985,11 +3897,11 @@
         "entry_price": 3751.9,
         "exit_price": 3748.0,
         "stop_loss": 3748.0,
-        "target": 3759.7,
+        "target": 3763.16,
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "4.54x"
+        "vol_ratio": "4.54x (Vol)"
     },
     {
         "entry_time": "2026-10-07 10:50:00",
@@ -2999,13 +3911,13 @@
         "market": "NSE",
         "spread": "3740 CE / 3780 CE",
         "entry_price": 3737.1,
-        "exit_price": 3747.3,
+        "exit_price": 3748.31,
         "stop_loss": 3732.0,
-        "target": 3747.3,
+        "target": 3748.31,
         "outcome": "TARGET_HIT",
         "capital_deployed": 60000,
         "net_pnl": 3600.0,
-        "vol_ratio": "2.44x"
+        "vol_ratio": "2.44x (Vol)"
     },
     {
         "entry_time": "2026-10-07 12:30:00",
@@ -3017,11 +3929,11 @@
         "entry_price": 3712.0,
         "exit_price": 3709.0,
         "stop_loss": 3709.0,
-        "target": 3718.0,
+        "target": 3723.14,
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "1.87x"
+        "vol_ratio": "1.87x (Vol)"
     },
     {
         "entry_time": "2026-10-15 15:05:00",
@@ -3037,7 +3949,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "2.89x"
+        "vol_ratio": "2.89x (Vol)"
     },
     {
         "entry_time": "2026-10-22 13:50:00",
@@ -3049,11 +3961,11 @@
         "entry_price": 3657.0,
         "exit_price": 3652.0,
         "stop_loss": 3652.0,
-        "target": 3667.0,
+        "target": 3667.97,
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "2.06x"
+        "vol_ratio": "2.06x (Vol)"
     },
     {
         "entry_time": "2026-10-22 14:55:00",
@@ -3069,7 +3981,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "3.55x"
+        "vol_ratio": "3.55x (Vol)"
     },
     {
         "entry_time": "2026-10-27 14:05:00",
@@ -3081,43 +3993,43 @@
         "entry_price": 3655.3,
         "exit_price": 3652.5,
         "stop_loss": 3652.5,
-        "target": 3660.9,
+        "target": 3666.27,
         "outcome": "STOP_LOSS",
         "capital_deployed": 60000,
         "net_pnl": -2100.0,
-        "vol_ratio": "1.93x"
+        "vol_ratio": "1.93x (Vol)"
     },
     {
         "entry_time": "2026-08-07 12:10:00",
-        "exit_time": "2026-08-07 12:25:00",
+        "exit_time": "2026-08-07 12:45:00",
         "date": "2026-08-07",
         "asset": "AXISBANK",
         "market": "NSE",
         "spread": "1240 CE / 1260 CE",
         "entry_price": 1243.4,
-        "exit_price": 1245.8,
+        "exit_price": 1247.13,
         "stop_loss": 1242.2,
-        "target": 1245.8,
+        "target": 1247.13,
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 7500.0,
-        "vol_ratio": "2.29x"
+        "vol_ratio": "2.29x (Vol)"
     },
     {
         "entry_time": "2026-08-11 12:40:00",
-        "exit_time": "2026-08-11 12:45:00",
+        "exit_time": "2026-08-11 13:05:00",
         "date": "2026-08-11",
         "asset": "AXISBANK",
         "market": "NSE",
         "spread": "1230 CE / 1250 CE",
         "entry_price": 1228.0,
-        "exit_price": 1230.6,
+        "exit_price": 1231.68,
         "stop_loss": 1226.7,
-        "target": 1230.6,
+        "target": 1231.68,
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 7500.0,
-        "vol_ratio": "4.3x"
+        "vol_ratio": "4.3x (Vol)"
     },
     {
         "entry_time": "2026-08-20 12:35:00",
@@ -3129,11 +4041,11 @@
         "entry_price": 1248.9,
         "exit_price": 1247.1,
         "stop_loss": 1247.1,
-        "target": 1252.5,
+        "target": 1252.65,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4375.0,
-        "vol_ratio": "3.43x"
+        "vol_ratio": "3.43x (Vol)"
     },
     {
         "entry_time": "2026-08-25 11:15:00",
@@ -3145,11 +4057,11 @@
         "entry_price": 1232.6,
         "exit_price": 1231.7,
         "stop_loss": 1231.7,
-        "target": 1234.4,
+        "target": 1236.3,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4375.0,
-        "vol_ratio": "1.86x"
+        "vol_ratio": "1.86x (Vol)"
     },
     {
         "entry_time": "2026-09-01 15:05:00",
@@ -3161,11 +4073,11 @@
         "entry_price": 1257.5,
         "exit_price": 1257.1,
         "stop_loss": 1257.1,
-        "target": 1258.3,
+        "target": 1261.27,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4375.0,
-        "vol_ratio": "5.18x"
+        "vol_ratio": "5.18x (Vol)"
     },
     {
         "entry_time": "2026-09-03 14:45:00",
@@ -3181,7 +4093,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4375.0,
-        "vol_ratio": "4.48x"
+        "vol_ratio": "4.48x (Vol)"
     },
     {
         "entry_time": "2026-09-03 15:05:00",
@@ -3197,7 +4109,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4375.0,
-        "vol_ratio": "2.44x"
+        "vol_ratio": "2.44x (Vol)"
     },
     {
         "entry_time": "2026-09-09 15:05:00",
@@ -3209,11 +4121,11 @@
         "entry_price": 1241.0,
         "exit_price": 1239.3,
         "stop_loss": 1239.3,
-        "target": 1244.4,
+        "target": 1244.72,
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4375.0,
-        "vol_ratio": "2.42x"
+        "vol_ratio": "2.42x (Vol)"
     },
     {
         "entry_time": "2026-09-23 15:10:00",
@@ -3229,7 +4141,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4375.0,
-        "vol_ratio": "3.03x"
+        "vol_ratio": "3.03x (Vol)"
     },
     {
         "entry_time": "2026-09-24 09:20:00",
@@ -3244,8 +4156,8 @@
         "target": 1220.7,
         "outcome": "EXPIRED",
         "capital_deployed": 55000,
-        "net_pnl": -2187.5,
-        "vol_ratio": "4.88x"
+        "net_pnl": -1750.0,
+        "vol_ratio": "4.88x (Vol)"
     },
     {
         "entry_time": "2026-09-24 13:45:00",
@@ -3261,7 +4173,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 55000,
         "net_pnl": -4375.0,
-        "vol_ratio": "2.17x"
+        "vol_ratio": "2.17x (Vol)"
     },
     {
         "entry_time": "2026-09-24 14:15:00",
@@ -3277,7 +4189,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 7500.0,
-        "vol_ratio": "3.16x"
+        "vol_ratio": "3.16x (Vol)"
     },
     {
         "entry_time": "2026-10-19 09:30:00",
@@ -3293,7 +4205,7 @@
         "outcome": "EXPIRED",
         "capital_deployed": 55000,
         "net_pnl": 2250.0,
-        "vol_ratio": "1.95x"
+        "vol_ratio": "1.95x (Vol)"
     },
     {
         "entry_time": "2026-10-29 13:05:00",
@@ -3309,7 +4221,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 55000,
         "net_pnl": 7500.0,
-        "vol_ratio": "3.08x"
+        "vol_ratio": "3.08x (Vol)"
     },
     {
         "entry_time": "2026-08-06 15:05:00",
@@ -3321,11 +4233,11 @@
         "entry_price": 1946.9,
         "exit_price": 1944.5,
         "stop_loss": 1944.5,
-        "target": 1951.7,
+        "target": 1952.74,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "2.39x"
+        "vol_ratio": "2.39x (Vol)"
     },
     {
         "entry_time": "2026-08-10 15:10:00",
@@ -3337,11 +4249,11 @@
         "entry_price": 1937.8,
         "exit_price": 1935.0,
         "stop_loss": 1935.0,
-        "target": 1943.4,
+        "target": 1943.61,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "2.11x"
+        "vol_ratio": "2.11x (Vol)"
     },
     {
         "entry_time": "2026-08-11 12:05:00",
@@ -3353,11 +4265,11 @@
         "entry_price": 1918.1,
         "exit_price": 1916.8,
         "stop_loss": 1916.8,
-        "target": 1920.7,
+        "target": 1923.85,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "2.65x"
+        "vol_ratio": "2.65x (Vol)"
     },
     {
         "entry_time": "2026-08-11 12:20:00",
@@ -3373,7 +4285,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "2.37x"
+        "vol_ratio": "2.37x (Vol)"
     },
     {
         "entry_time": "2026-08-12 15:05:00",
@@ -3389,7 +4301,7 @@
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
         "net_pnl": 5700.0,
-        "vol_ratio": "2.95x"
+        "vol_ratio": "2.95x (Vol)"
     },
     {
         "entry_time": "2026-08-13 15:00:00",
@@ -3401,11 +4313,11 @@
         "entry_price": 1941.9,
         "exit_price": 1939.3,
         "stop_loss": 1939.3,
-        "target": 1947.1,
+        "target": 1947.73,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "3.13x"
+        "vol_ratio": "3.13x (Vol)"
     },
     {
         "entry_time": "2026-08-17 14:35:00",
@@ -3417,11 +4329,11 @@
         "entry_price": 1982.4,
         "exit_price": 1980.4,
         "stop_loss": 1980.4,
-        "target": 1986.4,
+        "target": 1988.35,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "1.94x"
+        "vol_ratio": "1.94x (Vol)"
     },
     {
         "entry_time": "2026-08-20 15:10:00",
@@ -3433,11 +4345,11 @@
         "entry_price": 1946.2,
         "exit_price": 1943.4,
         "stop_loss": 1943.4,
-        "target": 1951.8,
+        "target": 1952.04,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "2.08x"
+        "vol_ratio": "2.08x (Vol)"
     },
     {
         "entry_time": "2026-08-21 13:50:00",
@@ -3449,27 +4361,27 @@
         "entry_price": 1946.8,
         "exit_price": 1944.8,
         "stop_loss": 1944.8,
-        "target": 1950.8,
+        "target": 1952.64,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "2.29x"
+        "vol_ratio": "2.29x (Vol)"
     },
     {
         "entry_time": "2026-08-24 14:25:00",
-        "exit_time": "2026-08-24 14:35:00",
+        "exit_time": "2026-08-24 14:50:00",
         "date": "2026-08-24",
         "asset": "BHARTIARTL",
         "market": "NSE",
         "spread": "1930 CE / 1950 CE",
         "entry_price": 1934.0,
-        "exit_price": 1937.0,
+        "exit_price": 1939.8,
         "stop_loss": 1932.5,
-        "target": 1937.0,
+        "target": 1939.8,
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
         "net_pnl": 5700.0,
-        "vol_ratio": "1.89x"
+        "vol_ratio": "1.89x (Vol)"
     },
     {
         "entry_time": "2026-08-27 09:20:00",
@@ -3481,11 +4393,11 @@
         "entry_price": 1900.7,
         "exit_price": 1898.6,
         "stop_loss": 1898.6,
-        "target": 1904.9,
+        "target": 1906.4,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "2.57x"
+        "vol_ratio": "2.57x (Vol)"
     },
     {
         "entry_time": "2026-08-31 15:05:00",
@@ -3497,11 +4409,11 @@
         "entry_price": 1866.7,
         "exit_price": 1864.1,
         "stop_loss": 1864.1,
-        "target": 1871.9,
+        "target": 1872.3,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "2.8x"
+        "vol_ratio": "2.8x (Vol)"
     },
     {
         "entry_time": "2026-09-01 14:35:00",
@@ -3511,13 +4423,13 @@
         "market": "NSE",
         "spread": "1860 CE / 1880 CE",
         "entry_price": 1861.2,
-        "exit_price": 1863.8,
+        "exit_price": 1866.78,
         "stop_loss": 1859.9,
-        "target": 1863.8,
+        "target": 1866.78,
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
         "net_pnl": 5700.0,
-        "vol_ratio": "2.65x"
+        "vol_ratio": "2.65x (Vol)"
     },
     {
         "entry_time": "2026-09-09 15:00:00",
@@ -3529,11 +4441,11 @@
         "entry_price": 1823.4,
         "exit_price": 1821.9,
         "stop_loss": 1821.9,
-        "target": 1826.4,
+        "target": 1828.87,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "2.18x"
+        "vol_ratio": "2.18x (Vol)"
     },
     {
         "entry_time": "2026-09-30 15:05:00",
@@ -3549,7 +4461,7 @@
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
         "net_pnl": -3325.0,
-        "vol_ratio": "2.3x"
+        "vol_ratio": "2.3x (Vol)"
     },
     {
         "entry_time": "2026-08-06 11:50:00",
@@ -3557,15 +4469,15 @@
         "date": "2026-08-06",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "190 CE / 195 CE",
+        "spread": "190 CE / 192.5 CE",
         "entry_price": 190.85,
         "exit_price": 190.39,
         "stop_loss": 190.39,
         "target": 191.77,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.05x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.05x (Vol)"
     },
     {
         "entry_time": "2026-08-06 13:15:00",
@@ -3573,15 +4485,15 @@
         "date": "2026-08-06",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "190 CE / 195 CE",
+        "spread": "190 CE / 192.5 CE",
         "entry_price": 190.42,
         "exit_price": 190.1,
         "stop_loss": 190.1,
         "target": 191.06,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.76x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.76x (Vol)"
     },
     {
         "entry_time": "2026-08-06 15:10:00",
@@ -3589,15 +4501,15 @@
         "date": "2026-08-06",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "190 CE / 195 CE",
+        "spread": "190 CE / 192.5 CE",
         "entry_price": 189.5,
         "exit_price": 189.02,
         "stop_loss": 189.02,
         "target": 190.46,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.9x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.9x (Vol)"
     },
     {
         "entry_time": "2026-08-13 12:30:00",
@@ -3605,15 +4517,15 @@
         "date": "2026-08-13",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "185 CE / 190 CE",
+        "spread": "185 CE / 187.5 CE",
         "entry_price": 184.25,
         "exit_price": 183.85,
         "stop_loss": 183.85,
         "target": 185.05,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "12.69x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "12.69x (Vol)"
     },
     {
         "entry_time": "2026-08-18 15:05:00",
@@ -3621,15 +4533,15 @@
         "date": "2026-08-18",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "185 CE / 190 CE",
+        "spread": "185 CE / 187.5 CE",
         "entry_price": 184.83,
         "exit_price": 184.44,
         "stop_loss": 184.44,
         "target": 185.61,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.75x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.75x (Vol)"
     },
     {
         "entry_time": "2026-08-20 15:10:00",
@@ -3637,15 +4549,15 @@
         "date": "2026-08-20",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "182 CE / 187 CE",
+        "spread": "182 CE / 184.5 CE",
         "entry_price": 183.45,
         "exit_price": 184.39,
         "stop_loss": 182.98,
         "target": 184.39,
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
-        "net_pnl": 16500.0,
-        "vol_ratio": "4.66x"
+        "net_pnl": 8250.0,
+        "vol_ratio": "4.66x (Vol)"
     },
     {
         "entry_time": "2026-08-21 15:05:00",
@@ -3653,15 +4565,15 @@
         "date": "2026-08-21",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "182 CE / 187 CE",
+        "spread": "182 CE / 184.5 CE",
         "entry_price": 182.5,
-        "exit_price": 183.04,
+        "exit_price": 183.05,
         "stop_loss": 182.23,
-        "target": 183.04,
+        "target": 183.05,
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
-        "net_pnl": 16500.0,
-        "vol_ratio": "2.65x"
+        "net_pnl": 8250.0,
+        "vol_ratio": "2.65x (Vol)"
     },
     {
         "entry_time": "2026-08-26 12:10:00",
@@ -3669,15 +4581,15 @@
         "date": "2026-08-26",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "185 CE / 190 CE",
+        "spread": "185 CE / 187.5 CE",
         "entry_price": 184.5,
         "exit_price": 184.4,
         "stop_loss": 184.4,
-        "target": 184.7,
+        "target": 185.05,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "1.85x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "1.85x (Vol)"
     },
     {
         "entry_time": "2026-08-28 11:05:00",
@@ -3685,15 +4597,15 @@
         "date": "2026-08-28",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "185 CE / 190 CE",
+        "spread": "185 CE / 187.5 CE",
         "entry_price": 186.2,
         "exit_price": 185.58,
         "stop_loss": 185.58,
         "target": 187.44,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "7.74x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "7.74x (Vol)"
     },
     {
         "entry_time": "2026-08-31 15:05:00",
@@ -3701,15 +4613,15 @@
         "date": "2026-08-31",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "182 CE / 187 CE",
+        "spread": "182 CE / 184.5 CE",
         "entry_price": 181.82,
         "exit_price": 182.56,
         "stop_loss": 181.45,
         "target": 182.56,
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
-        "net_pnl": 16500.0,
-        "vol_ratio": "4.25x"
+        "net_pnl": 8250.0,
+        "vol_ratio": "4.25x (Vol)"
     },
     {
         "entry_time": "2026-09-01 14:40:00",
@@ -3717,15 +4629,15 @@
         "date": "2026-09-01",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "182 CE / 187 CE",
+        "spread": "182 CE / 184.5 CE",
         "entry_price": 183.42,
         "exit_price": 183.21,
         "stop_loss": 183.21,
-        "target": 183.84,
+        "target": 183.97,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "3.18x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "3.18x (Vol)"
     },
     {
         "entry_time": "2026-09-09 15:05:00",
@@ -3733,31 +4645,15 @@
         "date": "2026-09-09",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "187 CE / 192 CE",
+        "spread": "187 CE / 189.5 CE",
         "entry_price": 188.21,
         "exit_price": 187.83,
         "stop_loss": 187.83,
         "target": 188.97,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.84x"
-    },
-    {
-        "entry_time": "2026-09-16 09:15:00",
-        "exit_time": "2026-09-16 09:25:00",
-        "date": "2026-09-16",
-        "asset": "TATASTEEL",
-        "market": "NSE",
-        "spread": "182 CE / 187 CE",
-        "entry_price": 183.33,
-        "exit_price": 182.3,
-        "stop_loss": 182.3,
-        "target": 185.39,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "3.9x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.84x (Vol)"
     },
     {
         "entry_time": "2026-09-18 14:35:00",
@@ -3765,15 +4661,15 @@
         "date": "2026-09-18",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "187 CE / 192 CE",
+        "spread": "187 CE / 189.5 CE",
         "entry_price": 186.45,
         "exit_price": 186.12,
         "stop_loss": 186.12,
         "target": 187.11,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.53x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.53x (Vol)"
     },
     {
         "entry_time": "2026-09-18 15:10:00",
@@ -3781,15 +4677,15 @@
         "date": "2026-09-18",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "185 CE / 190 CE",
+        "spread": "185 CE / 187.5 CE",
         "entry_price": 186.08,
         "exit_price": 185.9,
         "stop_loss": 185.9,
-        "target": 186.44,
+        "target": 186.64,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.79x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.79x (Vol)"
     },
     {
         "entry_time": "2026-09-21 15:05:00",
@@ -3797,31 +4693,15 @@
         "date": "2026-09-21",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "182 CE / 187 CE",
+        "spread": "182 CE / 184.5 CE",
         "entry_price": 183.64,
         "exit_price": 183.41,
         "stop_loss": 183.41,
-        "target": 184.1,
+        "target": 184.19,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "3.09x"
-    },
-    {
-        "entry_time": "2026-09-24 09:15:00",
-        "exit_time": "2026-09-24 09:35:00",
-        "date": "2026-09-24",
-        "asset": "TATASTEEL",
-        "market": "NSE",
-        "spread": "190 CE / 195 CE",
-        "entry_price": 189.51,
-        "exit_price": 191.33,
-        "stop_loss": 188.6,
-        "target": 191.33,
-        "outcome": "TARGET_HIT",
-        "capital_deployed": 50000,
-        "net_pnl": 16500.0,
-        "vol_ratio": "2.36x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "3.09x (Vol)"
     },
     {
         "entry_time": "2026-09-24 12:25:00",
@@ -3829,15 +4709,15 @@
         "date": "2026-09-24",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "190 CE / 195 CE",
+        "spread": "190 CE / 192.5 CE",
         "entry_price": 189.15,
         "exit_price": 188.83,
         "stop_loss": 188.83,
         "target": 189.79,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.56x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.56x (Vol)"
     },
     {
         "entry_time": "2026-09-24 15:05:00",
@@ -3845,15 +4725,15 @@
         "date": "2026-09-24",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "187 CE / 192 CE",
+        "spread": "187 CE / 189.5 CE",
         "entry_price": 188.51,
         "exit_price": 190.07,
         "stop_loss": 187.73,
         "target": 190.07,
         "outcome": "TARGET_HIT",
         "capital_deployed": 50000,
-        "net_pnl": 16500.0,
-        "vol_ratio": "6.08x"
+        "net_pnl": 8250.0,
+        "vol_ratio": "6.08x (Vol)"
     },
     {
         "entry_time": "2026-09-30 10:45:00",
@@ -3861,15 +4741,15 @@
         "date": "2026-09-30",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "187 CE / 192 CE",
+        "spread": "187 CE / 189.5 CE",
         "entry_price": 187.26,
         "exit_price": 187.0,
         "stop_loss": 187.0,
-        "target": 187.78,
+        "target": 187.82,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.55x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.55x (Vol)"
     },
     {
         "entry_time": "2026-09-30 14:25:00",
@@ -3877,31 +4757,15 @@
         "date": "2026-09-30",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "187 CE / 192 CE",
+        "spread": "187 CE / 189.5 CE",
         "entry_price": 187.08,
         "exit_price": 186.91,
         "stop_loss": 186.91,
-        "target": 187.42,
+        "target": 187.64,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.53x"
-    },
-    {
-        "entry_time": "2026-10-05 15:15:00",
-        "exit_time": "2026-10-06 09:15:00",
-        "date": "2026-10-05",
-        "asset": "TATASTEEL",
-        "market": "NSE",
-        "spread": "177 CE / 182 CE",
-        "entry_price": 178.14,
-        "exit_price": 177.39,
-        "stop_loss": 177.39,
-        "target": 179.64,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "3.29x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.53x (Vol)"
     },
     {
         "entry_time": "2026-10-08 09:25:00",
@@ -3909,15 +4773,15 @@
         "date": "2026-10-08",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "175 CE / 180 CE",
+        "spread": "175 CE / 177.5 CE",
         "entry_price": 174.88,
         "exit_price": 173.21,
         "stop_loss": 173.21,
         "target": 178.22,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.3x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.3x (Vol)"
     },
     {
         "entry_time": "2026-10-08 15:10:00",
@@ -3925,15 +4789,15 @@
         "date": "2026-10-08",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "172 CE / 177 CE",
+        "spread": "172 CE / 174.5 CE",
         "entry_price": 171.3,
         "exit_price": 170.65,
         "stop_loss": 170.65,
         "target": 172.6,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.75x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.75x (Vol)"
     },
     {
         "entry_time": "2026-10-14 13:05:00",
@@ -3941,15 +4805,15 @@
         "date": "2026-10-14",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "175 CE / 180 CE",
+        "spread": "175 CE / 177.5 CE",
         "entry_price": 174.12,
         "exit_price": 173.75,
         "stop_loss": 173.75,
         "target": 174.86,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "1.94x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "1.94x (Vol)"
     },
     {
         "entry_time": "2026-10-16 14:25:00",
@@ -3957,15 +4821,15 @@
         "date": "2026-10-16",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "175 CE / 180 CE",
+        "spread": "175 CE / 177.5 CE",
         "entry_price": 175.3,
         "exit_price": 174.92,
         "stop_loss": 174.92,
         "target": 176.06,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "5.42x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "5.42x (Vol)"
     },
     {
         "entry_time": "2026-10-21 13:55:00",
@@ -3973,15 +4837,15 @@
         "date": "2026-10-21",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "172 CE / 177 CE",
+        "spread": "172 CE / 174.5 CE",
         "entry_price": 171.31,
         "exit_price": 171.06,
         "stop_loss": 171.06,
-        "target": 171.81,
+        "target": 171.82,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "1.93x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "1.93x (Vol)"
     },
     {
         "entry_time": "2026-10-21 14:20:00",
@@ -3989,14 +4853,14 @@
         "date": "2026-10-21",
         "asset": "TATASTEEL",
         "market": "NSE",
-        "spread": "170 CE / 175 CE",
+        "spread": "170 CE / 172.5 CE",
         "entry_price": 171.14,
         "exit_price": 170.94,
         "stop_loss": 170.94,
-        "target": 171.54,
+        "target": 171.65,
         "outcome": "STOP_LOSS",
         "capital_deployed": 50000,
-        "net_pnl": -9625.0,
-        "vol_ratio": "2.23x"
+        "net_pnl": -4812.5,
+        "vol_ratio": "2.23x (Vol)"
     }
 ]
