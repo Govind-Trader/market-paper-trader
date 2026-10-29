@@ -1,5 +1,7 @@
 from datetime import datetime, time
+import json
 import math
+import os
 import time as tm
 import pandas as pd
 import pytz
@@ -21,8 +23,6 @@ st.set_page_config(
 # ==============================================================================
 # 2. TELEGRAM ALERT CREDENTIALS
 # ==============================================================================
-# Puraane bot ka Token aur Chat ID yahan daalein
-# Agar Streamlit Secrets use kar rahe hain toh yeh automatically detect ho jayega
 TELEGRAM_BOT_TOKEN = st.secrets.get("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
 TELEGRAM_CHAT_ID = st.secrets.get("TELEGRAM_CHAT_ID", "YOUR_CHAT_ID_HERE")
 
@@ -184,20 +184,19 @@ if "open_positions" not in st.session_state:
 
 
 def is_market_trading_hours(market_type: str) -> bool:
-    """Checks trading hours in Indian Standard Time (IST)."""
+    """IST trading hours check."""
     ist = pytz.timezone("Asia/Kolkata")
     now_time = datetime.now(ist).time()
 
     if market_type == "NSE":
         return time(9, 15) <= now_time <= time(15, 30)
     elif market_type == "MCX":
-        # MCX trades from 09:00 AM to 11:30 PM IST
         return time(9, 0) <= now_time <= time(23, 30)
     return False
 
 
 def get_volume_multiplier(asset_name: str) -> float:
-    """MCX Crude Oil US opening overlap (06:00 PM - 09:30 PM IST) ke dauran 2.2x volume threshold require karta hai."""
+    """MCX Crude Oil US opening overlap (06:00 PM - 09:30 PM IST) ke dauran 2.2x threshold."""
     ist = pytz.timezone("Asia/Kolkata")
     now_time = datetime.now(ist).time()
 
@@ -215,13 +214,9 @@ def scan_asset_for_setup(name: str, config: dict):
         if df.empty or len(df) < 35:
             return None
 
-        # 20-period Volume Moving Average
         df["Vol_MA20"] = df["Volume"].rolling(window=20).mean()
-
-        # Pichhle 30 candles ka lowest swing point (excluding trigger candle)
         prev_30_low = df["Low"].iloc[-31:-1].min()
 
-        # Trigger candle parameters
         curr = df.iloc[-1]
         c_open, c_high, c_low, c_close, c_vol = (
             curr["Open"],
@@ -234,21 +229,18 @@ def scan_asset_for_setup(name: str, config: dict):
 
         required_mult = get_volume_multiplier(name)
 
-        # 1. Sweep Rule: Low undercut previous 30-low, but closed back above it
         is_sweep = (c_low < prev_30_low) and (c_close > prev_30_low)
-        # 2. Bullish Rejection Candle
         is_green = c_close > c_open
-        # 3. Institutional Volume Absorption Spike
-        has_volume = c_vol >= (avg_vol * required_mult) if avg_vol > 0 else False
+        has_volume = (
+            c_vol >= (avg_vol * required_mult) if avg_vol > 0 else False
+        )
 
         if is_sweep and is_green and has_volume:
-            # Bull Call Spread strike computation
             atm_strike = int(
                 round(c_close / config["strike_step"]) * config["strike_step"]
             )
             otm_strike = atm_strike + config["spread_width"]
 
-            # Risk-Reward 1:2 Setup
             risk_points = round(c_close - c_low, 2)
             target_points = round(risk_points * 2, 2)
 
@@ -264,7 +256,7 @@ def scan_asset_for_setup(name: str, config: dict):
                 "otm_sell": f"{otm_strike} CE",
                 "spread_width": config["spread_width"],
                 "lot_size": config["lot_size"],
-                "capital_used": config["margin_per_lot"],  # Capital Tracking
+                "capital_used": config["margin_per_lot"],
                 "stop_loss": round(c_low, 2),
                 "target": round(c_close + target_points, 2),
                 "status": "ACTIVE",
@@ -283,7 +275,7 @@ st.caption(
     "Automated 5m 30-Candle Swing Low Sweep + 1.8x/2.2x Volume Absorption Bull Call Spreads"
 )
 
-# Header Metric Bar (Capital Deployed & Free Margin tracking)
+# Header Metrics Bar
 used_capital = sum(
     pos["capital_used"] for pos in st.session_state.open_positions
 )
@@ -301,8 +293,14 @@ m4.metric("Active Assets", "14 (NSE + MCX)")
 
 st.divider()
 
-# Tab Navigation
-tab1, tab2 = st.tabs(["📊 Interactive Live Charts", "⚙️ Scanner & Trade Log"])
+# 3 Complete Tabs
+tab1, tab2, tab3 = st.tabs(
+    [
+        "📊 Interactive Live Charts",
+        "⚙️ Scanner & Trade Log",
+        "📈 60-Day P&L & Capital Audit",
+    ]
+)
 
 # ------------------------------------------------------------------------------
 # TAB 1: TRADINGVIEW ADVANCED PRO WIDGET
@@ -369,12 +367,10 @@ with tab2:
                 signal = scan_asset_for_setup(asset_name, config)
                 if signal:
                     found_trades += 1
-                    # Capital Margin Check
                     if available_capital >= signal["capital_used"]:
                         st.session_state.open_positions.append(signal)
                         st.session_state.trade_history.append(signal)
 
-                        # Telegram Instant Notification Payload
                         alert_text = (
                             f"🚨 *NEW TRADE TRIGGERED* 🚨\n\n"
                             f"*Asset:* `{signal['asset']}` ({signal['market']})\n"
@@ -400,7 +396,7 @@ with tab2:
                     "Scanner Complete: 14 assets mein kisi par bhi 1.8x/2.2x volume absorption qualify nahi hua."
                 )
 
-    # 1. ACTIVE OPEN POSITIONS
+    # Active Open Positions
     st.subheader("📌 Open Positions & Live Capital Deployed")
     if st.session_state.open_positions:
         pos_rows = []
@@ -422,8 +418,8 @@ with tab2:
     else:
         st.caption("Filhal koi open position active nahi hai.")
 
-    # 2. COMPLETE TRADE AUDIT LOG
-    st.subheader("📜 Paper Trading Complete Audit History")
+    # Trade History Log
+    st.subheader("📜 Paper Trading Live History")
     if st.session_state.trade_history:
         hist_rows = []
         for t in st.session_state.trade_history:
@@ -441,4 +437,72 @@ with tab2:
             )
         st.dataframe(pd.DataFrame(hist_rows), use_container_width=True)
     else:
-        st.caption("Pichhla koi trade record nahi hai.")
+        st.caption("Aaj koi live trade record nahi hua hai.")
+
+# ------------------------------------------------------------------------------
+# TAB 3: 60-DAY HISTORICAL PERFORMANCE & CAPITAL AUDIT
+# ------------------------------------------------------------------------------
+with tab3:
+    if os.path.exists("trades_db.json"):
+        with open("trades_db.json", "r") as f:
+            db_data = json.load(f)
+
+        if db_data:
+            df_hist = pd.DataFrame(db_data)
+
+            total_net_pnl = df_hist["net_pnl"].sum()
+            target_hits = df_hist[df_hist["outcome"] == "TARGET_HIT"]
+            win_ratio = (
+                (len(target_hits) / len(df_hist)) * 100
+                if len(df_hist) > 0
+                else 0
+            )
+
+            # Peak Margin: Single day maximum capital block
+            peak_margin = (
+                df_hist.groupby("date")["capital_deployed"].sum().max()
+            )
+
+            st.subheader("💰 60-Day Capital & Performance Summary")
+            k1, k2, k3, k4 = st.columns(4)
+            k1.metric(
+                "Cumulative Net P&L",
+                f"₹{total_net_pnl:,.2f}",
+                delta=f"{win_ratio:.1f}% Win Rate",
+            )
+            k2.metric(
+                "Peak Capital Required",
+                f"₹{peak_margin:,.2f}",
+                help="Pichhle 60 dino mein kisi ek date par laga maximum total margin",
+            )
+            k3.metric("Total Trades Triggered", f"{len(df_hist)} Trades")
+            k4.metric(
+                "Avg Capital / Trade",
+                f"₹{df_hist['capital_deployed'].mean():,.2f}",
+            )
+
+            # Cumulative Equity Curve
+            st.subheader("📈 Capital Growth Curve")
+            df_hist["Equity_Curve"] = df_hist["net_pnl"].cumsum()
+            st.line_chart(df_hist.set_index("entry_time")["Equity_Curve"])
+
+            # Full Ledger Table
+            st.subheader("📜 Complete Trade Ledger")
+            st.dataframe(
+                df_hist[
+                    [
+                        "entry_time",
+                        "asset",
+                        "spread",
+                        "capital_deployed",
+                        "outcome",
+                        "net_pnl",
+                        "vol_ratio",
+                    ]
+                ],
+                use_container_width=True,
+            )
+        else:
+            st.info("trades_db.json file khali hai.")
+    else:
+        st.warning("trades_db.json file load nahi ho saki.")
