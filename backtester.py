@@ -1,13 +1,15 @@
 from datetime import datetime, time
 import json
+import numpy as np
 import pandas as pd
 import pytz
 import yfinance as yf
 
+# 14 Assets Clean Configuration
 ASSETS = {
     "NIFTY": {
         "symbol": "^NSEI",
-        "market": "NSE",
+        "market": "NSE_INDEX",
         "lot_size": 25,
         "strike_step": 50,
         "spread_width": 100,
@@ -15,7 +17,7 @@ ASSETS = {
     },
     "BANKNIFTY": {
         "symbol": "^NSEBANK",
-        "market": "NSE",
+        "market": "NSE_INDEX",
         "lot_size": 15,
         "strike_step": 100,
         "spread_width": 200,
@@ -23,7 +25,7 @@ ASSETS = {
     },
     "FINNIFTY": {
         "symbol": "NIFTY_FIN_SERVICE.NS",
-        "market": "NSE",
+        "market": "NSE_INDEX",
         "lot_size": 25,
         "strike_step": 50,
         "spread_width": 100,
@@ -114,32 +116,64 @@ ASSETS = {
         "market": "NSE",
         "lot_size": 5500,
         "strike_step": 2.5,
-        "spread_width": 5,
+        "spread_width": 2.5,
         "margin": 50000,
     },
 }
 
 
 def run_60d_simulation():
-    print("🚀 Fetching 60 Days 5m Data across 14 Assets...")
+    print(
+        "🚀 Scanning 14 Assets with Dynamic Index-Vol Proxy & MCX Hour Filtering..."
+    )
     all_trades = []
+    ist = pytz.timezone("Asia/Kolkata")
 
     for name, conf in ASSETS.items():
         print(f"Scanning {name}...")
         try:
             ticker = yf.Ticker(conf["symbol"])
             df = ticker.history(period="59d", interval="5m")
+
+            # Finnifty fallback agar standard symbol khali ho
+            if df.empty and name == "FINNIFTY":
+                ticker = yf.Ticker("NIFTY_FIN_SERVICE.NS")
+                df = ticker.history(period="59d", interval="5m")
+
             if df.empty or len(df) < 50:
+                print(f"Skipping {name}: Data empty or insufficient.")
                 continue
 
+            # Timezone conversion to IST
+            if df.index.tz is None:
+                df.index = df.index.tz_localize("UTC").tz_convert(ist)
+            else:
+                df.index = df.index.tz_convert(ist)
+
+            # Vol and Range Indicators
             df["Vol_MA20"] = df["Volume"].rolling(window=20).mean()
+            df["Range"] = df["High"] - df["Low"]
+            df["Range_MA20"] = df["Range"].rolling(window=20).mean()
 
             i = 31
             while i < len(df) - 5:
+                curr = df.iloc[i]
+                c_time = curr.name.time()
+
+                # Rule 1: Market Hours Check
+                if conf["market"] in ["NSE", "NSE_INDEX"]:
+                    if not (time(9, 20) <= c_time <= time(15, 10)):
+                        i += 1
+                        continue
+                elif conf["market"] == "MCX":
+                    # Sirf valid MCX trading hours
+                    if not (time(9, 15) <= c_time <= time(23, 15)):
+                        i += 1
+                        continue
+
                 window = df.iloc[i - 30 : i]
                 prev_30_low = window["Low"].min()
 
-                curr = df.iloc[i]
                 c_open, c_high, c_low, c_close, c_vol = (
                     curr["Open"],
                     curr["High"],
@@ -148,30 +182,44 @@ def run_60d_simulation():
                     curr["Volume"],
                 )
                 avg_vol = curr["Vol_MA20"]
-
-                c_time = curr.name.time()
-                req_mult = (
-                    2.2
-                    if (
-                        name == "CRUDEOIL"
-                        and time(18, 0) <= c_time <= time(21, 30)
-                    )
-                    else 1.8
-                )
+                avg_range = curr["Range_MA20"]
 
                 is_sweep = (c_low < prev_30_low) and (c_close > prev_30_low)
                 is_green = c_close > c_open
-                has_vol = (
-                    c_vol >= (avg_vol * req_mult) if avg_vol > 0 else False
-                )
 
-                if is_sweep and is_green and has_vol:
+                # Rule 2: Volume absorption for stocks/MCX, Range Expansion for Indices
+                if conf["market"] == "NSE_INDEX":
+                    # Indices lack volume on yfinance; use Candle Range Expansion >= 1.25x
+                    has_absorption = (
+                        (c_high - c_low) >= (avg_range * 1.25)
+                        if avg_range > 0
+                        else False
+                    )
+                    vol_metric_str = f"{round((c_high - c_low) / avg_range, 2)}x (Rng)"
+                else:
+                    req_mult = (
+                        2.2
+                        if (
+                            name == "CRUDEOIL"
+                            and time(18, 0) <= c_time <= time(21, 30)
+                        )
+                        else 1.8
+                    )
+                    has_absorption = (
+                        c_vol >= (avg_vol * req_mult) if avg_vol > 0 else False
+                    )
+                    vol_metric_str = f"{round(c_vol / avg_vol, 2)}x (Vol)"
+
+                if is_sweep and is_green and has_absorption:
                     entry_price = c_close
                     sl_price = c_low
-                    risk_pts = entry_price - sl_price
+                    risk_pts = max(
+                        entry_price - sl_price, entry_price * 0.0015
+                    )
                     target_pts = risk_pts * 2
                     target_price = entry_price + target_pts
 
+                    # Strike assignment
                     atm = int(
                         round(entry_price / conf["strike_step"])
                         * conf["strike_step"]
@@ -182,6 +230,7 @@ def run_60d_simulation():
                     exit_price = entry_price
                     exit_time = curr.name
 
+                    # Hedged Spread P&L Model
                     max_gain = conf["spread_width"] * 0.60 * conf["lot_size"]
                     max_loss = -(conf["spread_width"] * 0.35 * conf["lot_size"])
 
@@ -206,7 +255,7 @@ def run_60d_simulation():
                         pnl = (
                             max_gain * 0.3
                             if exit_price > entry_price
-                            else max_loss * 0.5
+                            else max_loss * 0.4
                         )
                         i += 24
 
@@ -229,17 +278,19 @@ def run_60d_simulation():
                             "outcome": outcome,
                             "capital_deployed": conf["margin"],
                             "net_pnl": round(pnl, 2),
-                            "vol_ratio": f"{round(c_vol / avg_vol, 2)}x",
+                            "vol_ratio": vol_metric_str,
                         }
                     )
                 i += 1
         except Exception as e:
-            print(f"Error processing {name}: {e}")
+            print(f"Error on {name}: {e}")
 
     with open("trades_db.json", "w") as f:
         json.dump(all_trades, f, indent=4)
 
-    print(f"\n✅ Simulation Complete! {len(all_trades)} trades saved.")
+    print(
+        f"\n✅ Updated Simulation Complete! {len(all_trades)} trades saved to trades_db.json."
+    )
 
 
 if __name__ == "__main__":
