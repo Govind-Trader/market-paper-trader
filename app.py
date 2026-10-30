@@ -42,22 +42,15 @@ st.markdown("""
 IST = pytz.timezone("Asia/Kolkata")
 
 ASSETS = {
-    "NIFTY": {"token": "99926000", "symbol": "^NSEI", "exch": "NSE", "market": "NSE_INDEX", "lot_size": 25, "strike_step": 50, "spread_width": 100, "margin": 45000},
+    "TCS": {"token": "11536", "symbol": "TCS.NS", "exch": "NSE", "market": "NSE", "lot_size": 175, "strike_step": 50, "spread_width": 100, "margin": 65000},
     "BANKNIFTY": {"token": "99926009", "symbol": "^NSEBANK", "exch": "NSE", "market": "NSE_INDEX", "lot_size": 15, "strike_step": 100, "spread_width": 200, "margin": 50000},
     "FINNIFTY": {"token": "99926037", "symbol": "NIFTY_FIN_SERVICE.NS", "exch": "NSE", "market": "NSE_INDEX", "lot_size": 25, "strike_step": 50, "spread_width": 100, "margin": 45000},
-    "CRUDEOIL": {"token": None, "symbol": "CL=F", "exch": "MCX", "market": "MCX", "lot_size": 100, "strike_step": 50, "spread_width": 100, "margin": 55000},
-    "RELIANCE": {"token": "2885", "symbol": "RELIANCE.NS", "exch": "NSE", "market": "NSE", "lot_size": 250, "strike_step": 20, "spread_width": 40, "margin": 65000},
-    "HDFCBANK": {"token": "1333", "symbol": "HDFCBANK.NS", "exch": "NSE", "market": "NSE", "lot_size": 550, "strike_step": 10, "spread_width": 20, "margin": 60000},
-    "ICICIBANK": {"token": "4963", "symbol": "ICICIBANK.NS", "exch": "NSE", "market": "NSE", "lot_size": 700, "strike_step": 10, "spread_width": 20, "margin": 55000},
     "SBIN": {"token": "3045", "symbol": "SBIN.NS", "exch": "NSE", "market": "NSE", "lot_size": 750, "strike_step": 5, "spread_width": 10, "margin": 50000},
-    "INFY": {"token": "1594", "symbol": "INFY.NS", "exch": "NSE", "market": "NSE", "lot_size": 400, "strike_step": 20, "spread_width": 40, "margin": 55000},
-    "TCS": {"token": "11536", "symbol": "TCS.NS", "exch": "NSE", "market": "NSE", "lot_size": 175, "strike_step": 50, "spread_width": 100, "margin": 65000},
     "LT": {"token": "11483", "symbol": "LT.NS", "exch": "NSE", "market": "NSE", "lot_size": 150, "strike_step": 20, "spread_width": 40, "margin": 60000},
     "AXISBANK": {"token": "5900", "symbol": "AXISBANK.NS", "exch": "NSE", "market": "NSE", "lot_size": 625, "strike_step": 10, "spread_width": 20, "margin": 55000},
-    "BHARTIARTL": {"token": "10604", "symbol": "BHARTIARTL.NS", "exch": "NSE", "market": "NSE", "lot_size": 475, "strike_step": 10, "spread_width": 20, "margin": 50000},
-    "TATASTEEL": {"token": "3499", "symbol": "TATASTEEL.NS", "exch": "NSE", "market": "NSE", "lot_size": 5500, "strike_step": 2.5, "spread_width": 2.5, "margin": 50000}
+    "NIFTY": {"token": "99926000", "symbol": "^NSEI", "exch": "NSE", "market": "NSE_INDEX", "lot_size": 25, "strike_step": 50, "spread_width": 100, "margin": 45000},
+    "HDFCBANK": {"token": "1333", "symbol": "HDFCBANK.NS", "exch": "NSE", "market": "NSE", "lot_size": 550, "strike_step": 10, "spread_width": 20, "margin": 60000}
 }
-
 TIMEFRAME_CONFIG = {
     "1 Minute": {"interval": "ONE_MINUTE", "days": 2, "yf": "1m"},
     "3 Minute": {"interval": "THREE_MINUTE", "days": 5, "yf": "5m"},
