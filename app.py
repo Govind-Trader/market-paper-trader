@@ -328,8 +328,7 @@ with tab3:
             st.dataframe(asset_grp[["asset", "Trades", "Wins", "Losses", "Win_Rate", "Net_PnL_Formatted"]], use_container_width=True)
 
             st.write("### 📜 Complete Trade Ledger")
-            disp_cols = [c for c in ["entry_time", "asset", "side", "spread", "outcome", "net_pnl", "vol_ratio"] if c in df_trades.columns]
-            st.dataframe(df_trades[disp_cols], use_container_width=True)
+            disp_cols = [c for c in ["entry_time", "exit_time", "asset", "side", "spread", "entry_price", "exit_price", "initial_sl", "target", "outcome", "net_pnl", "vol_ratio"] if c in df_trades.columns]
 
             csv_data = df_trades.to_csv(index=False).encode('utf-8')
             st.download_button(
