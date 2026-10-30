@@ -4,6 +4,8 @@ numpy
 pytz
 pyotp
 smartapi-python
+logzero
+websocket-client
 plotly
 yfinance
 requests
