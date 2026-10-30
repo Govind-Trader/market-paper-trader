@@ -61,14 +61,24 @@ ASSETS = {
     "TATASTEEL": {"token": "3499", "symbol": "TATASTEEL.NS", "exch": "NSE", "market": "NSE", "lot_size": 5500, "strike_step": 2.5, "spread_width": 2.5, "margin": 50000}
 }
 
+# Supported Timeframes
+TIMEFRAME_CONFIG = {
+    "1 Minute": {"interval": "ONE_MINUTE", "days": 2, "yf": "1m"},
+    "3 Minute": {"interval": "THREE_MINUTE", "days": 5, "yf": "5m"},
+    "5 Minute": {"interval": "FIVE_MINUTE", "days": 5, "yf": "5m"},
+    "15 Minute": {"interval": "FIFTEEN_MINUTE", "days": 15, "yf": "15m"},
+    "1 Hour": {"interval": "ONE_HOUR", "days": 30, "yf": "1h"},
+    "1 Day": {"interval": "ONE_DAY", "days": 90, "yf": "1d"}
+}
+
 # 1. Angel One SmartAPI Client Session
-@st.cache_resource(ttl=3600)
+@st.cache_resource(ttl=600)
 def get_smart_api_client():
     try:
-        api_key = st.secrets.get("SMARTAPI_KEY") or os.getenv("SMARTAPI_KEY")
-        client_code = st.secrets.get("SMARTAPI_CLIENT_CODE") or os.getenv("SMARTAPI_CLIENT_CODE")
-        pin = st.secrets.get("SMARTAPI_PIN") or os.getenv("SMARTAPI_PIN")
-        totp_secret = st.secrets.get("SMARTAPI_TOTP_KEY") or os.getenv("SMARTAPI_TOTP_KEY")
+        api_key = (st.secrets.get("SMARTAPI_KEY") or os.getenv("SMARTAPI_KEY", "")).strip()
+        client_code = (st.secrets.get("SMARTAPI_CLIENT_CODE") or os.getenv("SMARTAPI_CLIENT_CODE", "")).strip()
+        pin = (st.secrets.get("SMARTAPI_PIN") or os.getenv("SMARTAPI_PIN", "")).strip()
+        totp_secret = (st.secrets.get("SMARTAPI_TOTP_KEY") or os.getenv("SMARTAPI_TOTP_KEY", "")).strip()
 
         if not all([api_key, client_code, pin, totp_secret]):
             return None
@@ -83,21 +93,22 @@ def get_smart_api_client():
     return None
 
 # 2. Historical & Live Candle Fetcher
-def fetch_candles(asset_name, days=5):
+def fetch_candles(asset_name, tf_label="5 Minute"):
     conf = ASSETS[asset_name]
+    tf_info = TIMEFRAME_CONFIG[tf_label]
     smart_api = get_smart_api_client()
     df = pd.DataFrame()
 
     if smart_api and conf["token"]:
         try:
             now = datetime.now(IST)
-            from_date = (now - timedelta(days=days)).strftime("%Y-%m-%d 09:15")
+            from_date = (now - timedelta(days=tf_info["days"])).strftime("%Y-%m-%d 09:15")
             to_date = now.strftime("%Y-%m-%d 15:30")
 
             params = {
                 "exchange": conf["exch"],
                 "symboltoken": str(conf["token"]),
-                "interval": "FIVE_MINUTE",
+                "interval": tf_info["interval"],
                 "fromdate": from_date,
                 "todate": to_date
             }
@@ -117,7 +128,7 @@ def fetch_candles(asset_name, days=5):
     # Fallback to Yahoo Finance
     try:
         ticker = yf.Ticker(conf["symbol"])
-        df = ticker.history(period=f"{days}d", interval="5m")
+        df = ticker.history(period=f"{tf_info['days']}d", interval=tf_info["yf"])
         if not df.empty:
             if df.index.tz is None:
                 df.index = df.index.tz_localize("UTC").tz_convert(IST)
@@ -131,7 +142,7 @@ def fetch_candles(asset_name, days=5):
 
 # Header
 st.title("⚡ Institutional Liquidity Sweep & Absorption Terminal")
-st.caption("Angel One SmartAPI Real-Time Feeds | 4-Hour Major Liquidity Sweeps with 5-Minute Volume Absorption")
+st.caption("Angel One SmartAPI Real-Time Feeds | 4-Hour Major Liquidity Sweeps with Volume Absorption")
 
 tab1, tab2, tab3 = st.tabs([
     "📊 Live Interactive Chart (Angel One Feed)",
@@ -143,22 +154,27 @@ tab1, tab2, tab3 = st.tabs([
 # TAB 1: LIVE INTERACTIVE CHARTS
 # ==========================================
 with tab1:
-    col_sel, col_stat = st.columns([2, 3])
+    col_sel, col_tf, col_stat = st.columns([2, 2, 2])
     with col_sel:
         selected_asset = st.selectbox("Asset Select Karein:", list(ASSETS.keys()), index=0)
-    
+    with col_tf:
+        selected_tf = st.selectbox("Timeframe Switch:", list(TIMEFRAME_CONFIG.keys()), index=2)
     with col_stat:
         smart_status = "🟢 SmartAPI Live Feed Active" if get_smart_api_client() else "🟠 Yahoo Finance Fallback Mode"
         st.markdown(f"**Feed Status:** `{smart_status}`")
 
-    with st.spinner(f"Fetching real-time candles for {selected_asset}..."):
-        df_chart = fetch_candles(selected_asset, days=5)
+    with st.spinner(f"Fetching real-time {selected_tf} candles for {selected_asset}..."):
+        df_chart = fetch_candles(selected_asset, tf_label=selected_tf)
 
     if not df_chart.empty:
-        # Calculate HTF 4-Hour Swing Low & 5M Vol MA
+        # 4H Reference Calculation
         df_4h = df_chart.resample("4h").agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna()
-        df_4h["HTF_Low"] = df_4h["Low"].shift(1).rolling(window=6).min()
-        df_chart["HTF_Low"] = df_4h["HTF_Low"].reindex(df_chart.index, method="ffill")
+        if len(df_4h) > 6:
+            df_4h["HTF_Low"] = df_4h["Low"].shift(1).rolling(window=6).min()
+            df_chart["HTF_Low"] = df_4h["HTF_Low"].reindex(df_chart.index, method="ffill")
+        else:
+            df_chart["HTF_Low"] = np.nan
+
         df_chart["Vol_MA20"] = df_chart["Volume"].rolling(window=20).mean()
 
         latest_price = df_chart["Close"].iloc[-1]
@@ -169,10 +185,10 @@ with tab1:
         kpi1, kpi2, kpi3, kpi4 = st.columns(4)
         kpi1.metric("LTP", f"₹{latest_price:,.2f}")
         kpi2.metric("4-Hour Institutional Low", f"₹{latest_htf:,.2f}" if pd.notna(latest_htf) else "Calculating")
-        kpi3.metric("Latest 5M Volume", f"{int(latest_vol):,}")
+        kpi3.metric(f"Latest {selected_tf} Volume", f"{int(latest_vol):,}")
         kpi4.metric("Volume Expansion", f"{round(latest_vol/avg_vol, 2)}x" if avg_vol > 0 else "N/A")
 
-        # Plotly Subplots (Top: Candles, Bottom: Volume)
+        # Plotly Subplots
         fig = make_subplots(
             rows=2, cols=1,
             shared_xaxes=True,
@@ -187,22 +203,24 @@ with tab1:
             high=df_chart['High'],
             low=df_chart['Low'],
             close=df_chart['Close'],
-            name="5M Price",
-            increasing_line_color="#00FF7F",
-            decreasing_line_color="#FF4500"
+            name=f"{selected_tf} Price",
+            increasing_line_color="#089981",
+            decreasing_line_color="#F23645",
+            increasing_fillcolor="#089981",
+            decreasing_fillcolor="#F23645"
         ), row=1, col=1)
 
-        # 4H Institutional Liquidity Line
+        # 4H Institutional Reference Line
         if "HTF_Low" in df_chart.columns and not df_chart["HTF_Low"].dropna().empty:
             fig.add_trace(go.Scatter(
                 x=df_chart.index,
                 y=df_chart["HTF_Low"],
                 name="4H Liquidity Reference",
-                line=dict(color="#FFD700", width=2, dash="dash")
+                line=dict(color="#2962FF", width=2, dash="dash")
             ), row=1, col=1)
 
         # Volume Bars
-        vol_colors = ['#00FF7F' if c >= o else '#FF4500' for o, c in zip(df_chart['Open'], df_chart['Close'])]
+        vol_colors = ['#089981' if c >= o else '#F23645' for o, c in zip(df_chart['Open'], df_chart['Close'])]
         fig.add_trace(go.Bar(
             x=df_chart.index,
             y=df_chart['Volume'],
@@ -210,11 +228,27 @@ with tab1:
             marker_color=vol_colors
         ), row=2, col=1)
 
+        # Remove overnight and weekend gaps
+        if selected_tf != "1 Day":
+            fig.update_xaxes(
+                rangebreaks=[
+                    dict(bounds=["sat", "mon"]),
+                    dict(bounds=[15.5, 9.25], pattern="hour")
+                ]
+            )
+        else:
+            fig.update_xaxes(
+                rangebreaks=[dict(bounds=["sat", "mon"])]
+            )
+
         fig.update_layout(
             template="plotly_dark",
             xaxis_rangeslider_visible=False,
-            height=600,
-            margin=dict(l=10, r=10, t=10, b=10),
+            height=650,
+            margin=dict(l=20, r=40, t=20, b=20),
+            paper_bgcolor="#131722",
+            plot_bgcolor="#131722",
+            hovermode="x unified",
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
         )
         st.plotly_chart(fig, use_container_width=True)
@@ -233,7 +267,7 @@ with tab2:
         scan_progress = st.progress(0)
         
         for idx, (name, conf) in enumerate(ASSETS.items()):
-            df_asset = fetch_candles(name, days=5)
+            df_asset = fetch_candles(name, tf_label="5 Minute")
             if not df_asset.empty and len(df_asset) > 30:
                 df_4h = df_asset.resample("4h").agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna()
                 df_4h["HTF_Low"] = df_4h["Low"].shift(1).rolling(window=6).min()
@@ -277,24 +311,21 @@ with tab3:
         if trades_data:
             df_trades = pd.DataFrame(trades_data)
             
-            # Key Calculations
             total_trades = len(df_trades)
             winners = len(df_trades[df_trades["outcome"] == "TARGET_HIT"])
             win_rate = (winners / total_trades) * 100 if total_trades > 0 else 0
             net_pnl = df_trades["net_pnl"].sum()
             avg_capital = df_trades["capital_deployed"].mean()
 
-            # Top KPI Metrics
             m1, m2, m3, m4 = st.columns(4)
-            pnl_color = "#00FF7F" if net_pnl >= 0 else "#FF4500"
+            pnl_color = "#089981" if net_pnl >= 0 else "#F23645"
             m1.markdown(f"<div class='metric-card'><div class='metric-val' style='color:{pnl_color}'>₹{net_pnl:,.2f}</div><div class='metric-lbl'>Cumulative Net P&L</div></div>", unsafe_allow_html=True)
-            m2.markdown(f"<div class='metric-card'><div class='metric-val' style='color:#00FF7F'>{win_rate:.1f}%</div><div class='metric-lbl'>Win Rate ({winners}/{total_trades})</div></div>", unsafe_allow_html=True)
+            m2.markdown(f"<div class='metric-card'><div class='metric-val' style='color:#089981'>{win_rate:.1f}%</div><div class='metric-lbl'>Win Rate ({winners}/{total_trades})</div></div>", unsafe_allow_html=True)
             m3.markdown(f"<div class='metric-card'><div class='metric-val'>{total_trades}</div><div class='metric-lbl'>Total High-Conviction Trades</div></div>", unsafe_allow_html=True)
             m4.markdown(f"<div class='metric-card'><div class='metric-val'>₹{avg_capital:,.2f}</div><div class='metric-lbl'>Avg Capital Deployed / Trade</div></div>", unsafe_allow_html=True)
 
             st.write("---")
 
-            # Equity Curve
             df_trades["cum_pnl"] = df_trades["net_pnl"].cumsum()
             df_trades["trade_num"] = range(1, len(df_trades) + 1)
 
@@ -304,18 +335,19 @@ with tab3:
                 y=df_trades["cum_pnl"],
                 mode="lines+markers",
                 name="Equity Curve",
-                line=dict(color="#00FF7F" if net_pnl >= 0 else "#FF4500", width=2.5)
+                line=dict(color="#089981" if net_pnl >= 0 else "#F23645", width=2.5)
             ))
             fig_eq.update_layout(
                 title="Cumulative Equity Growth Curve (₹)",
                 template="plotly_dark",
                 height=400,
                 xaxis_title="Trade Number",
-                yaxis_title="Net P&L (₹)"
+                yaxis_title="Net P&L (₹)",
+                paper_bgcolor="#131722",
+                plot_bgcolor="#131722"
             )
             st.plotly_chart(fig_eq, use_container_width=True)
 
-            # Trades Table & CSV Download
             st.write("### 📜 Complete Trade Ledger")
             st.dataframe(df_trades[["entry_time", "asset", "spread", "outcome", "net_pnl", "vol_ratio"]], use_container_width=True)
 
