@@ -73,7 +73,7 @@ ASSETS = {
 }
 
 def run_simulation():
-    print("🚀 Running 4-Hour Liquidity Engine...")
+    print("🚀 Running 2-Candle Confirmation & Trailing Stop Engine...")
     smart_api = get_angel_smart_api()
     all_trades = []
     ist = pytz.timezone("Asia/Kolkata")
@@ -81,11 +81,9 @@ def run_simulation():
     for name, conf in ASSETS.items():
         df_5m = pd.DataFrame()
         
-        # 1. Fetch via SmartAPI for indices and mapped equities
         if smart_api and conf["token"]:
             df_5m = fetch_angel_index_data(smart_api, conf["token"], name)
             
-        # 2. Fallback to Yahoo Finance if API data not available
         if df_5m.empty:
             try:
                 ticker = yf.Ticker(conf["symbol"])
@@ -104,115 +102,202 @@ def run_simulation():
         if df_5m.empty or len(df_5m) < 100:
             continue
 
-        # 4-HOUR RESAMPLING LOGIC (Multi-Timeframe Setup)
+        # 4-HOUR RESAMPLING LOGIC (Both High and Low)
         df_4h = df_5m.resample("4h").agg({
             "Open": "first", "High": "max", "Low": "min", "Close": "last", "Volume": "sum"
         }).dropna()
 
-        # Rolling 6-period 4H Low (Pichhle 24 ghante ka major institutional swing low)
+        # Rolling 6-period 4H Low & High (Pichhle 24 ghante ka major swing)
         df_4h["HTF_Low"] = df_4h["Low"].shift(1).rolling(window=6).min()
-        df_5m["HTF_Low"] = df_4h["HTF_Low"].reindex(df_5m.index, method="ffill")
+        df_4h["HTF_High"] = df_4h["High"].shift(1).rolling(window=6).max()
 
+        df_5m["HTF_Low"] = df_4h["HTF_Low"].reindex(df_5m.index, method="ffill")
+        df_5m["HTF_High"] = df_4h["HTF_High"].reindex(df_5m.index, method="ffill")
         df_5m["Vol_MA20"] = df_5m["Volume"].rolling(window=20).mean()
-        df_5m["Range"] = df_5m["High"] - df_5m["Low"]
-        df_5m["Range_MA20"] = df_5m["Range"].rolling(window=20).mean()
 
         i = 40
-        while i < len(df_5m) - 5:
-            curr = df_5m.iloc[i]
-            c_time = curr.name.time()
+        while i < len(df_5m) - 6:
+            c1 = df_5m.iloc[i]     # Candle 1 (Alert Candle)
+            c2 = df_5m.iloc[i + 1] # Candle 2 (Confirmation Candle)
+            c_time = c1.name.time()
 
-            # Trade time window filter
+            # Market Timing Check
             if conf["market"] in ["NSE", "NSE_INDEX"]:
-                if not (time(9, 20) <= c_time <= time(15, 10)):
+                if not (time(9, 20) <= c_time <= time(15, 0)):
                     i += 1
                     continue
             elif conf["market"] == "MCX":
-                if not (time(9, 15) <= c_time <= time(23, 15)):
+                if not (time(9, 15) <= c_time <= time(23, 0)):
                     i += 1
                     continue
 
-            htf_liquidity_low = curr["HTF_Low"]
-            if pd.isna(htf_liquidity_low):
+            htf_low = c1["HTF_Low"]
+            htf_high = c1["HTF_High"]
+            if pd.isna(htf_low) or pd.isna(htf_high):
                 i += 1
                 continue
 
-            c_open, c_high, c_low, c_close, c_vol = curr["Open"], curr["High"], curr["Low"], curr["Close"], curr["Volume"]
-            avg_vol = curr["Vol_MA20"]
-            avg_range = curr["Range_MA20"]
+            # ==========================================
+            # SETUP 1: BULLISH SWEEP REVERSAL (CALL SPREAD)
+            # ==========================================
+            # 1. Alert Mode: Candle 1 sweeps/touches 4H Low
+            is_c1_sweep_low = c1["Low"] <= htf_low
+            
+            # 2. Trigger Mode: Candle 2 reverses and breaks Candle 1 High
+            is_c2_reversal_up = (c2["Close"] > c2["Open"]) and (c2["High"] > c1["High"])
 
-            # 4-HOUR LIQUIDITY SWEEP RULE
-            is_htf_sweep = (c_low < htf_liquidity_low) and (c_close > htf_liquidity_low)
-            is_green = c_close > c_open
+            if is_c1_sweep_low and is_c2_reversal_up:
+                entry_price = max(c2["Open"], c1["High"])
+                sl_buffer = entry_price * 0.0010
+                initial_sl = min(c1["Low"], c2["Low"]) - sl_buffer
+                risk_pts = entry_price - initial_sl
 
-            # Volume / Range Absorption Check
-            if conf["market"] == "NSE_INDEX":
-                if c_vol > 0 and avg_vol > 0:
-                    has_absorption = c_vol >= (avg_vol * 1.5)
-                    vol_metric_str = f"{round(c_vol / avg_vol, 2)}x (Vol)"
-                else:
-                    has_absorption = (c_high - c_low) >= (avg_range * 1.25) if avg_range > 0 else False
-                    vol_metric_str = f"{round((c_high - c_low) / avg_range, 2)}x (Rng)"
-            else:
-                req_mult = 2.2 if (name == "CRUDEOIL" and time(18, 0) <= c_time <= time(21, 30)) else 1.8
-                has_absorption = c_vol >= (avg_vol * req_mult) if avg_vol > 0 else False
-                vol_metric_str = f"{round(c_vol / avg_vol, 2)}x (Vol)"
+                if risk_pts > 0:
+                    target_price = entry_price + (risk_pts * 2.5)
+                    atm = int(round(entry_price / conf["strike_step"]) * conf["strike_step"])
+                    otm = atm + conf["spread_width"]
 
-            if is_htf_sweep and is_green and has_absorption:
-                entry_price = c_close
-                sl_price = c_low
-                risk_pts = max(entry_price - sl_price, entry_price * 0.0015)
-                target_pts = risk_pts * 2
-                target_price = entry_price + target_pts
+                    max_gain = conf["spread_width"] * 0.60 * conf["lot_size"]
+                    max_loss = -(conf["spread_width"] * 0.35 * conf["lot_size"])
 
-                atm = int(round(entry_price / conf["strike_step"]) * conf["strike_step"])
-                otm = atm + conf["spread_width"]
+                    # Trailing SL Loop
+                    current_sl = initial_sl
+                    outcome = "EXPIRED"
+                    exit_price = entry_price
+                    exit_time = c2.name
+                    pnl = 0
 
-                outcome = "EXPIRED"
-                exit_price = entry_price
-                exit_time = curr.name
+                    for forward_idx in range(i + 2, min(i + 36, len(df_5m))):
+                        bar = df_5m.iloc[forward_idx]
+                        
+                        # Target Hit Check
+                        if bar["High"] >= target_price:
+                            outcome = "TARGET_HIT"
+                            exit_price = target_price
+                            exit_time = bar.name
+                            pnl = max_gain
+                            i = forward_idx
+                            break
 
-                max_gain = conf["spread_width"] * 0.60 * conf["lot_size"]
-                max_loss = -(conf["spread_width"] * 0.35 * conf["lot_size"])
+                        # Trailing Rule: 1:1 Move par Cost (Breakeven) par shift
+                        if bar["High"] >= (entry_price + risk_pts):
+                            current_sl = max(current_sl, entry_price)
 
-                # Forward candle simulation (Max 36 bars = 3 hours hold)
-                for forward_idx in range(i + 1, min(i + 36, len(df_5m))):
-                    future_candle = df_5m.iloc[forward_idx]
-                    if future_candle["Low"] <= sl_price:
-                        outcome = "STOP_LOSS"
-                        exit_price = sl_price
-                        exit_time = future_candle.name
-                        pnl = max_loss
-                        i = forward_idx
-                        break
-                    elif future_candle["High"] >= target_price:
-                        outcome = "TARGET_HIT"
-                        exit_price = target_price
-                        exit_time = future_candle.name
-                        pnl = max_gain
-                        i = forward_idx
-                        break
-                else:
-                    exit_price = df_5m.iloc[min(i + 35, len(df_5m) - 1)]["Close"]
-                    pnl = max_gain * 0.3 if exit_price > entry_price else max_loss * 0.4
-                    i += 35
+                        # New Higher Lows trail karna
+                        if bar["Close"] > entry_price:
+                            current_sl = max(current_sl, bar["Low"] - sl_buffer)
 
-                all_trades.append({
-                    "entry_time": curr.name.strftime("%Y-%m-%d %H:%M:%S"),
-                    "exit_time": exit_time.strftime("%Y-%m-%d %H:%M:%S"),
-                    "date": curr.name.strftime("%Y-%m-%d"),
-                    "asset": name,
-                    "market": conf["market"],
-                    "spread": f"{atm} CE / {otm} CE",
-                    "entry_price": round(entry_price, 2),
-                    "exit_price": round(exit_price, 2),
-                    "stop_loss": round(sl_price, 2),
-                    "target": round(target_price, 2),
-                    "outcome": outcome,
-                    "capital_deployed": conf["margin"],
-                    "net_pnl": round(pnl, 2),
-                    "vol_ratio": vol_metric_str,
-                })
+                        # SL Hit Check
+                        if bar["Low"] <= current_sl:
+                            outcome = "TRAILING_SL" if current_sl >= entry_price else "STOP_LOSS"
+                            exit_price = current_sl
+                            exit_time = bar.name
+                            pnl = max_gain * 0.15 if current_sl >= entry_price else max_loss
+                            i = forward_idx
+                            break
+                    else:
+                        exit_price = df_5m.iloc[min(i + 35, len(df_5m) - 1)]["Close"]
+                        pnl = max_gain * 0.3 if exit_price > entry_price else max_loss * 0.4
+                        i += 35
+
+                    all_trades.append({
+                        "entry_time": c2.name.strftime("%Y-%m-%d %H:%M:%S"),
+                        "exit_time": exit_time.strftime("%Y-%m-%d %H:%M:%S"),
+                        "date": c2.name.strftime("%Y-%m-%d"),
+                        "asset": name,
+                        "side": "BULLISH_SWEEP",
+                        "spread": f"{atm} CE / {otm} CE",
+                        "entry_price": round(entry_price, 2),
+                        "exit_price": round(exit_price, 2),
+                        "initial_sl": round(initial_sl, 2),
+                        "target": round(target_price, 2),
+                        "outcome": outcome,
+                        "capital_deployed": conf["margin"],
+                        "net_pnl": round(pnl, 2),
+                        "vol_ratio": "2-Candle Confirmed"
+                    })
+                    continue
+
+            # ==========================================
+            # SETUP 2: BEARISH SWEEP REVERSAL (PUT SPREAD)
+            # ==========================================
+            # 1. Alert Mode: Candle 1 sweeps/touches 4H High
+            is_c1_sweep_high = c1["High"] >= htf_high
+
+            # 2. Trigger Mode: Candle 2 reverses down and breaks Candle 1 Low
+            is_c2_reversal_down = (c2["Close"] < c2["Open"]) and (c2["Low"] < c1["Low"])
+
+            if is_c1_sweep_high and is_c2_reversal_down:
+                entry_price = min(c2["Open"], c1["Low"])
+                sl_buffer = entry_price * 0.0010
+                initial_sl = max(c1["High"], c2["High"]) + sl_buffer
+                risk_pts = initial_sl - entry_price
+
+                if risk_pts > 0:
+                    target_price = entry_price - (risk_pts * 2.5)
+                    atm = int(round(entry_price / conf["strike_step"]) * conf["strike_step"])
+                    otm = atm - conf["spread_width"]
+
+                    max_gain = conf["spread_width"] * 0.60 * conf["lot_size"]
+                    max_loss = -(conf["spread_width"] * 0.35 * conf["lot_size"])
+
+                    current_sl = initial_sl
+                    outcome = "EXPIRED"
+                    exit_price = entry_price
+                    exit_time = c2.name
+                    pnl = 0
+
+                    for forward_idx in range(i + 2, min(i + 36, len(df_5m))):
+                        bar = df_5m.iloc[forward_idx]
+
+                        # Target Hit
+                        if bar["Low"] <= target_price:
+                            outcome = "TARGET_HIT"
+                            exit_price = target_price
+                            exit_time = bar.name
+                            pnl = max_gain
+                            i = forward_idx
+                            break
+
+                        # Trailing to Breakeven
+                        if bar["Low"] <= (entry_price - risk_pts):
+                            current_sl = min(current_sl, entry_price)
+
+                        # Trail with lower highs
+                        if bar["Close"] < entry_price:
+                            current_sl = min(current_sl, bar["High"] + sl_buffer)
+
+                        # SL Hit
+                        if bar["High"] >= current_sl:
+                            outcome = "TRAILING_SL" if current_sl <= entry_price else "STOP_LOSS"
+                            exit_price = current_sl
+                            exit_time = bar.name
+                            pnl = max_gain * 0.15 if current_sl <= entry_price else max_loss
+                            i = forward_idx
+                            break
+                    else:
+                        exit_price = df_5m.iloc[min(i + 35, len(df_5m) - 1)]["Close"]
+                        pnl = max_gain * 0.3 if exit_price < entry_price else max_loss * 0.4
+                        i += 35
+
+                    all_trades.append({
+                        "entry_time": c2.name.strftime("%Y-%m-%d %H:%M:%S"),
+                        "exit_time": exit_time.strftime("%Y-%m-%d %H:%M:%S"),
+                        "date": c2.name.strftime("%Y-%m-%d"),
+                        "asset": name,
+                        "side": "BEARISH_SWEEP",
+                        "spread": f"{atm} PE / {otm} PE",
+                        "entry_price": round(entry_price, 2),
+                        "exit_price": round(exit_price, 2),
+                        "initial_sl": round(initial_sl, 2),
+                        "target": round(target_price, 2),
+                        "outcome": outcome,
+                        "capital_deployed": conf["margin"],
+                        "net_pnl": round(pnl, 2),
+                        "vol_ratio": "2-Candle Confirmed"
+                    })
+                    continue
+
             i += 1
 
     with open("trades_db.json", "w") as f:
