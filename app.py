@@ -12,7 +12,6 @@ from plotly.subplots import make_subplots
 import yfinance as yf
 from SmartApi import SmartConnect
 
-# Page Setup
 st.set_page_config(
     page_title="Institutional Liquidity Terminal",
     page_icon="⚡",
@@ -20,7 +19,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom Dark Theme Styling
 st.markdown("""
 <style>
     .metric-card {
@@ -43,7 +41,6 @@ st.markdown("""
 
 IST = pytz.timezone("Asia/Kolkata")
 
-# Asset Universe Mapping (Angel One Tokens & Yahoo Symbols)
 ASSETS = {
     "NIFTY": {"token": "99926000", "symbol": "^NSEI", "exch": "NSE", "market": "NSE_INDEX", "lot_size": 25, "strike_step": 50, "spread_width": 100, "margin": 45000},
     "BANKNIFTY": {"token": "99926009", "symbol": "^NSEBANK", "exch": "NSE", "market": "NSE_INDEX", "lot_size": 15, "strike_step": 100, "spread_width": 200, "margin": 50000},
@@ -61,7 +58,6 @@ ASSETS = {
     "TATASTEEL": {"token": "3499", "symbol": "TATASTEEL.NS", "exch": "NSE", "market": "NSE", "lot_size": 5500, "strike_step": 2.5, "spread_width": 2.5, "margin": 50000}
 }
 
-# Supported Timeframes
 TIMEFRAME_CONFIG = {
     "1 Minute": {"interval": "ONE_MINUTE", "days": 2, "yf": "1m"},
     "3 Minute": {"interval": "THREE_MINUTE", "days": 5, "yf": "5m"},
@@ -71,7 +67,6 @@ TIMEFRAME_CONFIG = {
     "1 Day": {"interval": "ONE_DAY", "days": 90, "yf": "1d"}
 }
 
-# 1. Angel One SmartAPI Client Session
 @st.cache_resource(ttl=600)
 def get_smart_api_client():
     try:
@@ -92,7 +87,6 @@ def get_smart_api_client():
         print(f"SmartAPI auth error: {e}")
     return None
 
-# 2. Historical & Live Candle Fetcher
 def fetch_candles(asset_name, tf_label="5 Minute"):
     conf = ASSETS[asset_name]
     tf_info = TIMEFRAME_CONFIG[tf_label]
@@ -125,7 +119,6 @@ def fetch_candles(asset_name, tf_label="5 Minute"):
         except Exception as e:
             print(f"SmartAPI fetch error for {asset_name}: {e}")
 
-    # Fallback to Yahoo Finance
     try:
         ticker = yf.Ticker(conf["symbol"])
         df = ticker.history(period=f"{tf_info['days']}d", interval=tf_info["yf"])
@@ -140,19 +133,16 @@ def fetch_candles(asset_name, tf_label="5 Minute"):
 
     return df
 
-# Header
 st.title("⚡ Institutional Liquidity Sweep & Absorption Terminal")
-st.caption("Angel One SmartAPI Real-Time Feeds | 4-Hour Major Liquidity Sweeps with Volume Absorption")
+st.caption("Angel One SmartAPI Feeds | 2-Candle Reversal Confirmation + Trailing Stop Loss Engine")
 
 tab1, tab2, tab3 = st.tabs([
     "📊 Live Interactive Chart (Angel One Feed)",
-    "🎯 Live Scanner & Sweep Signals",
+    "🎯 Live Scanner & Sweep Alerts",
     "📈 60-Day P&L & Capital Audit"
 ])
 
-# ==========================================
-# TAB 1: LIVE INTERACTIVE CHARTS
-# ==========================================
+# TAB 1: CHARTS
 with tab1:
     col_sel, col_tf, col_stat = st.columns([2, 2, 2])
     with col_sel:
@@ -167,100 +157,64 @@ with tab1:
         df_chart = fetch_candles(selected_asset, tf_label=selected_tf)
 
     if not df_chart.empty:
-        # 4H Reference Calculation
         df_4h = df_chart.resample("4h").agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna()
         if len(df_4h) > 6:
             df_4h["HTF_Low"] = df_4h["Low"].shift(1).rolling(window=6).min()
+            df_4h["HTF_High"] = df_4h["High"].shift(1).rolling(window=6).max()
             df_chart["HTF_Low"] = df_4h["HTF_Low"].reindex(df_chart.index, method="ffill")
+            df_chart["HTF_High"] = df_4h["HTF_High"].reindex(df_chart.index, method="ffill")
         else:
             df_chart["HTF_Low"] = np.nan
-
-        df_chart["Vol_MA20"] = df_chart["Volume"].rolling(window=20).mean()
+            df_chart["HTF_High"] = np.nan
 
         latest_price = df_chart["Close"].iloc[-1]
-        latest_htf = df_chart["HTF_Low"].iloc[-1]
+        latest_htf_low = df_chart["HTF_Low"].iloc[-1]
+        latest_htf_high = df_chart["HTF_High"].iloc[-1]
         latest_vol = df_chart["Volume"].iloc[-1]
-        avg_vol = df_chart["Vol_MA20"].iloc[-1]
 
         kpi1, kpi2, kpi3, kpi4 = st.columns(4)
         kpi1.metric("LTP", f"₹{latest_price:,.2f}")
-        kpi2.metric("4-Hour Institutional Low", f"₹{latest_htf:,.2f}" if pd.notna(latest_htf) else "Calculating")
-        kpi3.metric(f"Latest {selected_tf} Volume", f"{int(latest_vol):,}")
-        kpi4.metric("Volume Expansion", f"{round(latest_vol/avg_vol, 2)}x" if avg_vol > 0 else "N/A")
+        kpi2.metric("4H High Liquidity", f"₹{latest_htf_high:,.2f}" if pd.notna(latest_htf_high) else "N/A")
+        kpi3.metric("4H Low Liquidity", f"₹{latest_htf_low:,.2f}" if pd.notna(latest_htf_low) else "N/A")
+        kpi4.metric(f"Latest {selected_tf} Volume", f"{int(latest_vol):,}")
 
-        # Plotly Subplots
-        fig = make_subplots(
-            rows=2, cols=1,
-            shared_xaxes=True,
-            vertical_spacing=0.03,
-            row_heights=[0.75, 0.25]
-        )
+        fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.03, row_heights=[0.75, 0.25])
 
         # Candlestick
         fig.add_trace(go.Candlestick(
-            x=df_chart.index,
-            open=df_chart['Open'],
-            high=df_chart['High'],
-            low=df_chart['Low'],
-            close=df_chart['Close'],
-            name=f"{selected_tf} Price",
-            increasing_line_color="#089981",
-            decreasing_line_color="#F23645",
-            increasing_fillcolor="#089981",
-            decreasing_fillcolor="#F23645"
+            x=df_chart.index, open=df_chart['Open'], high=df_chart['High'], low=df_chart['Low'], close=df_chart['Close'],
+            name=f"{selected_tf} Price", increasing_line_color="#089981", decreasing_line_color="#F23645",
+            increasing_fillcolor="#089981", decreasing_fillcolor="#F23645"
         ), row=1, col=1)
 
-        # 4H Institutional Reference Line
+        # 4H High & Low Lines
+        if "HTF_High" in df_chart.columns and not df_chart["HTF_High"].dropna().empty:
+            fig.add_trace(go.Scatter(x=df_chart.index, y=df_chart["HTF_High"], name="4H Liquidity High", line=dict(color="#FF4500", width=2, dash="dash")), row=1, col=1)
         if "HTF_Low" in df_chart.columns and not df_chart["HTF_Low"].dropna().empty:
-            fig.add_trace(go.Scatter(
-                x=df_chart.index,
-                y=df_chart["HTF_Low"],
-                name="4H Liquidity Reference",
-                line=dict(color="#2962FF", width=2, dash="dash")
-            ), row=1, col=1)
+            fig.add_trace(go.Scatter(x=df_chart.index, y=df_chart["HTF_Low"], name="4H Liquidity Low", line=dict(color="#2962FF", width=2, dash="dash")), row=1, col=1)
 
-        # Volume Bars
+        # Volume
         vol_colors = ['#089981' if c >= o else '#F23645' for o, c in zip(df_chart['Open'], df_chart['Close'])]
-        fig.add_trace(go.Bar(
-            x=df_chart.index,
-            y=df_chart['Volume'],
-            name="Volume",
-            marker_color=vol_colors
-        ), row=2, col=1)
+        fig.add_trace(go.Bar(x=df_chart.index, y=df_chart['Volume'], name="Volume", marker_color=vol_colors), row=2, col=1)
 
-        # Remove overnight and weekend gaps
         if selected_tf != "1 Day":
-            fig.update_xaxes(
-                rangebreaks=[
-                    dict(bounds=["sat", "mon"]),
-                    dict(bounds=[15.5, 9.25], pattern="hour")
-                ]
-            )
+            fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"]), dict(bounds=[15.5, 9.25], pattern="hour")])
         else:
-            fig.update_xaxes(
-                rangebreaks=[dict(bounds=["sat", "mon"])]
-            )
+            fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
 
         fig.update_layout(
-            template="plotly_dark",
-            xaxis_rangeslider_visible=False,
-            height=650,
-            margin=dict(l=20, r=40, t=20, b=20),
-            paper_bgcolor="#131722",
-            plot_bgcolor="#131722",
-            hovermode="x unified",
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+            template="plotly_dark", xaxis_rangeslider_visible=False, height=650,
+            margin=dict(l=20, r=40, t=20, b=20), paper_bgcolor="#131722", plot_bgcolor="#131722",
+            hovermode="x unified", legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.error(f"Candle data load nahi hua for {selected_asset}. Refresh karein.")
+        st.error(f"Data load nahi hua for {selected_asset}.")
 
-# ==========================================
-# TAB 2: LIVE SCANNER & SWEEP SIGNALS
-# ==========================================
+# TAB 2: SCANNER & ALERT MODE
 with tab2:
-    st.subheader("🎯 Real-Time 4-Hour Sweep Scanner")
-    st.write("Scan button dabate hi sabhi 14 assets live check honge:")
+    st.subheader("🎯 Real-Time 2-Candle Sweep Scanner")
+    st.caption("Checks for: 1. Alert Mode (Liquidity Sweep) -> 2. Confirmation (Reversal Breakout)")
 
     if st.button("🔍 Scan 14 Assets Now", use_container_width=True):
         signals = []
@@ -271,38 +225,43 @@ with tab2:
             if not df_asset.empty and len(df_asset) > 30:
                 df_4h = df_asset.resample("4h").agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna()
                 df_4h["HTF_Low"] = df_4h["Low"].shift(1).rolling(window=6).min()
+                df_4h["HTF_High"] = df_4h["High"].shift(1).rolling(window=6).max()
                 df_asset["HTF_Low"] = df_4h["HTF_Low"].reindex(df_asset.index, method="ffill")
-                df_asset["Vol_MA20"] = df_asset["Volume"].rolling(window=20).mean()
+                df_asset["HTF_High"] = df_4h["HTF_High"].reindex(df_asset.index, method="ffill")
 
-                curr = df_asset.iloc[-1]
-                htf_low = curr["HTF_Low"]
+                c1 = df_asset.iloc[-2] # Previous Candle
+                c2 = df_asset.iloc[-1] # Current Candle
+                htf_low = c1["HTF_Low"]
+                htf_high = c1["HTF_High"]
 
-                if pd.notna(htf_low):
-                    is_sweep = (curr["Low"] < htf_low) and (curr["Close"] > htf_low)
-                    is_green = curr["Close"] > curr["Open"]
-                    avg_v = curr["Vol_MA20"]
-                    vol_mult = round(curr["Volume"] / avg_v, 2) if avg_v > 0 else 0
-                    has_absorption = vol_mult >= 1.5
-
-                    status_str = "🟢 BUY TRIGGER (SWEEP + ABSORPTION)" if (is_sweep and is_green and has_absorption) else "⚪ Monitoring"
+                status_str = "⚪ Monitoring"
+                if pd.notna(htf_low) and pd.notna(htf_high):
+                    # Bullish check
+                    if c2["Low"] <= htf_low:
+                        status_str = "🟡 ALERT MODE (4H Low Touched)"
+                    if (c1["Low"] <= htf_low) and (c2["Close"] > c2["Open"]) and (c2["High"] > c1["High"]):
+                        status_str = "🟢 BUY CONFIRMED (Bull Call Spread)"
+                    
+                    # Bearish check
+                    if c2["High"] >= htf_high:
+                        status_str = "🟡 ALERT MODE (4H High Touched)"
+                    if (c1["High"] >= htf_high) and (c2["Close"] < c2["Open"]) and (c2["Low"] < c1["Low"]):
+                        status_str = "🔴 SELL CONFIRMED (Bear Put Spread)"
 
                     signals.append({
                         "Asset": name,
-                        "LTP": round(curr["Close"], 2),
-                        "4H Low Ref": round(htf_low, 2),
-                        "Candle": "Green" if is_green else "Red",
-                        "Volume Ratio": f"{vol_mult}x",
+                        "LTP": round(c2["Close"], 2),
+                        "4H High": round(htf_high, 2),
+                        "4H Low": round(htf_low, 2),
                         "Signal Status": status_str
                     })
             scan_progress.progress((idx + 1) / len(ASSETS))
 
         st.dataframe(pd.DataFrame(signals), use_container_width=True)
 
-# ==========================================
-# TAB 3: 60-DAY P&L & CAPITAL AUDIT
-# ==========================================
+# TAB 3: AUDIT
 with tab3:
-    st.subheader("📈 Institutional 4-Hour Engine Performance Audit")
+    st.subheader("📈 2-Candle & Trailing Stop Engine Audit")
 
     if os.path.exists("trades_db.json"):
         with open("trades_db.json", "r") as f:
@@ -312,7 +271,7 @@ with tab3:
             df_trades = pd.DataFrame(trades_data)
             
             total_trades = len(df_trades)
-            winners = len(df_trades[df_trades["outcome"] == "TARGET_HIT"])
+            winners = len(df_trades[df_trades["outcome"].isin(["TARGET_HIT", "TRAILING_SL"])])
             win_rate = (winners / total_trades) * 100 if total_trades > 0 else 0
             net_pnl = df_trades["net_pnl"].sum()
             avg_capital = df_trades["capital_deployed"].mean()
@@ -331,34 +290,28 @@ with tab3:
 
             fig_eq = go.Figure()
             fig_eq.add_trace(go.Scatter(
-                x=df_trades["trade_num"],
-                y=df_trades["cum_pnl"],
-                mode="lines+markers",
-                name="Equity Curve",
+                x=df_trades["trade_num"], y=df_trades["cum_pnl"],
+                mode="lines+markers", name="Equity Curve",
                 line=dict(color="#089981" if net_pnl >= 0 else "#F23645", width=2.5)
             ))
             fig_eq.update_layout(
-                title="Cumulative Equity Growth Curve (₹)",
-                template="plotly_dark",
-                height=400,
-                xaxis_title="Trade Number",
-                yaxis_title="Net P&L (₹)",
-                paper_bgcolor="#131722",
-                plot_bgcolor="#131722"
+                title="Cumulative Equity Growth Curve (₹)", template="plotly_dark",
+                height=400, xaxis_title="Trade Number", yaxis_title="Net P&L (₹)",
+                paper_bgcolor="#131722", plot_bgcolor="#131722"
             )
             st.plotly_chart(fig_eq, use_container_width=True)
 
             st.write("### 📜 Complete Trade Ledger")
-            st.dataframe(df_trades[["entry_time", "asset", "spread", "outcome", "net_pnl", "vol_ratio"]], use_container_width=True)
+            st.dataframe(df_trades[["entry_time", "asset", "side", "spread", "outcome", "net_pnl", "vol_ratio"]], use_container_width=True)
 
             csv_data = df_trades.to_csv(index=False).encode('utf-8')
             st.download_button(
                 label="📥 Download Trades CSV",
                 data=csv_data,
-                file_name="4H_institutional_trades_audit.csv",
+                file_name="2_candle_trailing_audit.csv",
                 mime="text/csv"
             )
         else:
-            st.info("trades_db.json empty hai. Actions workflow run karein.")
+            st.info("trades_db.json empty hai.")
     else:
-        st.warning("trades_db.json file nahi mili. Pehle backtester script run karein.")
+        st.warning("trades_db.json file nahi mili. Actions workflow run karein.")
