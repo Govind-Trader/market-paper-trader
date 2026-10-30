@@ -6,14 +6,14 @@
         "asset": "TCS",
         "side": "BULLISH_SWEEP",
         "spread": "2500 CE / 2600 CE",
-        "entry_price": 2475.6,
-        "exit_price": 2496.99,
+        "entry_price": 2475.7,
+        "exit_price": 2497.27,
         "initial_sl": 2463.72,
-        "target": 2496.99,
+        "target": 2497.27,
         "outcome": "TARGET_HIT",
         "capital_deployed": 65000,
         "net_pnl": 9625.0,
-        "vol_ratio": "3.63x (Vol)"
+        "vol_ratio": "3.19x (Vol)"
     },
     {
         "entry_time": "2026-10-28 11:55:00",
@@ -22,30 +22,14 @@
         "asset": "TCS",
         "side": "BULLISH_SWEEP",
         "spread": "2450 CE / 2550 CE",
-        "entry_price": 2428.2,
+        "entry_price": 2428.5,
         "exit_price": 2448.5,
         "initial_sl": 2409.46,
-        "target": 2461.94,
+        "target": 2462.78,
         "outcome": "EXPIRED",
         "capital_deployed": 65000,
         "net_pnl": 3368.75,
         "vol_ratio": "2.17x (Vol)"
-    },
-    {
-        "entry_time": "2026-08-24 09:55:00",
-        "exit_time": "2026-08-24 11:05:00",
-        "date": "2026-08-24",
-        "asset": "FINNIFTY",
-        "side": "BEARISH_SWEEP",
-        "spread": "26300 PE / 26200 PE",
-        "entry_price": 26289.1,
-        "exit_price": 26188.15,
-        "initial_sl": 26345.18,
-        "target": 26188.15,
-        "outcome": "TARGET_HIT",
-        "capital_deployed": 45000,
-        "net_pnl": 1375.0,
-        "vol_ratio": "1.53x (Rng)"
     },
     {
         "entry_time": "2026-10-05 10:00:00",
@@ -55,13 +39,13 @@
         "side": "BEARISH_SWEEP",
         "spread": "24800 PE / 24700 PE",
         "entry_price": 24787.85,
-        "exit_price": 24584.84,
-        "initial_sl": 24900.63,
-        "target": 24584.84,
+        "exit_price": 24583.77,
+        "initial_sl": 24901.23,
+        "target": 24583.77,
         "outcome": "TARGET_HIT",
         "capital_deployed": 45000,
         "net_pnl": 1375.0,
-        "vol_ratio": "2.1x (Rng)"
+        "vol_ratio": "1.92x (Rng)"
     },
     {
         "entry_time": "2026-10-06 13:45:00",
@@ -87,13 +71,13 @@
         "side": "BEARISH_SWEEP",
         "spread": "24900 PE / 24800 PE",
         "entry_price": 24912.9,
-        "exit_price": 24840.0,
-        "initial_sl": 25021.58,
-        "target": 24717.28,
+        "exit_price": 24841.2,
+        "initial_sl": 25022.88,
+        "target": 24714.94,
         "outcome": "EXPIRED",
         "capital_deployed": 45000,
         "net_pnl": 481.25,
-        "vol_ratio": "1.84x (Rng)"
+        "vol_ratio": "1.9x (Rng)"
     },
     {
         "entry_time": "2026-09-22 10:45:00",
@@ -128,22 +112,6 @@
         "vol_ratio": "2.55x (Vol)"
     },
     {
-        "entry_time": "2026-08-26 10:20:00",
-        "exit_time": "2026-08-26 10:20:00",
-        "date": "2026-08-26",
-        "asset": "NIFTY",
-        "side": "BEARISH_SWEEP",
-        "spread": "24300 PE / 24200 PE",
-        "entry_price": 24316.2,
-        "exit_price": 24273.3,
-        "initial_sl": 24369.4,
-        "target": 24220.43,
-        "outcome": "EXPIRED",
-        "capital_deployed": 45000,
-        "net_pnl": 481.25,
-        "vol_ratio": "1.56x (Rng)"
-    },
-    {
         "entry_time": "2026-09-21 14:30:00",
         "exit_time": "2026-09-22 09:15:00",
         "date": "2026-09-21",
@@ -174,22 +142,6 @@
         "capital_deployed": 45000,
         "net_pnl": 1375.0,
         "vol_ratio": "1.45x (Rng)"
-    },
-    {
-        "entry_time": "2026-09-08 11:20:00",
-        "exit_time": "2026-09-08 12:05:00",
-        "date": "2026-09-08",
-        "asset": "HDFCBANK",
-        "side": "BULLISH_SWEEP",
-        "spread": "710 CE / 730 CE",
-        "entry_price": 706.1,
-        "exit_price": 703.94,
-        "initial_sl": 703.94,
-        "target": 710.0,
-        "outcome": "STOP_LOSS",
-        "capital_deployed": 60000,
-        "net_pnl": -3850.0,
-        "vol_ratio": "1.63x (Vol)"
     },
     {
         "entry_time": "2026-09-24 11:00:00",
