@@ -73,7 +73,7 @@ ASSETS = {
 }
 
 def run_simulation():
-    print("🚀 Running 2-Candle Confirmation & Trailing Stop Engine...")
+    print("🚀 Running 4H Sweep + Volume Filter (1.5x) + 1:1.5 Trailing SL Engine...")
     smart_api = get_angel_smart_api()
     all_trades = []
     ist = pytz.timezone("Asia/Kolkata")
@@ -102,7 +102,7 @@ def run_simulation():
         if df_5m.empty or len(df_5m) < 100:
             continue
 
-        # 4-HOUR RESAMPLING LOGIC (Both High and Low)
+        # 4-HOUR RESAMPLING
         df_4h = df_5m.resample("4h").agg({
             "Open": "first", "High": "max", "Low": "min", "Close": "last", "Volume": "sum"
         }).dropna()
@@ -114,20 +114,22 @@ def run_simulation():
         df_5m["HTF_Low"] = df_4h["HTF_Low"].reindex(df_5m.index, method="ffill")
         df_5m["HTF_High"] = df_4h["HTF_High"].reindex(df_5m.index, method="ffill")
         df_5m["Vol_MA20"] = df_5m["Volume"].rolling(window=20).mean()
+        df_5m["Range"] = df_5m["High"] - df_5m["Low"]
+        df_5m["Range_MA20"] = df_5m["Range"].rolling(window=20).mean()
 
         i = 40
         while i < len(df_5m) - 6:
-            c1 = df_5m.iloc[i]     # Candle 1 (Alert Candle)
-            c2 = df_5m.iloc[i + 1] # Candle 2 (Confirmation Candle)
+            c1 = df_5m.iloc[i]     # Candle 1 (4H Sweep / Alert)
+            c2 = df_5m.iloc[i + 1] # Candle 2 (Breakout Candle with Volume)
+            c3 = df_5m.iloc[i + 2] # Candle 3 (Trigger Candle on Breakout High/Low break)
             c_time = c1.name.time()
 
-            # Market Timing Check
             if conf["market"] in ["NSE", "NSE_INDEX"]:
-                if not (time(9, 20) <= c_time <= time(15, 0)):
+                if not (time(9, 20) <= c_time <= time(14, 50)):
                     i += 1
                     continue
             elif conf["market"] == "MCX":
-                if not (time(9, 15) <= c_time <= time(23, 0)):
+                if not (time(9, 15) <= c_time <= time(22, 45)):
                     i += 1
                     continue
 
@@ -137,17 +139,31 @@ def run_simulation():
                 i += 1
                 continue
 
-            # ==========================================
-            # SETUP 1: BULLISH SWEEP REVERSAL (CALL SPREAD)
-            # ==========================================
-            # 1. Alert Mode: Candle 1 sweeps/touches 4H Low
-            is_c1_sweep_low = c1["Low"] <= htf_low
+            # Volume Absorption Calculation for Candle 2
+            avg_vol_2 = c2["Vol_MA20"]
+            avg_rng_2 = c2["Range_MA20"]
             
-            # 2. Trigger Mode: Candle 2 reverses and breaks Candle 1 High
-            is_c2_reversal_up = (c2["Close"] > c2["Open"]) and (c2["High"] > c1["High"])
+            if avg_vol_2 > 0 and c2["Volume"] > 0:
+                vol_ratio = c2["Volume"] / avg_vol_2
+                has_vol_absorption = vol_ratio >= 1.5
+                vol_str = f"{round(vol_ratio, 2)}x (Vol)"
+            else:
+                range_ratio = (c2["High"] - c2["Low"]) / avg_rng_2 if avg_rng_2 > 0 else 0
+                has_vol_absorption = range_ratio >= 1.4
+                vol_str = f"{round(range_ratio, 2)}x (Rng)"
 
-            if is_c1_sweep_low and is_c2_reversal_up:
-                entry_price = max(c2["Open"], c1["High"])
+            # ==========================================
+            # SETUP 1: BULLISH 4H SWEEP + VOLUME REVERSAL
+            # ==========================================
+            # 1. Candle 1 touches/sweeps 4H Low
+            is_c1_sweep = c1["Low"] <= htf_low
+            # 2. Candle 2 is Green, closes above Candle 1 high, AND has >= 1.5x Volume
+            is_c2_breakout = (c2["Close"] > c2["Open"]) and (c2["Close"] > c1["High"]) and has_vol_absorption
+            # 3. Candle 3 breaks Candle 2 High (Trend Continuation Trigger)
+            is_c3_trigger = c3["High"] > c2["High"]
+
+            if is_c1_sweep and is_c2_breakout and is_c3_trigger:
+                entry_price = c2["High"]
                 sl_buffer = entry_price * 0.0010
                 initial_sl = min(c1["Low"], c2["Low"]) - sl_buffer
                 risk_pts = entry_price - initial_sl
@@ -160,17 +176,16 @@ def run_simulation():
                     max_gain = conf["spread_width"] * 0.60 * conf["lot_size"]
                     max_loss = -(conf["spread_width"] * 0.35 * conf["lot_size"])
 
-                    # Trailing SL Loop
                     current_sl = initial_sl
                     outcome = "EXPIRED"
                     exit_price = entry_price
-                    exit_time = c2.name
+                    exit_time = c3.name
                     pnl = 0
 
-                    for forward_idx in range(i + 2, min(i + 36, len(df_5m))):
+                    for forward_idx in range(i + 3, min(i + 36, len(df_5m))):
                         bar = df_5m.iloc[forward_idx]
-                        
-                        # Target Hit Check
+
+                        # Target Check (1:2.5)
                         if bar["High"] >= target_price:
                             outcome = "TARGET_HIT"
                             exit_price = target_price
@@ -179,12 +194,12 @@ def run_simulation():
                             i = forward_idx
                             break
 
-                        # Trailing Rule: 1:1 Move par Cost (Breakeven) par shift
-                        if bar["High"] >= (entry_price + risk_pts):
+                        # Trailing Rule: Shift to Breakeven ONLY after 1:1.5 moves
+                        if bar["High"] >= (entry_price + (risk_pts * 1.5)):
                             current_sl = max(current_sl, entry_price)
 
-                        # New Higher Lows trail karna
-                        if bar["Close"] > entry_price:
+                        # Trail upwards above breakeven with rising candle lows
+                        if current_sl >= entry_price and bar["Close"] > (entry_price + (risk_pts * 1.5)):
                             current_sl = max(current_sl, bar["Low"] - sl_buffer)
 
                         # SL Hit Check
@@ -192,7 +207,7 @@ def run_simulation():
                             outcome = "TRAILING_SL" if current_sl >= entry_price else "STOP_LOSS"
                             exit_price = current_sl
                             exit_time = bar.name
-                            pnl = max_gain * 0.15 if current_sl >= entry_price else max_loss
+                            pnl = max_gain * 0.25 if current_sl >= entry_price else max_loss
                             i = forward_idx
                             break
                     else:
@@ -201,9 +216,9 @@ def run_simulation():
                         i += 35
 
                     all_trades.append({
-                        "entry_time": c2.name.strftime("%Y-%m-%d %H:%M:%S"),
+                        "entry_time": c3.name.strftime("%Y-%m-%d %H:%M:%S"),
                         "exit_time": exit_time.strftime("%Y-%m-%d %H:%M:%S"),
-                        "date": c2.name.strftime("%Y-%m-%d"),
+                        "date": c3.name.strftime("%Y-%m-%d"),
                         "asset": name,
                         "side": "BULLISH_SWEEP",
                         "spread": f"{atm} CE / {otm} CE",
@@ -214,21 +229,22 @@ def run_simulation():
                         "outcome": outcome,
                         "capital_deployed": conf["margin"],
                         "net_pnl": round(pnl, 2),
-                        "vol_ratio": "2-Candle Confirmed"
+                        "vol_ratio": vol_str
                     })
                     continue
 
             # ==========================================
-            # SETUP 2: BEARISH SWEEP REVERSAL (PUT SPREAD)
+            # SETUP 2: BEARISH 4H SWEEP + VOLUME BREAKDOWN
             # ==========================================
-            # 1. Alert Mode: Candle 1 sweeps/touches 4H High
+            # 1. Candle 1 touches/sweeps 4H High
             is_c1_sweep_high = c1["High"] >= htf_high
+            # 2. Candle 2 is Red, closes below Candle 1 low, AND has >= 1.5x Volume
+            is_c2_breakdown = (c2["Close"] < c2["Open"]) and (c2["Close"] < c1["Low"]) and has_vol_absorption
+            # 3. Candle 3 breaks Candle 2 Low (Trend Continuation Trigger)
+            is_c3_trigger_down = c3["Low"] < c2["Low"]
 
-            # 2. Trigger Mode: Candle 2 reverses down and breaks Candle 1 Low
-            is_c2_reversal_down = (c2["Close"] < c2["Open"]) and (c2["Low"] < c1["Low"])
-
-            if is_c1_sweep_high and is_c2_reversal_down:
-                entry_price = min(c2["Open"], c1["Low"])
+            if is_c1_sweep_high and is_c2_breakdown and is_c3_trigger_down:
+                entry_price = c2["Low"]
                 sl_buffer = entry_price * 0.0010
                 initial_sl = max(c1["High"], c2["High"]) + sl_buffer
                 risk_pts = initial_sl - entry_price
@@ -244,13 +260,13 @@ def run_simulation():
                     current_sl = initial_sl
                     outcome = "EXPIRED"
                     exit_price = entry_price
-                    exit_time = c2.name
+                    exit_time = c3.name
                     pnl = 0
 
-                    for forward_idx in range(i + 2, min(i + 36, len(df_5m))):
+                    for forward_idx in range(i + 3, min(i + 36, len(df_5m))):
                         bar = df_5m.iloc[forward_idx]
 
-                        # Target Hit
+                        # Target Check
                         if bar["Low"] <= target_price:
                             outcome = "TARGET_HIT"
                             exit_price = target_price
@@ -259,20 +275,20 @@ def run_simulation():
                             i = forward_idx
                             break
 
-                        # Trailing to Breakeven
-                        if bar["Low"] <= (entry_price - risk_pts):
+                        # Trailing Rule: Shift to Breakeven ONLY after 1:1.5 moves
+                        if bar["Low"] <= (entry_price - (risk_pts * 1.5)):
                             current_sl = min(current_sl, entry_price)
 
-                        # Trail with lower highs
-                        if bar["Close"] < entry_price:
+                        # Trail downwards with falling candle highs
+                        if current_sl <= entry_price and bar["Close"] < (entry_price - (risk_pts * 1.5)):
                             current_sl = min(current_sl, bar["High"] + sl_buffer)
 
-                        # SL Hit
+                        # SL Hit Check
                         if bar["High"] >= current_sl:
                             outcome = "TRAILING_SL" if current_sl <= entry_price else "STOP_LOSS"
                             exit_price = current_sl
                             exit_time = bar.name
-                            pnl = max_gain * 0.15 if current_sl <= entry_price else max_loss
+                            pnl = max_gain * 0.25 if current_sl <= entry_price else max_loss
                             i = forward_idx
                             break
                     else:
@@ -281,9 +297,9 @@ def run_simulation():
                         i += 35
 
                     all_trades.append({
-                        "entry_time": c2.name.strftime("%Y-%m-%d %H:%M:%S"),
+                        "entry_time": c3.name.strftime("%Y-%m-%d %H:%M:%S"),
                         "exit_time": exit_time.strftime("%Y-%m-%d %H:%M:%S"),
-                        "date": c2.name.strftime("%Y-%m-%d"),
+                        "date": c3.name.strftime("%Y-%m-%d"),
                         "asset": name,
                         "side": "BEARISH_SWEEP",
                         "spread": f"{atm} PE / {otm} PE",
@@ -294,7 +310,7 @@ def run_simulation():
                         "outcome": outcome,
                         "capital_deployed": conf["margin"],
                         "net_pnl": round(pnl, 2),
-                        "vol_ratio": "2-Candle Confirmed"
+                        "vol_ratio": vol_str
                     })
                     continue
 
@@ -302,7 +318,7 @@ def run_simulation():
 
     with open("trades_db.json", "w") as f:
         json.dump(all_trades, f, indent=4)
-    print(f"Finished. Total Trades: {len(all_trades)}")
+    print(f"Finished. Total Quality Trades: {len(all_trades)}")
 
 if __name__ == "__main__":
     run_simulation()
