@@ -254,30 +254,50 @@ with tab2:
 
 # TAB 3: AUDIT
 with tab3:
-    st.subheader("📈 2-Candle & Trailing Stop Engine Audit")
+    st.subheader("📈 Institutional Strategy Performance & Capital Audit")
 
-    if os.path.exists("trades_db.json"):
-        with open("trades_db.json", "r") as f:
+    db_path = "trades_db.json"
+    if os.path.exists(db_path):
+        # Fresh read without stale memory caching
+        with open(db_path, "r") as f:
             trades_data = json.load(f)
 
         if trades_data:
             df_trades = pd.DataFrame(trades_data)
             
             total_trades = len(df_trades)
-            winners = len(df_trades[df_trades["outcome"].isin(["TARGET_HIT", "TRAILING_SL"])])
+            # EXACT WIN CALCULATION: Any trade ending with positive net P&L
+            profitable_trades = df_trades[df_trades["net_pnl"] > 0]
+            losing_trades = df_trades[df_trades["net_pnl"] < 0]
+            
+            winners = len(profitable_trades)
+            losers = len(losing_trades)
             win_rate = (winners / total_trades) * 100 if total_trades > 0 else 0
+            
             net_pnl = df_trades["net_pnl"].sum()
-            avg_capital = df_trades["capital_deployed"].mean()
+            avg_win = profitable_trades["net_pnl"].mean() if winners > 0 else 0
+            avg_loss = abs(losing_trades["net_pnl"].mean()) if losers > 0 else 0
+            profit_factor = (profitable_trades["net_pnl"].sum() / abs(losing_trades["net_pnl"].sum())) if losers > 0 else 0
+            avg_capital = df_trades["capital_deployed"].mean() if "capital_deployed" in df_trades.columns else 50000
 
+            # Metric Cards
             m1, m2, m3, m4 = st.columns(4)
             pnl_color = "#089981" if net_pnl >= 0 else "#F23645"
             m1.markdown(f"<div class='metric-card'><div class='metric-val' style='color:{pnl_color}'>₹{net_pnl:,.2f}</div><div class='metric-lbl'>Cumulative Net P&L</div></div>", unsafe_allow_html=True)
-            m2.markdown(f"<div class='metric-card'><div class='metric-val' style='color:#089981'>{win_rate:.1f}%</div><div class='metric-lbl'>Win Rate ({winners}/{total_trades})</div></div>", unsafe_allow_html=True)
-            m3.markdown(f"<div class='metric-card'><div class='metric-val'>{total_trades}</div><div class='metric-lbl'>Total High-Conviction Trades</div></div>", unsafe_allow_html=True)
-            m4.markdown(f"<div class='metric-card'><div class='metric-val'>₹{avg_capital:,.2f}</div><div class='metric-lbl'>Avg Capital Deployed / Trade</div></div>", unsafe_allow_html=True)
+            m2.markdown(f"<div class='metric-card'><div class='metric-val' style='color:#089981'>{win_rate:.1f}%</div><div class='metric-lbl'>Win Rate ({winners} Wins / {total_trades} Trades)</div></div>", unsafe_allow_html=True)
+            m3.markdown(f"<div class='metric-card'><div class='metric-val'>{profit_factor:.2f}</div><div class='metric-lbl'>Profit Factor (Gross Win / Gross Loss)</div></div>", unsafe_allow_html=True)
+            m4.markdown(f"<div class='metric-card'><div class='metric-val'>₹{avg_capital:,.2f}</div><div class='metric-lbl'>Avg Margin / Trade</div></div>", unsafe_allow_html=True)
 
             st.write("---")
 
+            # Risk-Reward & Trade Breakdown Details
+            sub1, sub2, sub3, sub4 = st.columns(4)
+            sub1.metric("Average Profit / Win", f"₹{avg_win:,.2f}")
+            sub2.metric("Average Loss / Trade", f"-₹{avg_loss:,.2f}")
+            sub3.metric("Realized Risk-Reward", f"1 : {(avg_win / avg_loss):.2f}" if avg_loss > 0 else "N/A")
+            sub4.metric("Total Losses Recorded", f"{losers} Trades")
+
+            # Cumulative Equity Curve
             df_trades["cum_pnl"] = df_trades["net_pnl"].cumsum()
             df_trades["trade_num"] = range(1, len(df_trades) + 1)
 
@@ -294,14 +314,28 @@ with tab3:
             )
             st.plotly_chart(fig_eq, use_container_width=True)
 
+            # Detailed Asset Table
+            st.write("### 📊 Performance By Asset")
+            asset_grp = df_trades.groupby("asset").agg(
+                Trades=("net_pnl", "count"),
+                Wins=("net_pnl", lambda x: (x > 0).sum()),
+                Losses=("net_pnl", lambda x: (x < 0).sum()),
+                Net_PnL=("net_pnl", "sum")
+            ).reset_index()
+            asset_grp["Win_Rate"] = (asset_grp["Wins"] / asset_grp["Trades"]) * 100
+            asset_grp["Win_Rate"] = asset_grp["Win_Rate"].map("{:.1f}%".format)
+            asset_grp["Net_PnL_Formatted"] = asset_grp["Net_PnL"].map("₹{:,.2f}".format)
+            st.dataframe(asset_grp[["asset", "Trades", "Wins", "Losses", "Win_Rate", "Net_PnL_Formatted"]], use_container_width=True)
+
             st.write("### 📜 Complete Trade Ledger")
-            st.dataframe(df_trades[["entry_time", "asset", "side", "spread", "outcome", "net_pnl", "vol_ratio"]], use_container_width=True)
+            disp_cols = [c for c in ["entry_time", "asset", "side", "spread", "outcome", "net_pnl", "vol_ratio"] if c in df_trades.columns]
+            st.dataframe(df_trades[disp_cols], use_container_width=True)
 
             csv_data = df_trades.to_csv(index=False).encode('utf-8')
             st.download_button(
                 label="📥 Download Trades CSV",
                 data=csv_data,
-                file_name="2_candle_trailing_audit.csv",
+                file_name="verified_trades_audit.csv",
                 mime="text/csv"
             )
         else:
