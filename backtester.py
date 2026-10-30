@@ -9,10 +9,10 @@ import yfinance as yf
 from SmartApi import SmartConnect
 
 def get_angel_smart_api():
-    api_key = os.getenv("SMARTAPI_KEY")
-    client_code = os.getenv("SMARTAPI_CLIENT_CODE")
-    pin = os.getenv("SMARTAPI_PIN")
-    totp_secret = os.getenv("SMARTAPI_TOTP_KEY")
+    api_key = (os.getenv("SMARTAPI_KEY") or "").strip()
+    client_code = (os.getenv("SMARTAPI_CLIENT_CODE") or "").strip()
+    pin = (os.getenv("SMARTAPI_PIN") or "").strip()
+    totp_secret = (os.getenv("SMARTAPI_TOTP_KEY") or "").strip()
     
     if not all([api_key, client_code, pin, totp_secret]):
         return None
@@ -24,7 +24,7 @@ def get_angel_smart_api():
         if data and data.get("status"):
             return smart_api
     except Exception as e:
-        print(f"SmartAPI Error: {e}")
+        print(f"SmartAPI Auth Error: {e}")
     return None
 
 def fetch_angel_index_data(smart_api, token, symbol_name):
@@ -60,16 +60,16 @@ ASSETS = {
     "BANKNIFTY": {"token": "99926009", "symbol": "^NSEBANK", "market": "NSE_INDEX", "lot_size": 15, "strike_step": 100, "spread_width": 200, "margin": 50000},
     "FINNIFTY": {"token": "99926037", "symbol": "NIFTY_FIN_SERVICE.NS", "market": "NSE_INDEX", "lot_size": 25, "strike_step": 50, "spread_width": 100, "margin": 45000},
     "CRUDEOIL": {"token": None, "symbol": "CL=F", "market": "MCX", "lot_size": 100, "strike_step": 50, "spread_width": 100, "margin": 55000},
-    "RELIANCE": {"token": None, "symbol": "RELIANCE.NS", "market": "NSE", "lot_size": 250, "strike_step": 20, "spread_width": 40, "margin": 65000},
-    "HDFCBANK": {"token": None, "symbol": "HDFCBANK.NS", "market": "NSE", "lot_size": 550, "strike_step": 10, "spread_width": 20, "margin": 60000},
-    "ICICIBANK": {"token": None, "symbol": "ICICIBANK.NS", "market": "NSE", "lot_size": 700, "strike_step": 10, "spread_width": 20, "margin": 55000},
-    "SBIN": {"token": None, "symbol": "SBIN.NS", "market": "NSE", "lot_size": 750, "strike_step": 5, "spread_width": 10, "margin": 50000},
-    "INFY": {"token": None, "symbol": "INFY.NS", "market": "NSE", "lot_size": 400, "strike_step": 20, "spread_width": 40, "margin": 55000},
-    "TCS": {"token": None, "symbol": "TCS.NS", "market": "NSE", "lot_size": 175, "strike_step": 50, "spread_width": 100, "margin": 65000},
-    "LT": {"token": None, "symbol": "LT.NS", "market": "NSE", "lot_size": 150, "strike_step": 20, "spread_width": 40, "margin": 60000},
-    "AXISBANK": {"token": None, "symbol": "AXISBANK.NS", "market": "NSE", "lot_size": 625, "strike_step": 10, "spread_width": 20, "margin": 55000},
-    "BHARTIARTL": {"token": None, "symbol": "BHARTIARTL.NS", "market": "NSE", "lot_size": 475, "strike_step": 10, "spread_width": 20, "margin": 50000},
-    "TATASTEEL": {"token": None, "symbol": "TATASTEEL.NS", "market": "NSE", "lot_size": 5500, "strike_step": 2.5, "spread_width": 2.5, "margin": 50000}
+    "RELIANCE": {"token": "2885", "symbol": "RELIANCE.NS", "market": "NSE", "lot_size": 250, "strike_step": 20, "spread_width": 40, "margin": 65000},
+    "HDFCBANK": {"token": "1333", "symbol": "HDFCBANK.NS", "market": "NSE", "lot_size": 550, "strike_step": 10, "spread_width": 20, "margin": 60000},
+    "ICICIBANK": {"token": "4963", "symbol": "ICICIBANK.NS", "market": "NSE", "lot_size": 700, "strike_step": 10, "spread_width": 20, "margin": 55000},
+    "SBIN": {"token": "3045", "symbol": "SBIN.NS", "market": "NSE", "lot_size": 750, "strike_step": 5, "spread_width": 10, "margin": 50000},
+    "INFY": {"token": "1594", "symbol": "INFY.NS", "market": "NSE", "lot_size": 400, "strike_step": 20, "spread_width": 40, "margin": 55000},
+    "TCS": {"token": "11536", "symbol": "TCS.NS", "market": "NSE", "lot_size": 175, "strike_step": 50, "spread_width": 100, "margin": 65000},
+    "LT": {"token": "11483", "symbol": "LT.NS", "market": "NSE", "lot_size": 150, "strike_step": 20, "spread_width": 40, "margin": 60000},
+    "AXISBANK": {"token": "5900", "symbol": "AXISBANK.NS", "market": "NSE", "lot_size": 625, "strike_step": 10, "spread_width": 20, "margin": 55000},
+    "BHARTIARTL": {"token": "10604", "symbol": "BHARTIARTL.NS", "market": "NSE", "lot_size": 475, "strike_step": 10, "spread_width": 20, "margin": 50000},
+    "TATASTEEL": {"token": "3499", "symbol": "TATASTEEL.NS", "market": "NSE", "lot_size": 5500, "strike_step": 2.5, "spread_width": 2.5, "margin": 50000}
 }
 
 def run_simulation():
@@ -81,9 +81,11 @@ def run_simulation():
     for name, conf in ASSETS.items():
         df_5m = pd.DataFrame()
         
-        if conf["market"] == "NSE_INDEX" and smart_api and conf["token"]:
+        # 1. Fetch via SmartAPI for indices and mapped equities
+        if smart_api and conf["token"]:
             df_5m = fetch_angel_index_data(smart_api, conf["token"], name)
             
+        # 2. Fallback to Yahoo Finance if API data not available
         if df_5m.empty:
             try:
                 ticker = yf.Ticker(conf["symbol"])
@@ -102,12 +104,12 @@ def run_simulation():
         if df_5m.empty or len(df_5m) < 100:
             continue
 
-        # 4-HOUR RESAMPLING LOGIC (Multi-Timeframe)
+        # 4-HOUR RESAMPLING LOGIC (Multi-Timeframe Setup)
         df_4h = df_5m.resample("4h").agg({
             "Open": "first", "High": "max", "Low": "min", "Close": "last", "Volume": "sum"
         }).dropna()
 
-        # Rolling 6-period 4H Low (Pichhle 24 ghante ka major swing low)
+        # Rolling 6-period 4H Low (Pichhle 24 ghante ka major institutional swing low)
         df_4h["HTF_Low"] = df_4h["Low"].shift(1).rolling(window=6).min()
         df_5m["HTF_Low"] = df_4h["HTF_Low"].reindex(df_5m.index, method="ffill")
 
@@ -120,6 +122,7 @@ def run_simulation():
             curr = df_5m.iloc[i]
             c_time = curr.name.time()
 
+            # Trade time window filter
             if conf["market"] in ["NSE", "NSE_INDEX"]:
                 if not (time(9, 20) <= c_time <= time(15, 10)):
                     i += 1
@@ -138,10 +141,11 @@ def run_simulation():
             avg_vol = curr["Vol_MA20"]
             avg_range = curr["Range_MA20"]
 
-            # 4-HOUR SWEEP RULE
+            # 4-HOUR LIQUIDITY SWEEP RULE
             is_htf_sweep = (c_low < htf_liquidity_low) and (c_close > htf_liquidity_low)
             is_green = c_close > c_open
 
+            # Volume / Range Absorption Check
             if conf["market"] == "NSE_INDEX":
                 if c_vol > 0 and avg_vol > 0:
                     has_absorption = c_vol >= (avg_vol * 1.5)
@@ -171,6 +175,7 @@ def run_simulation():
                 max_gain = conf["spread_width"] * 0.60 * conf["lot_size"]
                 max_loss = -(conf["spread_width"] * 0.35 * conf["lot_size"])
 
+                # Forward candle simulation (Max 36 bars = 3 hours hold)
                 for forward_idx in range(i + 1, min(i + 36, len(df_5m))):
                     future_candle = df_5m.iloc[forward_idx]
                     if future_candle["Low"] <= sl_price:
