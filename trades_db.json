@@ -12,12 +12,12 @@
         "target": 2497.27,
         "outcome": "TARGET_HIT",
         "capital_deployed": 65000,
-        "net_pnl": 9625.0,
+        "net_pnl": 9505.0,
         "vol_ratio": "3.19x (Vol)"
     },
     {
         "entry_time": "2026-10-28 11:55:00",
-        "exit_time": "2026-10-28 11:55:00",
+        "exit_time": "2026-10-28 14:40:00",
         "date": "2026-10-28",
         "asset": "TCS",
         "side": "BULLISH_SWEEP",
@@ -28,7 +28,7 @@
         "target": 2462.78,
         "outcome": "EXPIRED",
         "capital_deployed": 65000,
-        "net_pnl": 3368.75,
+        "net_pnl": 3248.75,
         "vol_ratio": "2.17x (Vol)"
     },
     {
@@ -44,7 +44,7 @@
         "target": 24583.77,
         "outcome": "TARGET_HIT",
         "capital_deployed": 45000,
-        "net_pnl": 1375.0,
+        "net_pnl": 1255.0,
         "vol_ratio": "1.92x (Rng)"
     },
     {
@@ -60,12 +60,12 @@
         "target": 24820.11,
         "outcome": "TARGET_HIT",
         "capital_deployed": 45000,
-        "net_pnl": 1375.0,
+        "net_pnl": 1255.0,
         "vol_ratio": "1.51x (Rng)"
     },
     {
         "entry_time": "2026-10-07 10:35:00",
-        "exit_time": "2026-10-07 10:35:00",
+        "exit_time": "2026-10-07 13:20:00",
         "date": "2026-10-07",
         "asset": "FINNIFTY",
         "side": "BEARISH_SWEEP",
@@ -76,12 +76,12 @@
         "target": 24714.94,
         "outcome": "EXPIRED",
         "capital_deployed": 45000,
-        "net_pnl": 481.25,
+        "net_pnl": 361.25,
         "vol_ratio": "1.9x (Rng)"
     },
     {
         "entry_time": "2026-09-22 10:45:00",
-        "exit_time": "2026-09-22 10:45:00",
+        "exit_time": "2026-09-22 13:30:00",
         "date": "2026-09-22",
         "asset": "LT",
         "side": "BEARISH_SWEEP",
@@ -92,7 +92,7 @@
         "target": 3865.17,
         "outcome": "EXPIRED",
         "capital_deployed": 60000,
-        "net_pnl": 1155.0,
+        "net_pnl": 1035.0,
         "vol_ratio": "1.67x (Vol)"
     },
     {
@@ -108,7 +108,7 @@
         "target": 1218.91,
         "outcome": "TRAILING_SL",
         "capital_deployed": 55000,
-        "net_pnl": 1375.0,
+        "net_pnl": 1255.0,
         "vol_ratio": "2.55x (Vol)"
     },
     {
@@ -124,7 +124,7 @@
         "target": 23377.79,
         "outcome": "STOP_LOSS",
         "capital_deployed": 45000,
-        "net_pnl": -875.0,
+        "net_pnl": -995.0,
         "vol_ratio": "1.47x (Rng)"
     },
     {
@@ -140,7 +140,7 @@
         "target": 22671.59,
         "outcome": "TARGET_HIT",
         "capital_deployed": 45000,
-        "net_pnl": 1375.0,
+        "net_pnl": 1255.0,
         "vol_ratio": "1.45x (Rng)"
     },
     {
@@ -156,7 +156,7 @@
         "target": 734.53,
         "outcome": "TARGET_HIT",
         "capital_deployed": 60000,
-        "net_pnl": 6050.0,
+        "net_pnl": 5930.0,
         "vol_ratio": "1.89x (Vol)"
     }
 ]
