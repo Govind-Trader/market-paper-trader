@@ -2,7 +2,7 @@ name: Live Market 15-Min Scanner
 
 on:
   schedule:
-    # Runs Monday to Friday, every 15 mins during market hours (03:45 UTC to 10:00 UTC = 09:15 AM to 03:30 PM IST)
+    # Runs Monday to Friday every 15 mins during market hours (03:45 UTC to 10:00 UTC = 09:15 AM to 03:30 PM IST)
     - cron: '*/15 4-10 * * 1-5'
   workflow_dispatch:
 
@@ -20,10 +20,14 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install yfinance pandas requests pytz
+          pip install smartapi-python pyotp pandas requests pytz
 
-      - name: Run Market Scanner
+      - name: Run Real-Time Market Scanner
         env:
+          SMARTAPI_KEY: ${{ secrets.SMARTAPI_KEY }}
+          SMARTAPI_CLIENT_CODE: ${{ secrets.SMARTAPI_CLIENT_CODE }}
+          SMARTAPI_PIN: ${{ secrets.SMARTAPI_PIN }}
+          SMARTAPI_TOTP_KEY: ${{ secrets.SMARTAPI_TOTP_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python live_scanner.py
