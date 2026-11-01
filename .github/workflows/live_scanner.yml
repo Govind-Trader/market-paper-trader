@@ -20,7 +20,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install smartapi-python pyotp pandas requests pytz
+          pip install smartapi-python pyotp pandas requests pytz logzero websocket-client
 
       - name: Run Real-Time Market Scanner
         env:
