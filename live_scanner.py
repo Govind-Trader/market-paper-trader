@@ -1,12 +1,20 @@
 import os
-import json
+import sys
 import pytz
+import pyotp
 import requests
 import pandas as pd
-from datetime import datetime
-import yfinance as yf
+from datetime import datetime, timedelta
+from SmartApi import SmartConnect
 
 IST = pytz.timezone("Asia/Kolkata")
+
+# Credentials from GitHub Secrets
+API_KEY = os.getenv("SMARTAPI_KEY")
+CLIENT_CODE = os.getenv("SMARTAPI_CLIENT_CODE")
+PIN = os.getenv("SMARTAPI_PIN")
+TOTP_KEY = os.getenv("SMARTAPI_TOTP_KEY")
+
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
@@ -24,34 +32,73 @@ def send_telegram_alert(msg: str):
         print(f"Telegram Alert Error: {e}")
         return False
 
-# 7 Assets Universe
+# Angel One Instrument Tokens (NSE Equity / Indices)
 ASSETS = {
-    "TCS": {"symbol": "TCS.NS", "lot_size": 175, "strike_step": 20, "spread_width": 40},
-    "BANKNIFTY": {"symbol": "^NSEBANK", "lot_size": 15, "strike_step": 100, "spread_width": 200},
-    "FINNIFTY": {"symbol": "NIFTY_FIN_SERVICE.NS", "lot_size": 25, "strike_step": 50, "spread_width": 100},
-    "LT": {"symbol": "LT.NS", "lot_size": 150, "strike_step": 20, "spread_width": 40},
-    "AXISBANK": {"symbol": "AXISBANK.NS", "lot_size": 625, "strike_step": 10, "spread_width": 20},
-    "NIFTY": {"symbol": "^NSEI", "lot_size": 25, "strike_step": 50, "spread_width": 100},
-    "HDFCBANK": {"symbol": "HDFCBANK.NS", "lot_size": 550, "strike_step": 10, "spread_width": 20}
+    "TCS": {"token": "11536", "exchange": "NSE", "lot_size": 175, "strike_step": 20, "spread_width": 40},
+    "BANKNIFTY": {"token": "99926009", "exchange": "NSE", "lot_size": 15, "strike_step": 100, "spread_width": 200},
+    "FINNIFTY": {"token": "99926037", "exchange": "NSE", "lot_size": 25, "strike_step": 50, "spread_width": 100},
+    "LT": {"token": "11483", "exchange": "NSE", "lot_size": 150, "strike_step": 20, "spread_width": 40},
+    "AXISBANK": {"token": "5900", "exchange": "NSE", "lot_size": 625, "strike_step": 10, "spread_width": 20},
+    "NIFTY": {"token": "99926000", "exchange": "NSE", "lot_size": 25, "strike_step": 50, "spread_width": 100},
+    "HDFCBANK": {"token": "1333", "exchange": "NSE", "lot_size": 550, "strike_step": 10, "spread_width": 20}
 }
 
+def get_smartapi_client():
+    try:
+        smart_api = SmartConnect(API_KEY)
+        totp = pyotp.TOTP(TOTP_KEY).now()
+        data = smart_api.generateSession(CLIENT_CODE, PIN, totp)
+        if data and data.get("status"):
+            print("SmartAPI Session Connected Successfully.")
+            return smart_api
+        else:
+            print("SmartAPI Session Failed:", data)
+            return None
+    except Exception as e:
+        print(f"Session Authentication Exception: {e}")
+        return None
+
+def fetch_candles(smart_api, token, exchange, interval="FIVE_MINUTE", days=10):
+    to_date = datetime.now(IST)
+    from_date = to_date - timedelta(days=days)
+    params = {
+        "exchange": exchange,
+        "symboltoken": token,
+        "interval": interval,
+        "fromdate": from_date.strftime("%Y-%m-%d %H:%M"),
+        "todate": to_date.strftime("%Y-%m-%d %H:%M")
+    }
+    try:
+        res = smart_api.getCandleData(params)
+        if res and res.get("status") and res.get("data"):
+            df = pd.DataFrame(res["data"], columns=["timestamp", "Open", "High", "Low", "Close", "Volume"])
+            df["timestamp"] = pd.to_datetime(df["timestamp"])
+            df.set_index("timestamp", inplace=True)
+            if df.index.tz is None:
+                df.index = df.index.tz_localize("UTC").tz_convert(IST)
+            else:
+                df.index = df.index.tz_convert(IST)
+            return df
+    except Exception as e:
+        print(f"Candle Fetch Exception for token {token}: {e}")
+    return pd.DataFrame()
+
 def scan_live_market():
+    smart_api = get_smartapi_client()
+    if not smart_api:
+        print("SmartAPI connection unestablished. Exiting scan.")
+        return
+
     now = datetime.now(IST)
-    print(f"Running Market Scan at {now.strftime('%Y-%m-%d %H:%M:%S')} IST...")
+    print(f"Running Real-Time SmartAPI Scan at {now.strftime('%Y-%m-%d %H:%M:%S')} IST...")
 
     for name, conf in ASSETS.items():
         try:
-            ticker = yf.Ticker(conf["symbol"])
-            df_5m = ticker.history(period="15d", interval="5m")
+            df_5m = fetch_candles(smart_api, conf["token"], conf["exchange"], interval="FIVE_MINUTE", days=10)
             if df_5m.empty or len(df_5m) < 40:
                 continue
-            
-            if df_5m.index.tz is None:
-                df_5m.index = df_5m.index.tz_localize("UTC").tz_convert(IST)
-            else:
-                df_5m.index = df_5m.index.tz_convert(IST)
 
-            # Daily 20 EMA calculation
+            # Daily 20 EMA
             df_daily = df_5m.resample("1D").agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna()
             df_daily["EMA20"] = df_daily["Close"].ewm(span=20, adjust=False).mean()
             df_5m["Daily_EMA20"] = df_daily["EMA20"].reindex(df_5m.index, method="ffill")
@@ -102,7 +149,7 @@ def scan_live_market():
                 otm = (atm + conf["spread_width"]) if is_bull else (atm - conf["spread_width"])
 
                 msg = (
-                    f"🚨 *HIGH-CONVICTION TRADE ALERT*\n\n"
+                    f"🚨 *REAL-TIME SMARTAPI TRADE ALERT*\n\n"
                     f"📌 *Asset:* `{name}` ({side})\n"
                     f"⏰ *Candle Time:* `{c3.name.strftime('%H:%M IST')}`\n"
                     f"📊 *Spread Legs:* `{atm} {opt_type} Buy` / `{otm} {opt_type} Sell`\n"
@@ -113,7 +160,7 @@ def scan_live_market():
                     f"💼 *Lot Size:* `{conf['lot_size']}` (1 Lot Mode)\n\n"
                     f"🛡️ *Rules:* BE Trailing at 1:1.25 | Time Exit: 3 Hours"
                 )
-                print(f"Triggering Telegram alert for {name}...")
+                print(f"Triggering SmartAPI Alert for {name}...")
                 send_telegram_alert(msg)
 
         except Exception as e:
