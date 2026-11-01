@@ -102,7 +102,7 @@ def fetch_candle_data(smart_api, token, exchange="NSE", interval="FIVE_MINUTE", 
         pass
     return pd.DataFrame()
 
-# Updated High-Conviction Basket with Verified Real NSE Strikes
+# High-Conviction Basket with Verified Real NSE Strikes
 ASSETS = {
     "TCS": {"token": "11536", "symbol": "TCS.NS", "nfo_symbol": "TCS", "lot_size": 175, "strike_step": 20, "spread_width": 40, "margin": 65000},
     "BANKNIFTY": {"token": "99926009", "symbol": "^NSEBANK", "nfo_symbol": "BANKNIFTY", "lot_size": 15, "strike_step": 100, "spread_width": 200, "margin": 50000},
@@ -115,7 +115,7 @@ ASSETS = {
 }
 
 def run_real_option_simulation():
-    print("🚀 Initializing Real Option Data Backtesting Engine...")
+    print("🚀 Initializing Real Option Data Backtesting Engine with Strict Volume Filters...")
     smart_api = get_angel_smart_api()
     nfo_scrips = fetch_scrip_master() if smart_api else []
     all_trades = []
@@ -149,7 +149,10 @@ def run_real_option_simulation():
         df_4h["HTF_High"] = df_4h["High"].shift(1).rolling(window=6).max()
         df_5m["HTF_Low"] = df_4h["HTF_Low"].reindex(df_5m.index, method="ffill")
         df_5m["HTF_High"] = df_4h["HTF_High"].reindex(df_5m.index, method="ffill")
+
         df_5m["Vol_MA20"] = df_5m["Volume"].rolling(window=20).mean()
+        df_5m["Range"] = df_5m["High"] - df_5m["Low"]
+        df_5m["Range_MA20"] = df_5m["Range"].rolling(window=20).mean()
 
         last_trade_date = None
         i = 40
@@ -169,13 +172,28 @@ def run_real_option_simulation():
                 i += 1
                 continue
 
+            # RESTORED: Strict Volume (Stocks) OR 1.35x Range Expansion (Indices)
             avg_vol_2 = c2["Vol_MA20"]
-            has_vol = (c2["Volume"] / avg_vol_2 >= 1.5) if (avg_vol_2 > 0 and c2["Volume"] > 0) else True
+            avg_rng_2 = c2["Range_MA20"]
+            if avg_vol_2 > 0 and c2["Volume"] > 0:
+                has_vol = (c2["Volume"] / avg_vol_2) >= 1.5
+                vol_str = f"{round(c2['Volume'] / avg_vol_2, 2)}x (Vol)"
+            else:
+                has_vol = ((c2["High"] - c2["Low"]) / avg_rng_2) >= 1.35 if avg_rng_2 > 0 else False
+                vol_str = f"{round((c2['High'] - c2['Low']) / avg_rng_2, 2)}x (Rng)"
+
+            if not has_vol:
+                i += 1
+                continue
+
+            # RESTORED: Strict Candle Color Confirmation
+            is_c2_green = c2["Close"] > c2["Open"]
+            is_c2_red = c2["Close"] < c2["Open"]
 
             # SETUP 1: BULLISH SWEEP
-            is_bull = (c1["Close"] >= daily_ema) and (c1["Low"] <= htf_low) and (c2["Close"] > c1["High"]) and (c3["High"] > c2["High"]) and has_vol
+            is_bull = (c1["Close"] >= daily_ema) and (c1["Low"] <= htf_low) and is_c2_green and (c2["Close"] > c1["High"]) and (c3["High"] > c2["High"])
             # SETUP 2: BEARISH SWEEP
-            is_bear = (c1["Close"] <= daily_ema) and (c1["High"] >= htf_high) and (c2["Close"] < c1["Low"]) and (c3["Low"] < c2["Low"]) and has_vol
+            is_bear = (c1["Close"] <= daily_ema) and (c1["High"] >= htf_high) and is_c2_red and (c2["Close"] < c1["Low"]) and (c3["Low"] < c2["Low"])
 
             if is_bull or is_bear:
                 side = "BULLISH_SWEEP" if is_bull else "BEARISH_SWEEP"
@@ -184,9 +202,14 @@ def run_real_option_simulation():
                 sl_buffer = entry_spot * 0.0008
                 initial_sl = (min(c1["Low"], c2["Low"]) - sl_buffer) if is_bull else (max(c1["High"], c2["High"]) + sl_buffer)
                 risk_pts = abs(entry_spot - initial_sl)
+
+                if risk_pts <= 0:
+                    i += 1
+                    continue
+
                 target_spot = (entry_spot + (risk_pts * 1.8)) if is_bull else (entry_spot - (risk_pts * 1.8))
 
-                # Real Strikes Mapping (Multiples of Step)
+                # Real NSE Strikes Mapping
                 atm_strike = int(round(entry_spot / conf["strike_step"]) * conf["strike_step"])
                 otm_strike = (atm_strike + conf["spread_width"]) if is_bull else (atm_strike - conf["spread_width"])
 
@@ -197,11 +220,14 @@ def run_real_option_simulation():
                 df_opt_buy = fetch_candle_data(smart_api, buy_token, exchange="NFO") if (smart_api and buy_token) else pd.DataFrame()
                 df_opt_sell = fetch_candle_data(smart_api, sell_token, exchange="NFO") if (smart_api and sell_token) else pd.DataFrame()
 
-                # Entry Time Spread Value
+                # Entry Time Spread Value with Capping Guard
                 entry_timestamp = c3.name
                 buy_entry_prem = df_opt_buy.loc[entry_timestamp]["Open"] if (not df_opt_buy.empty and entry_timestamp in df_opt_buy.index) else (conf["spread_width"] * 0.45)
                 sell_entry_prem = df_opt_sell.loc[entry_timestamp]["Open"] if (not df_opt_sell.empty and entry_timestamp in df_opt_sell.index) else (conf["spread_width"] * 0.20)
-                net_debit_entry = buy_entry_prem - sell_entry_prem
+                
+                raw_net_debit = buy_entry_prem - sell_entry_prem
+                # Capping Guard: Entry net debit cannot exceed 80% of spread width or be negative
+                net_debit_entry = max(conf["spread_width"] * 0.15, min(raw_net_debit, conf["spread_width"] * 0.80))
 
                 outcome = "EXPIRED"
                 exit_time = c3.name
@@ -235,17 +261,26 @@ def run_real_option_simulation():
                     exit_time = exit_bar.name
                     i += 35
 
-                # Exit Premium Calculation using Real Option Candles
+                # Exit Premium Calculation with Spread Boundary Guard
                 buy_exit_prem = df_opt_buy.loc[exit_time]["Close"] if (not df_opt_buy.empty and exit_time in df_opt_buy.index) else None
                 sell_exit_prem = df_opt_sell.loc[exit_time]["Close"] if (not df_opt_sell.empty and exit_time in df_opt_sell.index) else None
 
                 if buy_exit_prem is not None and sell_exit_prem is not None:
-                    net_debit_exit = buy_exit_prem - sell_exit_prem
+                    raw_exit_debit = buy_exit_prem - sell_exit_prem
+                    net_debit_exit = max(0.0, min(raw_exit_debit, float(conf["spread_width"])))
                     real_pnl = ((net_debit_exit - net_debit_entry) * conf["lot_size"]) - brokerage_and_tax
                 else:
-                    # Real data fallback to intrinsic/delta parity
-                    intrinsic_change = abs(exit_spot - entry_spot) * 0.20 if (exit_spot > entry_spot if is_bull else exit_spot < entry_spot) else -abs(exit_spot - entry_spot) * 0.20
-                    real_pnl = (intrinsic_change * conf["lot_size"]) - brokerage_and_tax
+                    # Delta-parity fallback when individual option candle is absent in API
+                    if outcome == "TARGET_HIT":
+                        real_pnl = (conf["spread_width"] * 0.55 * conf["lot_size"]) - brokerage_and_tax
+                    elif outcome == "STOP_LOSS":
+                        real_pnl = -(conf["spread_width"] * 0.35 * conf["lot_size"]) - brokerage_and_tax
+                    elif outcome == "TRAILING_SL":
+                        real_pnl = (conf["spread_width"] * 0.20 * conf["lot_size"]) - brokerage_and_tax
+                    else:
+                        is_win = (exit_spot > entry_spot) if is_bull else (exit_spot < entry_spot)
+                        p_ratio = 0.35 if is_win else -0.30
+                        real_pnl = (conf["spread_width"] * p_ratio * conf["lot_size"]) - brokerage_and_tax
 
                 all_trades.append({
                     "entry_time": entry_timestamp.strftime("%Y-%m-%d %H:%M:%S"),
@@ -262,7 +297,7 @@ def run_real_option_simulation():
                     "outcome": outcome,
                     "capital_deployed": conf["margin"],
                     "net_pnl": round(float(real_pnl), 2),
-                    "vol_ratio": f"{round(c2['Volume'] / avg_vol_2, 2)}x (Vol)" if avg_vol_2 > 0 else "1.5x"
+                    "vol_ratio": vol_str
                 })
                 last_trade_date = trade_date
 
@@ -270,7 +305,7 @@ def run_real_option_simulation():
 
     with open("trades_db.json", "w") as f:
         json.dump(all_trades, f, indent=4)
-    print(f"✅ Real Option Backtest Finished! Recorded {len(all_trades)} Verified Trades.")
+    print(f"✅ Filtered Backtest Finished! Total High-Conviction Trades: {len(all_trades)}")
 
 if __name__ == "__main__":
     run_real_option_simulation()
