@@ -55,7 +55,7 @@ def fetch_angel_data(smart_api, token, symbol_name, interval="FIVE_MINUTE", days
         print(f"Error fetching {symbol_name}: {e}")
     return pd.DataFrame()
 
-# High-conviction consistent universe (60%+ Win Rate Potential)
+# High-conviction consistent universe (60%+ Win Rate Filtered Basket)
 ASSETS = {
     "TCS": {"token": "11536", "symbol": "TCS.NS", "market": "NSE", "lot_size": 175, "strike_step": 50, "spread_width": 100, "margin": 65000},
     "BANKNIFTY": {"token": "99926009", "symbol": "^NSEBANK", "market": "NSE_INDEX", "lot_size": 15, "strike_step": 100, "spread_width": 200, "margin": 50000},
@@ -68,10 +68,11 @@ ASSETS = {
 }
 
 def run_simulation():
-    print("🚀 Running 60%+ Trend-Aligned 4H Sweep Engine...")
+    print("🚀 Running 60%+ Trend-Aligned 4H Sweep Engine with Exit-Time Fix...")
     smart_api = get_angel_smart_api()
     all_trades = []
     ist = pytz.timezone("Asia/Kolkata")
+    friction_per_trade = 120.0  # ₹80 brokerage + ₹40 statutory taxes & STT per spread
     
     for name, conf in ASSETS.items():
         df_5m = pd.DataFrame()
@@ -97,12 +98,12 @@ def run_simulation():
         if df_5m.empty or len(df_5m) < 100:
             continue
 
-        # 1. DAILY 20 EMA TREND FILTER (Higher Timeframe Direction)
+        # 1. Daily 20 EMA Trend Filter (HTF Direction)
         df_daily = df_5m.resample("1D").agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna()
         df_daily["EMA20"] = df_daily["Close"].ewm(span=20, adjust=False).mean()
         df_5m["Daily_EMA20"] = df_daily["EMA20"].reindex(df_5m.index, method="ffill")
 
-        # 2. 4-HOUR LIQUIDITY LEVELS (High & Low of last 24h)
+        # 2. 4-Hour Rolling Liquidity Levels (High & Low of last 24h)
         df_4h = df_5m.resample("4h").agg({"Open": "first", "High": "max", "Low": "min", "Close": "last", "Volume": "sum"}).dropna()
         df_4h["HTF_Low"] = df_4h["Low"].shift(1).rolling(window=6).min()
         df_4h["HTF_High"] = df_4h["High"].shift(1).rolling(window=6).max()
@@ -118,16 +119,16 @@ def run_simulation():
         while i < len(df_5m) - 6:
             c1 = df_5m.iloc[i]     # Candle 1 (4H Sweep Alert)
             c2 = df_5m.iloc[i + 1] # Candle 2 (Volume Breakout / Absorption)
-            c3 = df_5m.iloc[i + 2] # Candle 3 (Trigger on High/Low Breakout)
+            c3 = df_5m.iloc[i + 2] # Candle 3 (Trigger on High/Low Continuation Breakout)
             c_time = c1.name.time()
             trade_date = c1.name.date()
 
-            # Trade Window: Avoid early 9:15-9:25 noise & late session chop
+            # Trade Execution Window: 09:30 AM to 02:45 PM
             if not (time(9, 30) <= c_time <= time(14, 45)):
                 i += 1
                 continue
 
-            # Cap: Max 1 high-conviction trade per day per asset
+            # Limit: Max 1 high-conviction trade per day per asset
             if last_trade_date == trade_date:
                 i += 1
                 continue
@@ -153,7 +154,6 @@ def run_simulation():
             # ==========================================
             # SETUP 1: TREND-ALIGNED BULLISH SWEEP (CE SPREAD)
             # ==========================================
-            # Daily Trend Bullish (Close > Daily EMA20)
             is_bullish_trend = c1["Close"] >= daily_ema
             is_c1_sweep_low = c1["Low"] <= htf_low
             is_c2_breakout_up = (c2["Close"] > c2["Open"]) and (c2["Close"] > c1["High"]) and has_vol_absorption
@@ -166,7 +166,6 @@ def run_simulation():
                 risk_pts = entry_price - initial_sl
 
                 if risk_pts > 0:
-                    # Optimized Target: 1:1.8 (Realistic Intraday Reach)
                     target_price = entry_price + (risk_pts * 1.8)
                     atm = int(round(entry_price / conf["strike_step"]) * conf["strike_step"])
                     otm = atm + conf["spread_width"]
@@ -183,12 +182,12 @@ def run_simulation():
                     for forward_idx in range(i + 3, min(i + 36, len(df_5m))):
                         bar = df_5m.iloc[forward_idx]
 
-                        # Target Hit
+                        # Target Hit (1:1.8)
                         if bar["High"] >= target_price:
                             outcome = "TARGET_HIT"
                             exit_price = target_price
                             exit_time = bar.name
-                            pnl = max_gain
+                            pnl = max_gain - friction_per_trade
                             i = forward_idx
                             break
 
@@ -201,12 +200,15 @@ def run_simulation():
                             outcome = "TRAILING_SL" if current_sl >= entry_price else "STOP_LOSS"
                             exit_price = current_sl
                             exit_time = bar.name
-                            pnl = max_gain * 0.20 if current_sl >= entry_price else max_loss
+                            pnl = (max_gain * 0.20 - friction_per_trade) if current_sl >= entry_price else (max_loss - friction_per_trade)
                             i = forward_idx
                             break
                     else:
-                        exit_price = df_5m.iloc[min(i + 35, len(df_5m) - 1)]["Close"]
-                        pnl = max_gain * 0.35 if exit_price > entry_price else max_loss * 0.3
+                        # FIXED: Exit time accurately assigned to 35 bars later
+                        exit_bar = df_5m.iloc[min(i + 35, len(df_5m) - 1)]
+                        exit_price = exit_bar["Close"]
+                        exit_time = exit_bar.name
+                        pnl = (max_gain * 0.35 - friction_per_trade) if exit_price > entry_price else (max_loss * 0.3 - friction_per_trade)
                         i += 35
 
                     all_trades.append({
@@ -231,7 +233,6 @@ def run_simulation():
             # ==========================================
             # SETUP 2: TREND-ALIGNED BEARISH SWEEP (PE SPREAD)
             # ==========================================
-            # Daily Trend Bearish (Close < Daily EMA20)
             is_bearish_trend = c1["Close"] <= daily_ema
             is_c1_sweep_high = c1["High"] >= htf_high
             is_c2_breakdown_dn = (c2["Close"] < c2["Open"]) and (c2["Close"] < c1["Low"]) and has_vol_absorption
@@ -260,12 +261,12 @@ def run_simulation():
                     for forward_idx in range(i + 3, min(i + 36, len(df_5m))):
                         bar = df_5m.iloc[forward_idx]
 
-                        # Target Hit
+                        # Target Hit (1:1.8)
                         if bar["Low"] <= target_price:
                             outcome = "TARGET_HIT"
                             exit_price = target_price
                             exit_time = bar.name
-                            pnl = max_gain
+                            pnl = max_gain - friction_per_trade
                             i = forward_idx
                             break
 
@@ -278,12 +279,15 @@ def run_simulation():
                             outcome = "TRAILING_SL" if current_sl <= entry_price else "STOP_LOSS"
                             exit_price = current_sl
                             exit_time = bar.name
-                            pnl = max_gain * 0.20 if current_sl <= entry_price else max_loss
+                            pnl = (max_gain * 0.20 - friction_per_trade) if current_sl <= entry_price else (max_loss - friction_per_trade)
                             i = forward_idx
                             break
                     else:
-                        exit_price = df_5m.iloc[min(i + 35, len(df_5m) - 1)]["Close"]
-                        pnl = max_gain * 0.35 if exit_price < entry_price else max_loss * 0.3
+                        # FIXED: Exit time accurately assigned to 35 bars later
+                        exit_bar = df_5m.iloc[min(i + 35, len(df_5m) - 1)]
+                        exit_price = exit_bar["Close"]
+                        exit_time = exit_bar.name
+                        pnl = (max_gain * 0.35 - friction_per_trade) if exit_price < entry_price else (max_loss * 0.3 - friction_per_trade)
                         i += 35
 
                     all_trades.append({
