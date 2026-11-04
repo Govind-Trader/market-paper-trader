@@ -146,10 +146,10 @@
         "exit_price": 22671.59,
         "initial_sl": 22838.67,
         "target": 22671.59,
-        "entry_premium": 41.6,
+        "entry_premium": 42.2,
         "outcome": "TARGET_HIT",
         "capital_deployed": 45000,
-        "net_pnl": 128.75,
+        "net_pnl": 57.5,
         "vol_ratio": "1.45x (Rng)"
     },
     {
@@ -168,5 +168,22 @@
         "capital_deployed": 60000,
         "net_pnl": 5930.0,
         "vol_ratio": "1.89x (Vol)"
+    },
+    {
+        "entry_time": "2026-09-28 14:50:00",
+        "exit_time": "2026-09-29 09:15:00",
+        "date": "2026-09-28",
+        "asset": "HDFCBANK",
+        "side": "BULLISH_SWEEP",
+        "spread": "720 CE / 740 CE",
+        "entry_price": 720.45,
+        "exit_price": 718.07,
+        "initial_sl": 718.07,
+        "target": 724.73,
+        "entry_premium": 5.0,
+        "outcome": "STOP_LOSS",
+        "capital_deployed": 60000,
+        "net_pnl": -3970.0,
+        "vol_ratio": "1.81x (Vol)"
     }
 ]
