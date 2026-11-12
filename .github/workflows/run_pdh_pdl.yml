@@ -14,7 +14,7 @@ jobs:
       - name: Execute PDH/PDL Backtest
         env:
           SMARTAPI_KEY: ${{ secrets.SMARTAPI_KEY }}
-          CLIENT_CODE: ${{ secrets.CLIENT_CODE }}
-          PIN: ${{ secrets.PIN }}
-          TOTP_KEY: ${{ secrets.TOTP_KEY }}
+          SMARTAPI_CLIENT_CODE: ${{ secrets.SMARTAPI_CLIENT_CODE }}
+          SMARTAPI_PIN: ${{ secrets.SMARTAPI_PIN }}
+          SMARTAPI_TOTP_KEY: ${{ secrets.SMARTAPI_TOTP_KEY }}
         run: python backtest_pdh_pdl.py
