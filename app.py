@@ -13,8 +13,8 @@ from SmartApi import SmartConnect
 # 1. PAGE CONFIG & CREDENTIALS
 # ==========================================
 st.set_page_config(
-    page_title="Liquidity Sweep Options Tracker",
-    page_icon="📈",
+    page_title="Hybrid Liquidity Sweep Options Dashboard",
+    page_icon="📊",
     layout="wide"
 )
 
@@ -41,7 +41,7 @@ ASSETS = {
 
 
 # ==========================================
-# 2. SMARTAPI SESSION & DATA FETCHING (WITH RETRY)
+# 2. SMARTAPI SESSION & RATE-LIMIT SAFE DATA
 # ==========================================
 @st.cache_resource(ttl=3600)
 def get_smartapi_session():
@@ -71,7 +71,6 @@ def fetch_candles(_obj, symbol: str, days: int = 45) -> pd.DataFrame:
         "todate": to_dt.strftime("%Y-%m-%d %H:%M")
     }
 
-    # Auto-retry up to 3 times if Angel One rate-limits the call
     for attempt in range(3):
         try:
             time_module.sleep(0.55 + (attempt * 0.5))
@@ -91,19 +90,20 @@ def fetch_candles(_obj, symbol: str, days: int = 45) -> pd.DataFrame:
 
 
 # ==========================================
-# 3. LIVE SCANNER ENGINE (FIXED ALERT LOGIC)
+# 3. STRATEGY ENGINE (WITH 03:15 PM SAME-DAY EXIT)
 # ==========================================
-def run_live_dashboard_scan(obj):
-    rows = []
+def run_full_scan_and_backtest(obj, lookback_days: int = 45):
+    scanner_rows = []
+    all_trades = []
     progress = st.progress(0)
     total = len(ASSETS)
 
-    for idx, symbol in enumerate(ASSETS.keys()):
-        df_5m = fetch_candles(obj, symbol, days=7)
+    for idx, (symbol, info) in enumerate(ASSETS.items()):
+        df_5m = fetch_candles(obj, symbol, days=lookback_days)
         progress.progress((idx + 1) / total)
 
-        if len(df_5m) < 40:
-            rows.append({
+        if len(df_5m) < 60:
+            scanner_rows.append({
                 "Asset": symbol,
                 "LTP": 0.0,
                 "4H High": 0.0,
@@ -112,7 +112,7 @@ def run_live_dashboard_scan(obj):
             })
             continue
 
-        # Build clean 4H levels from completed 4H blocks
+        # 4H Levels (IST aligned)
         df_4h = df_5m.resample("4h", origin="start_day").agg({
             "Open": "first",
             "High": "max",
@@ -123,24 +123,21 @@ def run_live_dashboard_scan(obj):
         prev_4h_high = round(float(df_4h["High"].iloc[-2]), 2)
         prev_4h_low = round(float(df_4h["Low"].iloc[-2]), 2)
 
-        c2 = df_5m.iloc[-3]
-        c3 = df_5m.iloc[-2]
+        c2_live = df_5m.iloc[-3]
+        c3_live = df_5m.iloc[-2]
         ltp = round(float(df_5m["Close"].iloc[-1]), 2)
 
         status = "⚪ Monitoring"
-
-        # Step 2: Reversal Confirmation (Strict Sweep + Rejection + Breakout)
-        if c2["High"] > prev_4h_high and c2["Close"] < prev_4h_high and c3["Close"] < c2["Low"] and ltp < prev_4h_high:
+        if c2_live["High"] > prev_4h_high and c2_live["Close"] < prev_4h_high and c3_live["Close"] < c2_live["Low"] and ltp < prev_4h_high:
             status = "🔴 SELL CONFIRMED (Bear Put Spread)"
-        elif c2["Low"] < prev_4h_low and c2["Close"] > prev_4h_low and c3["Close"] > c2["High"] and ltp > prev_4h_low:
+        elif c2_live["Low"] < prev_4h_low and c2_live["Close"] > prev_4h_low and c3_live["Close"] > c2_live["High"] and ltp > prev_4h_low:
             status = "🟢 BUY CONFIRMED (Bull Call Spread)"
-        # Step 1: Alert Mode (Only when current LTP actually pierces 4H High/Low)
         elif ltp >= prev_4h_high:
             status = "🟠 ALERT MODE (4H High Swept)"
         elif ltp <= prev_4h_low:
             status = "🟠 ALERT MODE (4H Low Swept)"
 
-        rows.append({
+        scanner_rows.append({
             "Asset": symbol,
             "LTP": ltp,
             "4H High": prev_4h_high,
@@ -148,37 +145,18 @@ def run_live_dashboard_scan(obj):
             "Signal Status": status
         })
 
-    progress.empty()
-    return pd.DataFrame(rows)
-
-
-# ==========================================
-# 4. BACKTEST SIMULATOR (WITH 03:15 PM SAME-DAY EXIT)
-# ==========================================
-def run_backtest_audit(obj, lookback_days: int = 45) -> pd.DataFrame:
-    all_trades = []
-
-    for symbol, info in ASSETS.items():
-        df_5m = fetch_candles(obj, symbol, days=lookback_days)
-        if len(df_5m) < 100:
-            continue
-
+        # Historical Backtest Simulation (Entry unaltered + Mandatory 03:15 PM Same-Day Exit)
         df_5m["Vol_MA20"] = df_5m["Volume"].rolling(20).mean()
-        df_4h = df_5m.resample("4h", origin="start_day").agg({
-            "High": "max",
-            "Low": "min"
-        }).dropna()
-
         df_4h["Prev_4H_High"] = df_4h["High"].shift(1)
         df_4h["Prev_4H_Low"] = df_4h["Low"].shift(1)
-        df_5m = df_5m.join(df_4h[["Prev_4H_High", "Prev_4H_Low"]], how="left")
-        df_5m[["Prev_4H_High", "Prev_4H_Low"]] = df_5m[["Prev_4H_High", "Prev_4H_Low"]].ffill()
+        df_bt = df_5m.join(df_4h[["Prev_4H_High", "Prev_4H_Low"]], how="left")
+        df_bt[["Prev_4H_High", "Prev_4H_Low"]] = df_bt[["Prev_4H_High", "Prev_4H_Low"]].ffill()
 
         last_trade_date = None
 
-        for i in range(25, len(df_5m) - 1):
-            c2 = df_5m.iloc[i - 1]
-            c3 = df_5m.iloc[i]
+        for i in range(25, len(df_bt) - 1):
+            c2 = df_bt.iloc[i - 1]
+            c3 = df_bt.iloc[i]
             entry_dt = c3.name
             entry_t = entry_dt.time()
             trade_date = entry_dt.strftime("%Y-%m-%d")
@@ -220,8 +198,8 @@ def run_backtest_audit(obj, lookback_days: int = 45) -> pd.DataFrame:
             exit_dt = entry_dt
             outcome = "EOD_CLOSED"
 
-            for j in range(i + 1, len(df_5m)):
-                bar = df_5m.iloc[j]
+            for j in range(i + 1, len(df_bt)):
+                bar = df_bt.iloc[j]
                 bar_dt = bar.name
                 bar_t = bar_dt.time()
                 hours_held = (bar_dt - entry_dt).total_seconds() / 3600.0
@@ -294,153 +272,171 @@ def run_backtest_audit(obj, lookback_days: int = 45) -> pd.DataFrame:
             })
             last_trade_date = trade_date
 
-    if not all_trades:
-        return pd.DataFrame()
+    progress.empty()
+    df_scanner = pd.DataFrame(scanner_rows)
+    df_trades = pd.DataFrame(all_trades)
 
-    df_res = pd.DataFrame(all_trades)
-    df_res.sort_values("entry_time", inplace=True)
-    df_res.reset_index(drop=True, inplace=True)
-    df_res["cum_pnl"] = df_res["net_pnl"].cumsum().round(2)
-    df_res["trade_num"] = df_res.index + 1
-    return df_res
+    if not df_trades.empty:
+        df_trades.sort_values("entry_time", inplace=True)
+        df_trades.reset_index(drop=True, inplace=True)
+        df_trades["cum_pnl"] = df_trades["net_pnl"].cumsum().round(2)
+        df_trades["trade_num"] = df_trades.index + 1
+
+    return df_scanner, df_trades
 
 
 # ==========================================
-# 5. STREAMLIT UI LAYOUT
+# 4. SINGLE-PAGE CLEAN DASHBOARD UI
 # ==========================================
 st.title("📊 Hybrid Liquidity Sweep Options Dashboard")
 st.caption("Checks for: 1. Alert Mode (Liquidity Sweep) ➔ 2. Confirmation (Reversal Breakout) | Auto Same-Day Closing: 03:15 PM IST")
 
 obj = get_smartapi_session()
 
-tab1, tab2, tab3 = st.tabs(["🔍 Live Market Scanner & Charts", "🧪 Backtest & Audit Report", "📁 Live Paper Trades (trades_db.json)"])
+if obj is None:
+    st.error("SmartAPI credentials configure nahi hain. Streamlit Secrets check karein.")
+    st.stop()
 
-# --- TAB 1: LIVE SCANNER & INTERACTIVE CANDLESTICK CHARTS ---
-with tab1:
-    if st.button(f"🔍 Scan {len(ASSETS)} Assets Now", use_container_width=True):
-        if obj is None:
-            st.error("SmartAPI credentials configure nahi hain. Streamlit Secrets check karein.")
-        else:
-            df_scan = run_live_dashboard_scan(obj)
-            st.dataframe(df_scan, use_container_width=True, hide_index=True)
+col_btn, col_days = st.columns([3, 1])
+with col_days:
+    lookback_days = st.number_input("Backtest Days", min_value=15, max_value=60, value=45, step=5)
+with col_btn:
+    st.write("")
+    run_clicked = st.button(f"🔍 Scan {len(ASSETS)} Assets & Update Accuracy / Trades", use_container_width=True)
 
-    st.divider()
-    st.subheader("🕯️ Live Interactive Candlestick Chart (with 4H Liquidity Levels)")
+# Auto-run on initial load or button click
+if run_clicked or "df_scanner" not in st.session_state:
+    df_scanner, df_trades = run_full_scan_and_backtest(obj, lookback_days=lookback_days)
+    st.session_state["df_scanner"] = df_scanner
+    st.session_state["df_trades"] = df_trades
+else:
+    df_scanner = st.session_state["df_scanner"]
+    df_trades = st.session_state["df_trades"]
 
-    selected_asset = st.selectbox(
-        "Chart dekhne ke liye Stock / Index select karein:",
-        options=list(ASSETS.keys()),
-        index=0
+# --- SECTION 1: LIVE SCANNER TABLE ---
+st.subheader("📡 Live Market Scanner")
+st.dataframe(df_scanner, use_container_width=True, hide_index=True)
+
+# --- SECTION 2: LIVE CHART (IST WITH NO HOLIDAY / OVERNIGHT GAPS) ---
+st.divider()
+st.subheader("🕯️ Live Chart (IST — Continuous Without Holiday/Overnight Gaps)")
+
+selected_asset = st.selectbox("Select Asset for Live IST Chart:", options=list(ASSETS.keys()), index=0)
+df_chart = fetch_candles(obj, selected_asset, days=7)
+
+if not df_chart.empty and len(df_chart) >= 30:
+    df_4h = df_chart.resample("4h", origin="start_day").agg({
+        "Open": "first",
+        "High": "max",
+        "Low": "min",
+        "Close": "last"
+    }).dropna()
+
+    prev_4h_high = float(df_4h["High"].iloc[-2])
+    prev_4h_low = float(df_4h["Low"].iloc[-2])
+    current_ltp = float(df_chart["Close"].iloc[-1])
+
+    df_plot = df_chart.tail(100).copy()
+    # Format IST timestamps as string categories so Plotly removes ALL weekend/holiday/overnight gaps
+    ist_labels = df_plot.index.strftime("%d %b %H:%M")
+
+    fig = go.Figure(data=[go.Candlestick(
+        x=ist_labels,
+        open=df_plot["Open"],
+        high=df_plot["High"],
+        low=df_plot["Low"],
+        close=df_plot["Close"],
+        name=selected_asset,
+        increasing_line_color="#00d26a",
+        decreasing_line_color="#ff4b4b"
+    )])
+
+    fig.add_hline(
+        y=prev_4h_high,
+        line_dash="dash",
+        line_color="#ff9f1c",
+        line_width=1.8,
+        annotation_text=f"Prev 4H High: {prev_4h_high:.2f}",
+        annotation_position="top left"
     )
 
-    if obj is not None and selected_asset:
-        df_chart = fetch_candles(obj, selected_asset, days=5)
-        if not df_chart.empty and len(df_chart) >= 30:
-            df_4h = df_chart.resample("4h", origin="start_day").agg({
-                "Open": "first",
-                "High": "max",
-                "Low": "min",
-                "Close": "last"
-            }).dropna()
+    fig.add_hline(
+        y=prev_4h_low,
+        line_dash="dash",
+        line_color="#00b4d8",
+        line_width=1.8,
+        annotation_text=f"Prev 4H Low: {prev_4h_low:.2f}",
+        annotation_position="bottom left"
+    )
 
-            prev_4h_high = float(df_4h["High"].iloc[-2])
-            prev_4h_low = float(df_4h["Low"].iloc[-2])
-            current_ltp = float(df_chart["Close"].iloc[-1])
+    fig.update_layout(
+        title=f"{selected_asset} — 5-Min IST Chart (No Holiday Gaps) | LTP: ₹{current_ltp:,.2f}",
+        template="plotly_dark",
+        xaxis_type="category",  # Eliminates weekend, holiday & overnight gaps completely
+        xaxis_rangeslider_visible=False,
+        xaxis=dict(nticks=12),
+        height=500,
+        margin=dict(l=20, r=20, t=50, b=20),
+        yaxis_title="Spot Price (₹)"
+    )
 
-            df_plot = df_chart.tail(85)
+    st.plotly_chart(fig, use_container_width=True)
 
-            fig = go.Figure(data=[go.Candlestick(
-                x=df_plot.index,
-                open=df_plot["Open"],
-                high=df_plot["High"],
-                low=df_plot["Low"],
-                close=df_plot["Close"],
-                name=selected_asset,
-                increasing_line_color="#00d26a",
-                decreasing_line_color="#ff4b4b"
-            )])
+# --- SECTION 3: ACCURACY PERCENTAGE & ASSET-WISE PERFORMANCE ---
+st.divider()
+st.subheader("🎯 Strategy Accuracy & Asset-Wise Performance")
 
-            fig.add_hline(
-                y=prev_4h_high,
-                line_dash="dash",
-                line_color="#ff9f1c",
-                line_width=1.8,
-                annotation_text=f"Prev 4H High: {prev_4h_high:.2f}",
-                annotation_position="top left"
-            )
+if not df_trades.empty:
+    total_trades = len(df_trades)
+    wins = len(df_trades[df_trades["net_pnl"] > 0])
+    losses = len(df_trades[df_trades["net_pnl"] <= 0])
+    accuracy_pct = (wins / total_trades) * 100
+    net_pnl_total = df_trades["net_pnl"].sum()
 
-            fig.add_hline(
-                y=prev_4h_low,
-                line_dash="dash",
-                line_color="#00b4d8",
-                line_width=1.8,
-                annotation_text=f"Prev 4H Low: {prev_4h_low:.2f}",
-                annotation_position="bottom left"
-            )
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Overall Accuracy %", f"{accuracy_pct:.1f}%")
+    m2.metric("Total Trades", f"{total_trades} ({wins}W / {losses}L)")
+    m3.metric("Net Cumulative P&L", f"₹{net_pnl_total:,.2f}")
+    m4.metric("Closing Rule", "03:15 PM IST (Same-Day)")
 
-            fig.update_layout(
-                title=f"{selected_asset} — 5-Min Candlestick Chart | LTP: ₹{current_ltp:,.2f}",
-                template="plotly_dark",
-                xaxis_rangeslider_visible=False,
-                height=520,
-                margin=dict(l=20, r=20, t=50, b=20),
-                yaxis_title="Price (₹)"
-            )
+    # Asset-wise Accuracy Table
+    asset_stats = []
+    for asset_name, grp in df_trades.groupby("asset"):
+        t_cnt = len(grp)
+        w_cnt = len(grp[grp["net_pnl"] > 0])
+        l_cnt = t_cnt - w_cnt
+        acc = (w_cnt / t_cnt) * 100
+        pnl_sum = grp["net_pnl"].sum()
+        asset_stats.append({
+            "Asset": asset_name,
+            "Trades": t_cnt,
+            "Wins": w_cnt,
+            "Losses": l_cnt,
+            "Accuracy %": f"{acc:.1f}%",
+            "Net P&L (₹)": round(pnl_sum, 2)
+        })
+    st.dataframe(pd.DataFrame(asset_stats), use_container_width=True, hide_index=True)
 
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.warning(f"{selected_asset} ke liye candle data abhi fetch nahi ho paya. Thodi der baad dubara try karein.")
+    # --- SECTION 4: COMPLETE TRADE LIST (WITH SAME-DAY CLOSING) ---
+    st.divider()
+    st.subheader("📋 Complete Trade List (Chronological & Same-Day Closed)")
+    st.dataframe(df_trades, use_container_width=True, hide_index=True)
 
-# --- TAB 2: BACKTEST AUDIT ---
-with tab2:
-    lookback = st.slider("Historical Lookback Window (Days)", min_value=15, max_value=60, value=45)
-    if st.button("⚙️ Run Verified Strategy Backtest"):
-        if obj is None:
-            st.error("SmartAPI session active nahi hai.")
-        else:
-            with st.spinner("Historical candles scan ho rahi hain (with 03:15 PM Same-Day Closing)..."):
-                df_audit = run_backtest_audit(obj, lookback_days=lookback)
-                if df_audit.empty:
-                    st.warning("Selected window mein koi rule-qualified trade nahi mili.")
-                else:
-                    wins = len(df_audit[df_audit["net_pnl"] > 0])
-                    total_t = len(df_audit)
-                    win_rate = (wins / total_t) * 100
-                    total_pnl = df_audit["net_pnl"].sum()
+    csv_bytes = df_trades.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="📥 Download Trade List (CSV)",
+        data=csv_bytes,
+        file_name="verified_trades_audit.csv",
+        mime="text/csv"
+    )
+else:
+    st.info("Selected lookback window mein abhi koi qualified trade nahi mili.")
 
-                    c1, c2, c3 = st.columns(3)
-                    c1.metric("Total Verified Trades", total_t)
-                    c2.metric("Win Rate", f"{win_rate:.1f}%")
-                    c3.metric("Net Cumulative P&L", f"₹{total_pnl:,.2f}")
-
-                    st.dataframe(df_audit, use_container_width=True, hide_index=True)
-
-                    st.subheader("📈 Cumulative Equity Curve & Asset Performance")
-                    col_c1, col_c2 = st.columns(2)
-                    with col_c1:
-                        st.caption("Cumulative P&L Growth (₹)")
-                        st.line_chart(df_audit.set_index("entry_time")["cum_pnl"], color="#00d26a")
-                    with col_c2:
-                        st.caption("Asset-Wise Net P&L (₹)")
-                        st.bar_chart(df_audit.groupby("asset")["net_pnl"].sum())
-
-                    csv_data = df_audit.to_csv(index=False).encode("utf-8")
-                    st.download_button(
-                        label="📥 Download verified_trades_audit.csv",
-                        data=csv_data,
-                        file_name="verified_trades_audit.csv",
-                        mime="text/csv"
-                    )
-
-# --- TAB 3: LIVE PAPER TRADES DB ---
-with tab3:
-    if os.path.exists(DB_FILE):
-        with open(DB_FILE, "r") as f:
-            live_data = json.load(f)
-        if live_data:
-            df_live = pd.DataFrame(live_data)
-            st.dataframe(df_live, use_container_width=True, hide_index=True)
-        else:
-            st.info("Abhi tak trades_db.json mein koi live paper trade record nahi hui hai.")
-    else:
-        st.info("trades_db.json file abhi create nahi hui hai.")
+# --- SECTION 5: LIVE PAPER TRADES LOG (trades_db.json) ---
+if os.path.exists(DB_FILE):
+    with open(DB_FILE, "r") as f:
+        live_records = json.load(f)
+    if live_records:
+        st.divider()
+        st.subheader("⚡ Live Paper Trades Log (trades_db.json)")
+        st.dataframe(pd.DataFrame(live_records), use_container_width=True, hide_index=True)
