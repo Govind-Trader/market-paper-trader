@@ -1,0 +1,20 @@
+name: Run PDH PDL straddle Backtest
+on:
+  workflow_dispatch:
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: pip install pandas pyotp smartapi-python logzero websocket-client pytz requests
+      - name: Execute PDH/PDL Backtest
+        env:
+          SMARTAPI_KEY: ${{ secrets.SMARTAPI_KEY }}
+          SMARTAPI_CLIENT_CODE: ${{ secrets.SMARTAPI_CLIENT_CODE }}
+          SMARTAPI_PIN: ${{ secrets.SMARTAPI_PIN }}
+          SMARTAPI_TOTP_KEY: ${{ secrets.SMARTAPI_TOTP_KEY }}
+        run: python backtest_monthly_straddle.py
