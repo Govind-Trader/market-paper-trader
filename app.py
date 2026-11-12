@@ -26,7 +26,7 @@ API_KEY = str(st.secrets.get("SMARTAPI_KEY") or st.secrets.get("API_KEY") or st.
 CLIENT_CODE = str(st.secrets.get("CLIENT_CODE") or st.secrets.get("USER_ID") or st.secrets.get("CLIENT_ID") or os.environ.get("CLIENT_CODE", "")).strip()
 PIN = str(st.secrets.get("PIN") or st.secrets.get("MPIN") or st.secrets.get("PASSWORD") or os.environ.get("PIN", "")).strip()
 TOTP_KEY = str(st.secrets.get("TOTP_KEY") or st.secrets.get("TOTP_SECRET") or st.secrets.get("TOTP") or os.environ.get("TOTP_KEY", "")).strip()
-
+st.info(f"Available Secret Keys: {list(st.secrets.keys())}")
 ASSETS = {
     "TCS": {"token": "11536", "exchange": "NSE", "lot_size": 175, "strike_step": 20, "spread_width": 40, "cap": 65000},
     "BANKNIFTY": {"token": "99926009", "exchange": "NSE", "lot_size": 15, "strike_step": 100, "spread_width": 200, "cap": 50000},
