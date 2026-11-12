@@ -19,22 +19,24 @@ st.set_page_config(
 )
 
 IST = pytz.timezone("Asia/Kolkata")
-FORCE_EXIT_TIME = time(15, 15)  # 03:15 PM mandatory same-day square-off
+FORCE_EXIT_TIME = time(15, 15)  # ONLY addition: 03:15 PM mandatory same-day square-off
 DB_FILE = "trades_db.json"
 
-# Streamlit Secrets Exact Mapping
 API_KEY = str(st.secrets.get("SMARTAPI_KEY", os.environ.get("SMARTAPI_KEY", ""))).strip()
 CLIENT_CODE = str(st.secrets.get("SMARTAPI_CLIENT_CODE", os.environ.get("CLIENT_CODE", ""))).strip()
 PIN = str(st.secrets.get("SMARTAPI_PIN", os.environ.get("PIN", ""))).strip()
 TOTP_KEY = str(st.secrets.get("SMARTAPI_TOTP_KEY", os.environ.get("TOTP_KEY", ""))).strip()
 
-# High-Accuracy Filtered Assets
+# All 8 Original Assets
 ASSETS = {
-    "NIFTY": {"token": "99926000", "exchange": "NSE", "lot_size": 25, "strike_step": 50, "spread_width": 100, "cap": 45000},
-    "AXISBANK": {"token": "5900", "exchange": "NSE", "lot_size": 625, "strike_step": 10, "spread_width": 20, "cap": 55000},
-    "SBIN": {"token": "3045", "exchange": "NSE", "lot_size": 750, "strike_step": 10, "spread_width": 20, "cap": 50000},
-    "TCS": {"token": "11536", "exchange": "NSE", "lot_size": 175, "strike_step": 20, "spread_width": 40, "cap": 65000},
-    "LT": {"token": "11483", "exchange": "NSE", "lot_size": 150, "strike_step": 20, "spread_width": 40, "cap": 60000}
+    "TCS": {"token": "11536", "exchange": "NSE", "lot_size": 175, "strike_step": 20, "spread_width": 40, "cap": 65000, "is_index": False},
+    "BANKNIFTY": {"token": "99926009", "exchange": "NSE", "lot_size": 15, "strike_step": 100, "spread_width": 200, "cap": 50000, "is_index": True},
+    "FINNIFTY": {"token": "99926037", "exchange": "NSE", "lot_size": 25, "strike_step": 50, "spread_width": 100, "cap": 45000, "is_index": True},
+    "SBIN": {"token": "3045", "exchange": "NSE", "lot_size": 750, "strike_step": 10, "spread_width": 20, "cap": 50000, "is_index": False},
+    "LT": {"token": "11483", "exchange": "NSE", "lot_size": 150, "strike_step": 20, "spread_width": 40, "cap": 60000, "is_index": False},
+    "AXISBANK": {"token": "5900", "exchange": "NSE", "lot_size": 625, "strike_step": 10, "spread_width": 20, "cap": 55000, "is_index": False},
+    "NIFTY": {"token": "99926000", "exchange": "NSE", "lot_size": 25, "strike_step": 50, "spread_width": 100, "cap": 45000, "is_index": True},
+    "HDFCBANK": {"token": "1333", "exchange": "NSE", "lot_size": 550, "strike_step": 10, "spread_width": 20, "cap": 60000, "is_index": False}
 }
 
 
@@ -88,7 +90,7 @@ def fetch_candles(_obj, symbol: str, days: int = 45) -> pd.DataFrame:
 
 
 # ==========================================
-# 3. HIGH-ACCURACY STRATEGY ENGINE (4H EMA-20 + 03:15 PM EXIT)
+# 3. EXACT ORIGINAL ENGINE + ONLY 03:15 PM SAME-DAY EXIT
 # ==========================================
 def run_full_scan_and_backtest(obj, lookback_days: int = 45):
     scanner_rows = []
@@ -106,38 +108,33 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
                 "LTP": 0.0,
                 "4H High": 0.0,
                 "4H Low": 0.0,
-                "4H Trend": "⚪ No Data",
                 "Signal Status": "⚪ No Data"
             })
             continue
 
-        # Authentic 4H Resample + 4H 20-EMA Trend Filter
+        # Original 4H Resample
         df_4h = df_5m.resample("4h").agg({
             "Open": "first",
             "High": "max",
             "Low": "min",
             "Close": "last"
         }).dropna()
-        df_4h["EMA20"] = df_4h["Close"].ewm(span=20, adjust=False).mean()
 
         prev_4h_high = round(float(df_4h["High"].iloc[-2]), 2)
         prev_4h_low = round(float(df_4h["Low"].iloc[-2]), 2)
-        ema_4h_live = round(float(df_4h["EMA20"].iloc[-2]), 2)
 
         c2_live = df_5m.iloc[-3]
         c3_live = df_5m.iloc[-2]
         ltp = round(float(df_5m["Close"].iloc[-1]), 2)
 
-        trend_label = "🟢 UPTREND" if ltp > ema_4h_live else "🔴 DOWNTREND"
         status = "⚪ Monitoring"
-
-        if ltp < ema_4h_live and c2_live["High"] > prev_4h_high and c2_live["Close"] < prev_4h_high and c3_live["Close"] < c2_live["Low"]:
+        if c2_live["High"] > prev_4h_high and c2_live["Close"] < prev_4h_high and c3_live["Close"] < c2_live["Low"] and ltp < prev_4h_high:
             status = "🔴 SELL CONFIRMED (Bear Put Spread)"
-        elif ltp > ema_4h_live and c2_live["Low"] < prev_4h_low and c2_live["Close"] > prev_4h_low and c3_live["Close"] > c2_live["High"]:
+        elif c2_live["Low"] < prev_4h_low and c2_live["Close"] > prev_4h_low and c3_live["Close"] > c2_live["High"] and ltp > prev_4h_low:
             status = "🟢 BUY CONFIRMED (Bull Call Spread)"
-        elif ltp >= prev_4h_high and ltp < ema_4h_live:
+        elif ltp >= prev_4h_high:
             status = "🟠 ALERT MODE (4H High Swept)"
-        elif ltp <= prev_4h_low and ltp > ema_4h_live:
+        elif ltp <= prev_4h_low:
             status = "🟠 ALERT MODE (4H Low Swept)"
 
         scanner_rows.append({
@@ -145,88 +142,91 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
             "LTP": ltp,
             "4H High": prev_4h_high,
             "4H Low": prev_4h_low,
-            "4H Trend": trend_label,
             "Signal Status": status
         })
 
-        # Volume & Range Expansion Metrics
+        # Original Volume (1.5x) for Stocks & Range (1.5x) for Indices
         df_5m["Vol_MA20"] = df_5m["Volume"].rolling(20).mean()
         df_5m["Range"] = df_5m["High"] - df_5m["Low"]
         df_5m["Range_MA20"] = df_5m["Range"].rolling(20).mean()
 
         df_4h["Prev_4H_High"] = df_4h["High"].shift(1)
         df_4h["Prev_4H_Low"] = df_4h["Low"].shift(1)
-        df_4h["Prev_4H_EMA20"] = df_4h["EMA20"].shift(1)
+        df_bt = df_5m.join(df_4h[["Prev_4H_High", "Prev_4H_Low"]], how="left")
+        df_bt[["Prev_4H_High", "Prev_4H_Low"]] = df_bt[["Prev_4H_High", "Prev_4H_Low"]].ffill()
 
-        df_bt = df_5m.join(df_4h[["Prev_4H_High", "Prev_4H_Low", "Prev_4H_EMA20"]], how="left")
-        df_bt[["Prev_4H_High", "Prev_4H_Low", "Prev_4H_EMA20"]] = df_bt[["Prev_4H_High", "Prev_4H_Low", "Prev_4H_EMA20"]].ffill()
-
-        is_index = symbol == "NIFTY"
-        last_trade_date = None
-
-        for i in range(25, len(df_bt) - 1):
+        # Sequential Trade Loop (Skips only while current trade is still open)
+        i = 25
+        while i < len(df_bt) - 1:
             c2 = df_bt.iloc[i - 1]
             c3 = df_bt.iloc[i]
             entry_dt = c3.name
             entry_t = entry_dt.time()
             trade_date = entry_dt.strftime("%Y-%m-%d")
 
-            if entry_t >= FORCE_EXIT_TIME or last_trade_date == trade_date:
+            # Do not open at/after 03:15 PM mandatory close
+            if entry_t >= FORCE_EXIT_TIME:
+                i += 1
                 continue
 
             h4_high = c2["Prev_4H_High"]
             h4_low = c2["Prev_4H_Low"]
-            h4_ema = c2["Prev_4H_EMA20"]
-            if pd.isna(h4_high) or pd.isna(h4_low) or pd.isna(h4_ema):
+            if pd.isna(h4_high) or pd.isna(h4_low):
+                i += 1
                 continue
 
-            if is_index:
-                rng_ratio = (c3["Range"] / c3["Range_MA20"]) if c3["Range_MA20"] > 0 else 0.0
-                if rng_ratio < 1.40:
+            # Original 1.5x Confirmation Filter
+            if info["is_index"]:
+                ratio = (c3["Range"] / c3["Range_MA20"]) if c3["Range_MA20"] > 0 else 0.0
+                if ratio < 1.50:
+                    i += 1
                     continue
-                conf_label = f"{rng_ratio:.2f}x (Rng)"
+                conf_label = f"{ratio:.2f}x (Rng)"
             else:
-                vol_ratio = (c3["Volume"] / c3["Vol_MA20"]) if c3["Vol_MA20"] > 0 else 0.0
-                if vol_ratio < 1.50:
+                ratio = (c3["Volume"] / c3["Vol_MA20"]) if c3["Vol_MA20"] > 0 else 0.0
+                if ratio < 1.50:
+                    i += 1
                     continue
-                conf_label = f"{vol_ratio:.2f}x (Vol)"
+                conf_label = f"{ratio:.2f}x (Vol)"
 
             side = None
             entry_price = float(c3["Close"])
             initial_sl = 0.0
 
-            # Bearish Sweep ONLY in 4H Downtrend
-            if entry_price < h4_ema and c2["High"] > h4_high and c2["Close"] < h4_high and c3["Close"] < c2["Low"]:
+            if c2["High"] > h4_high and c2["Close"] < h4_high and c3["Close"] < c2["Low"]:
                 side = "BEARISH_SWEEP"
                 initial_sl = round(max(c2["High"], c3["High"]) + (entry_price * 0.0005), 2)
-            # Bullish Sweep ONLY in 4H Uptrend
-            elif entry_price > h4_ema and c2["Low"] < h4_low and c2["Close"] > h4_low and c3["Close"] > c2["High"]:
+            elif c2["Low"] < h4_low and c2["Close"] > h4_low and c3["Close"] > c2["High"]:
                 side = "BULLISH_SWEEP"
                 initial_sl = round(min(c2["Low"], c3["Low"]) - (entry_price * 0.0005), 2)
 
             if not side:
+                i += 1
                 continue
 
             risk_pts = abs(entry_price - initial_sl)
             if risk_pts <= 0:
+                i += 1
                 continue
 
-            # 1:1.50 Intraday R:R Target & 1:1.10 Breakeven Trailing SL
-            target = round(entry_price + (1.50 * risk_pts), 2) if side == "BULLISH_SWEEP" else round(entry_price - (1.50 * risk_pts), 2)
+            # Original 1:1.80 R:R Target & 1:1.25 Breakeven Trailing SL
+            target = round(entry_price + (1.80 * risk_pts), 2) if side == "BULLISH_SWEEP" else round(entry_price - (1.80 * risk_pts), 2)
             current_sl = initial_sl
 
             exit_price = entry_price
             exit_dt = entry_dt
             outcome = "EOD_CLOSED"
+            exit_idx = i + 1
 
             for j in range(i + 1, len(df_bt)):
+                exit_idx = j
                 bar = df_bt.iloc[j]
                 bar_dt = bar.name
                 bar_t = bar_dt.time()
                 hours_held = (bar_dt - entry_dt).total_seconds() / 3600.0
 
                 if side == "BULLISH_SWEEP":
-                    if bar["High"] >= entry_price + (1.10 * risk_pts):
+                    if bar["High"] >= entry_price + (1.25 * risk_pts):
                         current_sl = max(current_sl, entry_price)
 
                     if bar["Low"] <= current_sl:
@@ -240,7 +240,7 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
                         outcome = "TARGET_HIT"
                         break
                 else:
-                    if bar["Low"] <= entry_price - (1.10 * risk_pts):
+                    if bar["Low"] <= entry_price - (1.25 * risk_pts):
                         current_sl = min(current_sl, entry_price)
 
                     if bar["High"] >= current_sl:
@@ -260,7 +260,7 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
                     outcome = "EXPIRED"
                     break
 
-                # MANDATORY SAME-DAY CLOSING RULE (03:15 PM IST)
+                # ONLY NEW RULE: Same-day mandatory square-off at 03:15 PM IST
                 if bar_t >= FORCE_EXIT_TIME:
                     exit_price = float(bar["Close"])
                     exit_dt = bar_dt
@@ -291,7 +291,9 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
                 "net_pnl": net_pnl,
                 "vol_ratio": conf_label
             })
-            last_trade_date = trade_date
+
+            # Jump index to after current trade closed
+            i = exit_idx + 1
 
     progress.empty()
     df_scanner = pd.DataFrame(scanner_rows)
@@ -310,7 +312,7 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
 # 4. SINGLE-PAGE CLEAN DASHBOARD UI
 # ==========================================
 st.title("📊 Hybrid Liquidity Sweep Options Dashboard")
-st.caption("4H EMA-20 Trend Filter + Liquidity Sweep Confirmation | Auto Same-Day Closing: 03:15 PM IST")
+st.caption("Checks for: 1. Alert Mode (Liquidity Sweep) ➔ 2. Confirmation (Reversal Breakout) | Auto Same-Day Closing: 03:15 PM IST")
 
 obj = get_smartapi_session()
 
@@ -323,7 +325,7 @@ with col_days:
     lookback_days = st.number_input("Backtest Days", min_value=15, max_value=60, value=45, step=5)
 with col_btn:
     st.write("")
-    run_clicked = st.button(f"🔍 Scan {len(ASSETS)} High-Accuracy Assets & Update Trades", use_container_width=True)
+    run_clicked = st.button(f"🔍 Scan {len(ASSETS)} Assets & Update Accuracy / Trades", use_container_width=True)
 
 if run_clicked or "df_scanner" not in st.session_state:
     df_scanner, df_trades = run_full_scan_and_backtest(obj, lookback_days=lookback_days)
