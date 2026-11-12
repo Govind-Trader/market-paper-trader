@@ -19,7 +19,9 @@ st.set_page_config(
 )
 
 IST = pytz.timezone("Asia/Kolkata")
-FORCE_EXIT_TIME = time(15, 15)  # Same-day mandatory square-off at 03:15 PM IST
+ENTRY_START = time(9, 20)
+ENTRY_CUTOFF = time(14, 15)     # 02:15 PM ke baad no new low-time entries
+FORCE_EXIT_TIME = time(15, 15)  # 03:15 PM mandatory same-day square-off
 DB_FILE = "trades_db.json"
 
 # Streamlit Secrets Exact Mapping
@@ -90,7 +92,7 @@ def fetch_candles(_obj, symbol: str, days: int = 45) -> pd.DataFrame:
 
 
 # ==========================================
-# 3. STRATEGY ENGINE (WITH 03:15 PM SAME-DAY EXIT)
+# 3. STRATEGY ENGINE (HIGH-ACCURACY + INDICES + 03:15 PM EXIT)
 # ==========================================
 def run_full_scan_and_backtest(obj, lookback_days: int = 45):
     scanner_rows = []
@@ -112,8 +114,8 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
             })
             continue
 
-        # 4H Levels (IST aligned)
-        df_4h = df_5m.resample("4h", origin="start_day").agg({
+        # Authentic 4H Resample
+        df_4h = df_5m.resample("4h").agg({
             "Open": "first",
             "High": "max",
             "Low": "min",
@@ -145,13 +147,17 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
             "Signal Status": status
         })
 
-        # Historical Backtest Simulation (Entry unaltered + Mandatory 03:15 PM Same-Day Exit)
+        # Volume & Range Expansion Metrics (Fixes Index Volume = 0 issue)
         df_5m["Vol_MA20"] = df_5m["Volume"].rolling(20).mean()
+        df_5m["Range"] = df_5m["High"] - df_5m["Low"]
+        df_5m["Range_MA20"] = df_5m["Range"].rolling(20).mean()
+
         df_4h["Prev_4H_High"] = df_4h["High"].shift(1)
         df_4h["Prev_4H_Low"] = df_4h["Low"].shift(1)
         df_bt = df_5m.join(df_4h[["Prev_4H_High", "Prev_4H_Low"]], how="left")
         df_bt[["Prev_4H_High", "Prev_4H_Low"]] = df_bt[["Prev_4H_High", "Prev_4H_Low"]].ffill()
 
+        is_index = symbol in {"NIFTY", "BANKNIFTY", "FINNIFTY"}
         last_trade_date = None
 
         for i in range(25, len(df_bt) - 1):
@@ -161,7 +167,7 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
             entry_t = entry_dt.time()
             trade_date = entry_dt.strftime("%Y-%m-%d")
 
-            if entry_t >= FORCE_EXIT_TIME or last_trade_date == trade_date:
+            if not (ENTRY_START <= entry_t <= ENTRY_CUTOFF) or last_trade_date == trade_date:
                 continue
 
             h4_high = c2["Prev_4H_High"]
@@ -169,17 +175,27 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
             if pd.isna(h4_high) or pd.isna(h4_low):
                 continue
 
-            vol_ratio = (c3["Volume"] / c3["Vol_MA20"]) if c3["Vol_MA20"] > 0 else 1.0
-            if vol_ratio < 1.5:
-                continue
+            # Momentum / Volume Confirmation (Range expansion for Indices, Volume spike for Stocks)
+            if is_index:
+                rng_ratio = (c3["Range"] / c3["Range_MA20"]) if c3["Range_MA20"] > 0 else 0.0
+                if rng_ratio < 1.40:
+                    continue
+                conf_label = f"{rng_ratio:.2f}x (Rng)"
+            else:
+                vol_ratio = (c3["Volume"] / c3["Vol_MA20"]) if c3["Vol_MA20"] > 0 else 0.0
+                if vol_ratio < 1.50:
+                    continue
+                conf_label = f"{vol_ratio:.2f}x (Vol)"
 
             side = None
             entry_price = float(c3["Close"])
             initial_sl = 0.0
 
+            # Bearish Sweep + Rejection + Breakout Confirmation
             if c2["High"] > h4_high and c2["Close"] < h4_high and c3["Close"] < c2["Low"]:
                 side = "BEARISH_SWEEP"
                 initial_sl = round(max(c2["High"], c3["High"]) + (entry_price * 0.0005), 2)
+            # Bullish Sweep + Rejection + Breakout Confirmation
             elif c2["Low"] < h4_low and c2["Close"] > h4_low and c3["Close"] > c2["High"]:
                 side = "BULLISH_SWEEP"
                 initial_sl = round(min(c2["Low"], c3["Low"]) - (entry_price * 0.0005), 2)
@@ -205,6 +221,7 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
                 hours_held = (bar_dt - entry_dt).total_seconds() / 3600.0
 
                 if side == "BULLISH_SWEEP":
+                    # Breakeven trailing SL at 1:1.25 move
                     if bar["High"] >= entry_price + (1.25 * risk_pts):
                         current_sl = max(current_sl, entry_price)
 
@@ -233,6 +250,7 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
                         outcome = "TARGET_HIT"
                         break
 
+                # 3-Hour Max Hold Duration
                 if hours_held >= 3.0:
                     exit_price = float(bar["Close"])
                     exit_dt = bar_dt
@@ -268,7 +286,7 @@ def run_full_scan_and_backtest(obj, lookback_days: int = 45):
                 "outcome": outcome,
                 "capital_deployed": info["cap"],
                 "net_pnl": net_pnl,
-                "vol_ratio": f"{vol_ratio:.2f}x (Vol)"
+                "vol_ratio": conf_label
             })
             last_trade_date = trade_date
 
@@ -304,7 +322,6 @@ with col_btn:
     st.write("")
     run_clicked = st.button(f"🔍 Scan {len(ASSETS)} Assets & Update Accuracy / Trades", use_container_width=True)
 
-# Auto-run on initial load or button click
 if run_clicked or "df_scanner" not in st.session_state:
     df_scanner, df_trades = run_full_scan_and_backtest(obj, lookback_days=lookback_days)
     st.session_state["df_scanner"] = df_scanner
@@ -325,7 +342,7 @@ selected_asset = st.selectbox("Select Asset for Live IST Chart:", options=list(A
 df_chart = fetch_candles(obj, selected_asset, days=7)
 
 if not df_chart.empty and len(df_chart) >= 30:
-    df_4h = df_chart.resample("4h", origin="start_day").agg({
+    df_4h = df_chart.resample("4h").agg({
         "Open": "first",
         "High": "max",
         "Low": "min",
@@ -337,7 +354,6 @@ if not df_chart.empty and len(df_chart) >= 30:
     current_ltp = float(df_chart["Close"].iloc[-1])
 
     df_plot = df_chart.tail(100).copy()
-    # Format IST timestamps as string categories so Plotly removes ALL weekend/holiday/overnight gaps
     ist_labels = df_plot.index.strftime("%d %b %H:%M")
 
     fig = go.Figure(data=[go.Candlestick(
@@ -372,7 +388,7 @@ if not df_chart.empty and len(df_chart) >= 30:
     fig.update_layout(
         title=f"{selected_asset} — 5-Min IST Chart (No Holiday Gaps) | LTP: ₹{current_ltp:,.2f}",
         template="plotly_dark",
-        xaxis_type="category",  # Eliminates weekend, holiday & overnight gaps completely
+        xaxis_type="category",
         xaxis_rangeslider_visible=False,
         xaxis=dict(nticks=12),
         height=500,
@@ -399,7 +415,6 @@ if not df_trades.empty:
     m3.metric("Net Cumulative P&L", f"₹{net_pnl_total:,.2f}")
     m4.metric("Closing Rule", "03:15 PM IST (Same-Day)")
 
-    # Asset-wise Accuracy Table
     asset_stats = []
     for asset_name, grp in df_trades.groupby("asset"):
         t_cnt = len(grp)
