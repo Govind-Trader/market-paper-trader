@@ -21,11 +21,11 @@ IST = pytz.timezone("Asia/Kolkata")
 FORCE_EXIT_TIME = time(15, 15)  # Same-day mandatory square-off at 03:15 PM IST
 DB_FILE = "trades_db.json"
 
-# Streamlit Secrets or Environment Variables
-API_KEY = st.secrets.get("SMARTAPI_KEY", os.environ.get("SMARTAPI_KEY", "")).strip()
-CLIENT_CODE = st.secrets.get("CLIENT_CODE", os.environ.get("CLIENT_CODE", "")).strip()
-PIN = st.secrets.get("PIN", os.environ.get("PIN", "")).strip()
-TOTP_KEY = st.secrets.get("TOTP_KEY", os.environ.get("TOTP_KEY", "")).strip()
+# Streamlit Secrets or Environment Variables (Auto-detects any key name)
+API_KEY = str(st.secrets.get("SMARTAPI_KEY") or st.secrets.get("API_KEY") or st.secrets.get("ANGEL_API_KEY") or os.environ.get("SMARTAPI_KEY", "")).strip()
+CLIENT_CODE = str(st.secrets.get("CLIENT_CODE") or st.secrets.get("USER_ID") or st.secrets.get("CLIENT_ID") or os.environ.get("CLIENT_CODE", "")).strip()
+PIN = str(st.secrets.get("PIN") or st.secrets.get("MPIN") or st.secrets.get("PASSWORD") or os.environ.get("PIN", "")).strip()
+TOTP_KEY = str(st.secrets.get("TOTP_KEY") or st.secrets.get("TOTP_SECRET") or st.secrets.get("TOTP") or os.environ.get("TOTP_KEY", "")).strip()
 
 ASSETS = {
     "TCS": {"token": "11536", "exchange": "NSE", "lot_size": 175, "strike_step": 20, "spread_width": 40, "cap": 65000},
