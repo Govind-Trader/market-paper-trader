@@ -10,9 +10,9 @@ from SmartApi import SmartConnect
 # 1. CREDENTIALS (Environment ya direct paste)
 # ==========================================
 API_KEY = os.environ.get("SMARTAPI_KEY", "").strip()
-CLIENT_CODE = os.environ.get("SMARTAPI_CLIENT_CODE") or os.environ.get("CLIENT_CODE", "").strip()
-PIN = os.environ.get("SMARTAPI_PIN") or os.environ.get("PIN", "").strip()
-TOTP_KEY = os.environ.get("SMARTAPI_TOTP_KEY") or os.environ.get("TOTP_KEY", "").strip()
+CLIENT_CODE = (os.environ.get("SMARTAPI_CLIENT_CODE") or os.environ.get("CLIENT_CODE") or "").strip()
+PIN = (os.environ.get("SMARTAPI_PIN") or os.environ.get("PIN") or "").strip()
+TOTP_KEY = (os.environ.get("SMARTAPI_TOTP_KEY") or os.environ.get("TOTP_KEY") or "").strip()
 
 IST = pytz.timezone("Asia/Kolkata")
 ENTRY_CUTOFF = time(14, 0)      # 02:00 PM IST ke baad no new entry (15m move ke liye time chahiye)
