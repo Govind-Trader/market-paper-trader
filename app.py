@@ -65,7 +65,7 @@ TIMEFRAME_CONFIG = {
 
 
 # ==========================================
-# PERSISTENT JSON STORAGE HELPERS
+# PERSISTENT JSON STORAGE & NSE 4H HELPER
 # ==========================================
 def load_json_list(filepath):
     if os.path.exists(filepath):
@@ -81,6 +81,16 @@ def load_json_list(filepath):
 def save_json_list(filepath, data_list):
     with open(filepath, "w") as f:
         json.dump(data_list, f, indent=2)
+
+
+def resample_nse_4h(df_intraday: pd.DataFrame) -> pd.DataFrame:
+    """Exact TradingView/NSE Market-Aligned 4H Candles (09:15-13:15 & 13:15-15:30)."""
+    return df_intraday.resample("4h", origin="start_day", offset="9h15min").agg({
+        "Open": "first",
+        "High": "max",
+        "Low": "min",
+        "Close": "last"
+    }).dropna()
 
 
 def send_telegram_alert(msg: str):
@@ -146,7 +156,7 @@ def fetch_candles(asset_name, tf_label="5 Minute"):
                 df["Timestamp"] = pd.to_datetime(df["Timestamp"])
                 df.set_index("Timestamp", inplace=True)
                 if df.index.tz is None:
-                    df.index = df.index.tz_localize("UTC").tz_convert(IST)
+                    df.index = df.index.tz_localize(IST)
                 else:
                     df.index = df.index.tz_convert(IST)
                 return df
@@ -172,13 +182,6 @@ def fetch_candles(asset_name, tf_label="5 Minute"):
 # TIME-GAP & LIFECYCLE ENGINE FOR OPEN TRADES
 # ==========================================
 def evaluate_open_trades():
-    """
-    Checks all OPEN trades in live_trades.json against historical/live candles
-    after entry_time. Properly handles:
-    1. Overnight/Weekend Opening Time-Gaps (09:15 AM Gap Open past SL/Target)
-    2. 1:1 Breakeven Trail + 1.8x Trail (Zero fake profit bug fixed)
-    3. Max 2 Trading Days (48H) Holding Time Expiry
-    """
     open_trades = load_json_list(OPEN_TRADES_FILE)
     if not open_trades:
         return [], []
@@ -222,7 +225,7 @@ def evaluate_open_trades():
             bar_close = float(bar["Close"])
             curr_date = bar_dt.date()
 
-            # 1. OVERNIGHT / TIME-GAP CHECK (If new day opens across SL or Target)
+            # 1. OVERNIGHT / TIME-GAP CHECK
             if curr_date > prev_date:
                 if side == "BULLISH_SWEEP":
                     if bar_open <= curr_sl:
@@ -254,7 +257,6 @@ def evaluate_open_trades():
 
             # 2. INTRADAY SL, TRAILING & TARGET CHECK
             if side == "BULLISH_SWEEP":
-                # Breakeven trail after +1R move
                 if bar_high >= entry_price + risk_pts and curr_sl < entry_price:
                     curr_sl = entry_price
                 if bar_low <= curr_sl:
@@ -285,7 +287,7 @@ def evaluate_open_trades():
                     closed_flag = True
                     break
 
-            # 3. MAX HOLDING TIME EXPIRY (2 Trading Days / 48 Hours)
+            # 3. MAX HOLDING TIME EXPIRY (2 Trading Days)
             trading_days_held = len(set(post_df[post_df.index <= bar_dt].index.date))
             if trading_days_held >= 2 and bar_dt.time() >= time(15, 15):
                 exit_price = bar_close
@@ -296,10 +298,8 @@ def evaluate_open_trades():
 
         if closed_flag:
             spot_move = (exit_price - entry_price) if side == "BULLISH_SWEEP" else (entry_price - exit_price)
-            # Overnight time-decay penalty if held > 1 day
             days_held = max((exit_dt.date() - entry_dt.date()).days, 0)
             theta_penalty = days_held * 2.5 * lot_size
-            # Accurate Net P&L (0 point breakeven exit = -₹60 brokerage, no fake profit bug)
             net_pnl = round((spot_move * 0.40 * lot_size) - 60.0 - theta_penalty, 2)
 
             closed_record = {
@@ -346,7 +346,7 @@ def evaluate_open_trades():
 # MAIN UI
 # ==========================================
 st.title("⚡ Institutional Liquidity Sweep & Absorption Terminal")
-st.caption("Persistent Open/Closed Ledger | Overnight Time-Gap Protection | Angel One SmartAPI")
+st.caption("NSE-Aligned 4H Liquidity (09:15–13:15 & 13:15–15:30) | Persistent Ledger | Time-Gap Protected")
 
 tab1, tab2, tab3 = st.tabs([
     "📊 Live Interactive Chart (Angel One Feed)",
@@ -369,7 +369,7 @@ with tab1:
         df_chart = fetch_candles(selected_asset, tf_label=selected_tf)
 
     if not df_chart.empty:
-        df_4h = df_chart.resample("4h").agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna()
+        df_4h = resample_nse_4h(df_chart)
         if len(df_4h) > 6:
             df_4h["HTF_Low"] = df_4h["Low"].shift(1).rolling(window=6).min()
             df_4h["HTF_High"] = df_4h["High"].shift(1).rolling(window=6).max()
@@ -422,7 +422,7 @@ with tab1:
 # TAB 2: LIVE SCANNER & PERSISTENT OPEN POSITIONS
 with tab2:
     st.subheader("🟢 Active / Open Paper Positions (Time-Gap & Auto-Exit Protected)")
-    st.caption("Jo bhi live Telegram signal aata hai woh pehle yahan save hota hai — SL, Target, Gap-Open ya 48H Expiry hit hone ke baad hi Closed Ledger mein jata hai.")
+    st.caption("Jo bhi live Telegram signal aata hai woh pehle yahan save hota hai — SL, Target, Gap-Open ya Expiry hit hone ke baad hi Closed Ledger mein jata hai.")
 
     col_sync1, col_sync2 = st.columns([2, 2])
     with col_sync1:
@@ -465,7 +465,7 @@ with tab2:
         st.info("Abhi koi OPEN trade active nahi hai. Sabhi logged trades SL/Target/Expiry par close ho chuki hain.")
 
     st.write("---")
-    st.subheader("🎯 Real-Time 2-Candle Sweep Scanner (Auto-Logs Confirmed Signals)")
+    st.subheader("🎯 Real-Time 2-Candle Sweep Scanner (NSE 4H Aligned)")
 
     if st.button("🔍 Scan 8 Assets & Auto-Log Live Signals", use_container_width=True):
         signals = []
@@ -476,7 +476,7 @@ with tab2:
         for idx, (name, conf) in enumerate(ASSETS.items()):
             df_asset = fetch_candles(name, tf_label="5 Minute")
             if not df_asset.empty and len(df_asset) > 30:
-                df_4h = df_asset.resample("4h").agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna()
+                df_4h = resample_nse_4h(df_asset)
                 df_4h["HTF_Low"] = df_4h["Low"].shift(1).rolling(window=6).min()
                 df_4h["HTF_High"] = df_4h["High"].shift(1).rolling(window=6).max()
                 df_asset["HTF_Low"] = df_4h["HTF_Low"].reindex(df_asset.index, method="ffill")
@@ -567,7 +567,6 @@ with tab3:
     trades_data = load_json_list(CLOSED_TRADES_FILE)
     if trades_data:
         df_trades = pd.DataFrame(trades_data)
-        # Deduplicate by asset + entry_time so rolling scripts cannot corrupt history
         df_trades = df_trades.drop_duplicates(subset=["asset", "entry_time"]).sort_values("entry_time").reset_index(drop=True)
 
         total_trades = len(df_trades)
