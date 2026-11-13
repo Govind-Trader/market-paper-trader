@@ -71,6 +71,17 @@ def save_json_db(filepath: str, data: list):
         json.dump(data, f, indent=4)
 
 
+def resample_nse_4h(df_5m: pd.DataFrame) -> pd.DataFrame:
+    """Exact TradingView/NSE Market-Aligned 4H Candles (09:15-13:15 & 13:15-15:30)."""
+    return df_5m.resample("4h", origin="start_day", offset="9h15min").agg({
+        "Open": "first",
+        "High": "max",
+        "Low": "min",
+        "Close": "last",
+        "Volume": "sum"
+    }).dropna()
+
+
 # ==========================================
 # 3. ANGEL ONE SMARTAPI CONNECTION & DATA
 # ==========================================
@@ -207,7 +218,6 @@ def manage_open_trades(obj, now_dt: datetime) -> bool:
         exit_dt = now_dt
         prev_date = entry_dt.date()
 
-        # Walk every 5m bar after entry so GitHub Actions cron delays NEVER miss SL/Target/Gap/EOD!
         for bar_dt, bar in post_df.iterrows():
             b_open, b_high, b_low, b_close = float(bar["Open"]), float(bar["High"]), float(bar["Low"]), float(bar["Close"])
             curr_date = bar_dt.date()
@@ -272,7 +282,7 @@ def manage_open_trades(obj, now_dt: datetime) -> bool:
                     exit_reason = "TARGET_HIT"
                     break
 
-            # 3. SAME-DAY MANDATORY SQUARE-OFF AT 03:15 PM IST (Even if cron runs late!)
+            # 3. SAME-DAY MANDATORY SQUARE-OFF AT 03:15 PM IST
             if bar_dt.time() >= FORCE_EXIT_TIME:
                 exit_price = b_close
                 exit_dt = bar_dt
@@ -283,7 +293,6 @@ def manage_open_trades(obj, now_dt: datetime) -> bool:
             spot_move = (exit_price - entry_price) if side == "BULLISH_SWEEP" else (entry_price - exit_price)
             days_held = max((exit_dt.date() - entry_dt.date()).days, 0)
             theta_penalty = days_held * 2.5 * lot_size
-            # Exact P&L (Breakeven 0 move = -₹60 brokerage, compatible with app.py!)
             net_pnl = round((spot_move * 0.40 * lot_size) - 60.0 - theta_penalty, 2)
 
             closed_record = {
@@ -335,7 +344,7 @@ def run_scanner():
 
     obj = init_smartapi()
 
-    # Always resolve any lingering open trades first (even outside market hours!)
+    # Always resolve any lingering open trades first
     manage_open_trades(obj, now_dt)
 
     if not (time(9, 15) <= now_time <= time(15, 30)):
@@ -370,13 +379,8 @@ def run_scanner():
         df_5m["Range"] = df_5m["High"] - df_5m["Low"]
         df_5m["Range_MA20"] = df_5m["Range"].rolling(20).mean()
 
-        df_4h = df_5m.resample("4h").agg({
-            "Open": "first",
-            "High": "max",
-            "Low": "min",
-            "Close": "last",
-            "Volume": "sum"
-        }).dropna()
+        # Exact TradingView / NSE Market-Aligned 4H Candles (09:15 - 13:15 & 13:15 - 15:30)
+        df_4h = resample_nse_4h(df_5m)
 
         if len(df_4h) < 20:
             continue
