@@ -39,6 +39,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add trades_db.json || true
-          git commit -m "Auto-update live paper trades [skip ci]" || true
-          git push || true
+          touch live_trades.json trades_db.json
+          git add live_trades.json trades_db.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update live & closed trade ledgers [skip ci]"
+          git push
