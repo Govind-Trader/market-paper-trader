@@ -85,6 +85,23 @@
         "vol_ratio": "1.9x (Rng)"
     },
     {
+        "entry_time": "2026-11-19 09:40:00",
+        "exit_time": "2026-11-19 12:25:00",
+        "date": "2026-11-19",
+        "asset": "FINNIFTY",
+        "side": "BULLISH_SWEEP",
+        "spread": "27950 CE / 28050 CE",
+        "entry_price": 27970.2,
+        "exit_price": 28134.7,
+        "initial_sl": 27845.92,
+        "target": 28193.9,
+        "entry_premium": 50.2,
+        "outcome": "EXPIRED",
+        "capital_deployed": 45000,
+        "net_pnl": -3.75,
+        "vol_ratio": "1.89x (Rng)"
+    },
+    {
         "entry_time": "2026-09-30 14:25:00",
         "exit_time": "2026-10-01 09:15:00",
         "date": "2026-09-30",
@@ -100,5 +117,39 @@
         "capital_deployed": 55000,
         "net_pnl": 2380.0,
         "vol_ratio": "2.55x (Vol)"
+    },
+    {
+        "entry_time": "2026-10-27 12:55:00",
+        "exit_time": "2026-10-27 14:00:00",
+        "date": "2026-10-27",
+        "asset": "NIFTY",
+        "side": "BEARISH_SWEEP",
+        "spread": "22800 PE / 22700 PE",
+        "entry_price": 22779.0,
+        "exit_price": 22671.59,
+        "initial_sl": 22838.67,
+        "target": 22671.59,
+        "entry_premium": 39.35,
+        "outcome": "TARGET_HIT",
+        "capital_deployed": 45000,
+        "net_pnl": 35.0,
+        "vol_ratio": "1.45x (Rng)"
+    },
+    {
+        "entry_time": "2026-11-19 09:40:00",
+        "exit_time": "2026-11-19 12:25:00",
+        "date": "2026-11-19",
+        "asset": "NIFTY",
+        "side": "BULLISH_SWEEP",
+        "spread": "25200 CE / 25300 CE",
+        "entry_price": 25208.0,
+        "exit_price": 25358.35,
+        "initial_sl": 25084.63,
+        "target": 25430.06,
+        "entry_premium": 40.15,
+        "outcome": "EXPIRED",
+        "capital_deployed": 45000,
+        "net_pnl": 565.0,
+        "vol_ratio": "2.26x (Rng)"
     }
 ]
