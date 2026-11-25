@@ -10,10 +10,10 @@
         "exit_price": 2497.27,
         "initial_sl": 2463.72,
         "target": 2497.27,
-        "entry_premium": 19.35,
+        "entry_premium": 6.0,
         "outcome": "TARGET_HIT",
         "capital_deployed": 65000,
-        "net_pnl": 273.75,
+        "net_pnl": 3730.0,
         "vol_ratio": "3.19x (Vol)"
     },
     {
@@ -27,10 +27,10 @@
         "exit_price": 2448.5,
         "initial_sl": 2409.46,
         "target": 2462.78,
-        "entry_premium": 20.2,
+        "entry_premium": 10.0,
         "outcome": "EXPIRED",
         "capital_deployed": 65000,
-        "net_pnl": 300.0,
+        "net_pnl": 2330.0,
         "vol_ratio": "2.17x (Vol)"
     },
     {
@@ -44,10 +44,10 @@
         "exit_price": 28134.7,
         "initial_sl": 27845.92,
         "target": 28193.9,
-        "entry_premium": 50.2,
+        "entry_premium": 25.0,
         "outcome": "EXPIRED",
         "capital_deployed": 45000,
-        "net_pnl": -3.75,
+        "net_pnl": 755.0,
         "vol_ratio": "1.89x (Rng)"
     },
     {
@@ -61,10 +61,10 @@
         "exit_price": 25358.35,
         "initial_sl": 25084.63,
         "target": 25430.06,
-        "entry_premium": 40.15,
+        "entry_premium": 46.65,
         "outcome": "EXPIRED",
         "capital_deployed": 45000,
-        "net_pnl": 565.0,
+        "net_pnl": 302.5,
         "vol_ratio": "2.26x (Rng)"
     }
 ]
